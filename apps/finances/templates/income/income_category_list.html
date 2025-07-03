@@ -1,7 +1,7 @@
 {% extends layout_path %}
 {% load static %}
 
-{% block title %}Expense Categories{% endblock %}
+{% block title %}Income Categories{% endblock %}
 
 {% block vendor_css %}
   {{ block.super }}
@@ -13,20 +13,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 {% endblock %}
 
-
 {% block content %}
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
   $(document).ready(function () {
-    // Handle form submission
-    $('#ajax-expense-category-form').on('submit', function (e) {
+    $('#ajax-income-category-form').on('submit', function (e) {
       e.preventDefault();
       const formData = new FormData(this);
 
       $.ajax({
-        url: "{% url 'ajax_expense_category_save' %}",
+        url: "{% url 'ajax_income_category_save' %}",
         method: "POST",
         data: formData,
         processData: false,
@@ -34,49 +31,45 @@
         headers: { "X-CSRFToken": '{{ csrf_token }}' },
         success: function (res) {
           toastr.success(res.message);
-          $('#addCategoryModal').modal('hide');
+          $('#addIncomeCategoryModal').modal('hide');
           setTimeout(() => location.reload(), 800);
-
         },
         error: function (xhr) {
           toastr.error(xhr.responseJSON?.message || 'Something went wrong');
-
         }
       });
     });
 
-    // Pre-fill modal for edit
     $('.btn-edit').on('click', function () {
-      $('#category-id').val($(this).data('id'));
-      $('#category-name').val($(this).data('name'));
-      $('#addCategoryModal').modal('show');
+      $('#income-category-id').val($(this).data('id'));
+      $('#income-category-name').val($(this).data('name'));
+      $('#addIncomeCategoryModal').modal('show');
     });
 
-    // Reset form on modal open
-    $('#addCategoryModal').on('hidden.bs.modal', function () {
-      $('#ajax-expense-category-form')[0].reset();
-      $('#category-id').val('');
+    $('#addIncomeCategoryModal').on('hidden.bs.modal', function () {
+      $('#ajax-income-category-form')[0].reset();
+      $('#income-category-id').val('');
     });
-  });
 
-  $(document).on("submit", ".delete-category-form", function (e) {
-    e.preventDefault();
-    if (!confirm("Delete this category?")) return;
+    $(document).on("submit", ".delete-income-category-form", function (e) {
+      e.preventDefault();
+      if (!confirm("Delete this category?")) return;
 
-    const form = $(this);
-    const url = form.attr("action");
+      const form = $(this);
+      const url = form.attr("action");
 
-    $.ajax({
-      url: url,
-      type: "POST",
-      headers: { "X-CSRFToken": "{{ csrf_token }}" },
-      success: function (res) {
-        toastr.success(res.message);
-        setTimeout(() => location.reload(), 800);
-      },
-      error: function () {
-        toastr.error("Delete failed.");
-      }
+      $.ajax({
+        url: url,
+        type: "POST",
+        headers: { "X-CSRFToken": "{{ csrf_token }}" },
+        success: function (res) {
+          toastr.success(res.message);
+          setTimeout(() => location.reload(), 800);
+        },
+        error: function () {
+          toastr.error("Delete failed.");
+        }
+      });
     });
   });
 </script>
@@ -90,23 +83,22 @@
 
   #toast-container > .toast-success { background-color: #28c76f !important; }
   #toast-container > .toast-error { background-color: #ea5455 !important; }
-  .exp-cat th,
-  .exp-cat td {
+
+  .income-cat th, .income-cat td {
     border-left: 1px solid #dee2e6 !important;
     border-right: 1px solid #dee2e6 !important;
   }
 
-  .exp-cat {
+  .income-cat {
     border-collapse: separate;
     border-spacing: 0;
   }
 </style>
 
 <div class="content-header">
-  <h4 class="mb-2">Expense Categories</h4>
+  <h4 class="mb-2">Income Categories</h4>
 </div>
 
-<!-- Search + Add -->
 <div class="card p-3 mb-3">
   <form method="get" class="row g-2">
     <div class="col-md-8">
@@ -116,17 +108,16 @@
       <button type="submit" class="btn btn-primary w-100">Search</button>
     </div>
     <div class="col-md-2 text-end">
-      <button type="button" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+      <button type="button" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addIncomeCategoryModal">
         + Add Category
       </button>
     </div>
   </form>
 </div>
 
-<!-- Table -->
-<div class="card p-2 ">
-  <div class="table-responsive mt-5">
-    <table class="table table-striped table-hover exp-cat">
+<div class="card p-2">
+  <div class="table-responsive mt-4">
+    <table class="table table-striped table-hover income-cat">
       <thead>
         <tr>
           <th>#</th>
@@ -142,22 +133,16 @@
           <td>{{ cat.name }}</td>
           <td>{{ cat.created_at|date:"Y-m-d H:i" }}</td>
           <td>
-            <!-- Edit Icon Button -->
             <button type="button" class="btn btn-sm btn-icon btn-warning btn-edit"
-                    data-id="{{ cat.id }}"
-                    data-name="{{ cat.name }}"
-                    title="Edit">
+                    data-id="{{ cat.id }}" data-name="{{ cat.name }}" title="Edit">
               <i class="ti ti-edit"></i>
             </button>
-
-            <!-- Delete Icon Button -->
-            <form method="post" action="{% url 'delete_expense_category' cat.id %}" class="d-inline delete-category-form">
+            <form method="post" action="{% url 'delete_income_category' cat.id %}" class="d-inline delete-income-category-form">
               {% csrf_token %}
               <button type="submit" class="btn btn-sm btn-icon btn-danger" title="Delete">
                 <i class="ti ti-trash"></i>
               </button>
             </form>
-
           </td>
         </tr>
         {% empty %}
@@ -169,7 +154,6 @@
     </table>
   </div>
 
-  <!-- Pagination -->
   <div class="card-footer">
     <nav>
       <ul class="pagination justify-content-center">
@@ -194,20 +178,20 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="addIncomeCategoryModal" tabindex="-1" aria-labelledby="addIncomeCategoryModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form id="ajax-expense-category-form">
+      <form id="ajax-income-category-form">
         {% csrf_token %}
         <div class="modal-header">
           <h5 class="modal-title">Add/Edit Category</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <input type="hidden" name="id" id="category-id">
+          <input type="hidden" name="id" id="income-category-id">
           <div class="mb-3">
             <label class="form-label">Category Name</label>
-            <input type="text" name="name" class="form-control" id="category-name" required>
+            <input type="text" name="name" class="form-control" id="income-category-name" required>
           </div>
         </div>
         <div class="modal-footer">

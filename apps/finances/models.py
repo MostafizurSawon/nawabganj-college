@@ -14,7 +14,7 @@ class Expense(models.Model):
     exp_category = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE, related_name='expenses', verbose_name="Expense Category")
     exp_name = models.CharField(max_length=255, verbose_name="Expense Name", null=True, blank=True)
     date = models.DateField(verbose_name="Date")
-    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Expense Amount")
+    amount = models.IntegerField(verbose_name="Expense Amount")
     note = models.TextField(blank=True, null=True, verbose_name="Expense Note")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -37,7 +37,7 @@ class Income(models.Model):
     income_category = models.ForeignKey(IncomeCategory, on_delete=models.CASCADE, related_name='incomes', verbose_name="Income Category")
     income_name = models.CharField(max_length=255, verbose_name="income Name", null=True, blank=True)
     date = models.DateField(verbose_name="Date")
-    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Income Amount")
+    amount = models.IntegerField(verbose_name="Income Amount")
     note = models.TextField(blank=True, null=True, verbose_name="Income Note")
     created_at = models.DateTimeField(auto_now_add=True)
 

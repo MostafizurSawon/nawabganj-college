@@ -39,7 +39,7 @@ TEMPLATE_CONFIG = {
 THEME_VARIABLES = {
     "creator_name": "PixInvent",
     "creator_url": "https://pixinvent.com/",
-    "template_name": "Vuexy",
+    "template_name": "College",
     "template_suffix": "Django Admin Template",
     "template_version": "2.0.0",
     "template_free": False,

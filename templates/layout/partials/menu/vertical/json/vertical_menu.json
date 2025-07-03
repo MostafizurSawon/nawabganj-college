@@ -2,13 +2,30 @@
   "menu": [
     {
       "url": "index",
-      "icon": "menu-icon tf-icons ti ti-smart-home",
-      "name": "Page 1",
+      "icon": "menu-icon tf-icons ti ti-layout-dashboard",
+      "name": "Dashboard",
       "slug": "index"
     },
     {
-      "name": "Income and Expense",
-      "icon": "menu-icon tf-icons ti ti-user-circle",
+      "name": "Income",
+      "icon": "menu-icon tf-icons ti ti-currency-dollar",
+      "slug": "income-expense",
+      "submenu": [
+        {
+          "url": "income_list",
+          "name": "Income List",
+          "slug": "income_list"
+        },
+        {
+          "url": "income_category_list",
+          "name": "Income Category",
+          "slug": "income_category_list"
+        }
+      ]
+    },
+    {
+      "name": "Expense",
+      "icon": "menu-icon tf-icons ti ti-report-money",
       "slug": "income-expense",
       "submenu": [
         {
@@ -22,6 +39,12 @@
           "slug": "expense_category_list"
         }
       ]
+    },
+    {
+      "url": "ledger_view",
+      "icon": "menu-icon tf-icons ti ti-currency-exchange",
+      "name": "Income-expense Ledger",
+      "slug": "ledger_view"
     }
   ]
 }

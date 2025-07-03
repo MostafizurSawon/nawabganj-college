@@ -1,10 +1,10 @@
 from django.urls import path
 from .views import (
     ExpenseView, ExpenseDeleteView, ExpenseCategoryView, ExpenseCategoryDeleteView,
-    IncomeView, IncomeDeleteView, IncomeCategoryView, IncomeCategoryDeleteView
+    IncomeView, IncomeDeleteView, IncomeCategoryView, IncomeCategoryDeleteView, LedgerView
 )
 
-from .views import ExpenseDataAPIView,ExpenseCategoryAjaxView,ExpenseDetailAjaxView
+from .views import ExpenseDataAPIView,ExpenseCategoryAjaxView,ExpenseDetailAjaxView, IncomeDataAPIView, IncomeDetailAjaxView, IncomeCategoryAjaxView
 
 urlpatterns = [
     # Expense
@@ -23,12 +23,26 @@ urlpatterns = [
     path('expense-categories/delete/<int:pk>/', ExpenseCategoryDeleteView.as_view(), name='delete_expense_category'),
 
     # Income
+
+    path('incomes/data/', IncomeDataAPIView.as_view(), name='income_data'),   # Ajax Api
+    path('incomes/data/<int:pk>/', IncomeDetailAjaxView.as_view(), name='income_detail_ajax'),
+    path("income-categories/ajax/save/", IncomeCategoryAjaxView.as_view(), name="ajax_income_category_save"),
+
+
     path('incomes/', IncomeView.as_view(), name='income_list'),
     path('incomes/edit/<int:pk>/', IncomeView.as_view(), name='edit_income'),
     path('incomes/delete/<int:pk>/', IncomeDeleteView.as_view(), name='delete_income'),
+
+
 
     # Income Categories
     path('income-categories/', IncomeCategoryView.as_view(), name='income_category_list'),
     path('income-categories/edit/<int:pk>/', IncomeCategoryView.as_view(), name='edit_income_category'),
     path('income-categories/delete/<int:pk>/', IncomeCategoryDeleteView.as_view(), name='delete_income_category'),
+
+
+
+
+    # Ledger
+    path('ledger/', LedgerView.as_view(), name='ledger_view'),
 ]
