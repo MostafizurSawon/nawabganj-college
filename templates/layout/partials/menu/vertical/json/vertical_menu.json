@@ -1,0 +1,27 @@
+{
+  "menu": [
+    {
+      "url": "index",
+      "icon": "menu-icon tf-icons ti ti-smart-home",
+      "name": "Page 1",
+      "slug": "index"
+    },
+    {
+      "name": "Income and Expense",
+      "icon": "menu-icon tf-icons ti ti-user-circle",
+      "slug": "income-expense",
+      "submenu": [
+        {
+          "url": "expense_list",
+          "name": "Expense List",
+          "slug": "expense_list"
+        },
+        {
+          "url": "expense_category_list",
+          "name": "Expense Category",
+          "slug": "expense_category_list"
+        }
+      ]
+    }
+  ]
+}
