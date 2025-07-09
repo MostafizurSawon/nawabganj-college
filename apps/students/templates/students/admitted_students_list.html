@@ -16,7 +16,7 @@
   {% endif %}
 
   <div class="card mb-4">
-    <h3 class="m-4 text-center">Admitted Students</h3>
+    <h3 class="m-4 text-center">Admitted Students </h3>
     <div class="card-header d-flex justify-content-between align-items-center">
 
 
@@ -75,6 +75,10 @@
 
     <div class="table-responsive p-4">
       <p class="ms-4 text-muted">Total students: {{ page_obj.paginator.count }}</p>
+      <a href="{% url 'generate_admission_pdfs' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-primary mb-3">
+        📄 Download PDF
+      </a>
+
 
       <table class="table table-hover table-bordered">
         <thead class="table-light">
@@ -98,9 +102,21 @@
                 <a href="{% url 'hsc_admission_view' student.id %}" class="btn btn-icon btn-sm btn-outline-info me-1" title="View">
                   <i class="ti ti-eye"></i>
                 </a>
-                <a href="{% url 'hsc_admission_update' student.id %}" class="btn btn-icon btn-sm btn-outline-warning me-1" title="Edit">
-                  <i class="ti ti-pencil"></i>
-                </a>
+
+
+
+                {% if student.add_admission_group == 'arts' %}
+                  <a href="{% url 'hsc_admission_update_arts' student.id %}" class="btn btn-icon btn-sm btn-outline-warning me-1" title="Edit">
+                    <i class="ti ti-pencil"></i>
+                  </a>
+                {% else %}
+                  <a href="{% url 'hsc_admission_update' student.id %}" class="btn btn-icon btn-sm btn-outline-warning me-1" title="Edit">
+                    <i class="ti ti-pencil"></i>
+                  </a>
+                {% endif %}
+
+
+
                 <a href="{% url 'hsc_admission_delete' student.id %}"
                   class="btn btn-icon btn-sm btn-outline-danger"
                   title="Delete"

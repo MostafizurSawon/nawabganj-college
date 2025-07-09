@@ -18,9 +18,6 @@ class AdmittedStudentListView(ListView):
         program = self.request.GET.get('program')
         group = self.request.GET.get('group')
 
-
-
-
         if session:
             queryset = queryset.filter(add_session_id=session)
         if program:
@@ -34,6 +31,7 @@ class AdmittedStudentListView(ListView):
             queryset = queryset.filter(
                 Q(add_name__icontains=search) |
                 Q(add_father__icontains=search) |
+                Q(add_mobile__icontains=search) |
                 Q(add_class_roll__icontains=search)
             )
 
@@ -131,6 +129,88 @@ class HscAdmissionUpdateView(UpdateView):
         return reverse_lazy('admitted_students_list')
 
 
+
+# Arts Update View
+from apps.admissions.forms import ArtsAdmissionForm
+from apps.admissions.models import Programs
+
+class HscAdmissionUpdateArtsView(UpdateView):
+    model = HscAdmissions
+    form_class = ArtsAdmissionForm
+    template_name = "admissions/admission_form_arts.html"
+    success_url = reverse_lazy("admitted_students_list")  # or anywhere you want
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Layout setup
+        context = TemplateLayout.init(self, context)
+        context["layout"] = "vertical"
+        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+
+        # Subjects
+        group = "arts"
+        status = "active"
+        context["subjects_all"] = Subjects.objects.filter(group=group, sub_status=status, sub_select="all")
+        context["subjects_optional"] = Subjects.objects.filter(group=group, sub_status=status, sub_select="optional")
+        context["subjects_optional2"] = Subjects.objects.filter(group=group, sub_status=status, sub_select="optional2")
+        context["subjects_main"] = Subjects.objects.filter(group=group, sub_status=status, sub_select="main")
+        context["subjects_fourth"] = Subjects.objects.filter(group=group, sub_status=status, sub_select="fourth")
+
+        context["student"] = self.object  # 👈 for subject pre-fill
+        return context
+
+    def form_valid(self, form):
+        # Set again
+        try:
+            hsc_program = Programs.objects.get(pro_name__iexact="hsc")
+            form.instance.add_program = hsc_program
+            form.instance.add_admission_group = "arts"
+        except Programs.DoesNotExist:
+            form.add_error(None, "HSC program not found.")
+            return self.form_invalid(form)
+
+        # Set subjects
+        form.instance.main_subject_id = self.request.POST.get("main_subject")
+        form.instance.fourth_subject_id = self.request.POST.get("fourth_subject")
+        form.instance.optional_subject_id = self.request.POST.get("optional_subject")
+        form.instance.optional_subject_2_id = self.request.POST.get("optional_subject_2")
+
+        self.object = form.save()
+
+        # Set only selected subjects (same logic as create)
+        selected_subject_ids = []
+
+        # All (auto)
+        all_subjects = Subjects.objects.filter(group="arts", sub_status="active", sub_select="all")
+        selected_subject_ids += list(all_subjects.values_list('id', flat=True))
+
+        # Manual selections
+        if form.instance.optional_subject_id:
+            selected_subject_ids.append(form.instance.optional_subject_id)
+
+        if form.instance.optional_subject_2_id:
+            selected_subject_ids.append(form.instance.optional_subject_2_id)
+
+        self.object.subjects.set(selected_subject_ids)
+
+        messages.success(
+            self.request,
+            f"✅ {self.object.add_name}'s data updated successfully."
+        )
+        return redirect(self.success_url)
+
+    def form_invalid(self, form):
+        print("Form invalid:", form.errors)
+        return super().form_invalid(form)
+
+
+
+
+
+
+
+
 from django.shortcuts import redirect
 
 # 🗑️ Delete View
@@ -150,3 +230,82 @@ class HscAdmissionDeleteView(DeleteView):
             return redirect(self.success_url)
 
         return super().dispatch(request, *args, **kwargs)
+
+
+
+
+
+
+
+# Bulk admission form pdf
+
+from django.shortcuts import render
+
+# def admission_pdf_preview(request):
+#     students = HscAdmissions.objects.all()
+#     return render(request, "hsc/admission_pdf_bulk.html", {"students": students})
+
+# from apps.admissions.models import HscAdmissions
+
+def admission_pdf_preview(request):
+    search = request.GET.get("search")
+    session = request.GET.get("session")
+    program = request.GET.get("program")
+    group = request.GET.get("group")
+
+    students = HscAdmissions.objects.all()
+
+    if search:
+        students = students.filter(
+            Q(add_name__icontains=search) |
+            Q(add_mobile__icontains=search) |
+            Q(add_class_roll__icontains=search)
+        )
+    if session:
+        students = students.filter(add_session_id=session)
+    if program:
+        students = students.filter(add_program_id=program)
+    if group:
+        students = students.filter(add_admission_group=group)
+
+    return render(request, "hsc/admission_pdf_bulk.html", {"students": students})
+
+
+# views.py
+# from django.template.loader import render_to_string
+# from weasyprint import HTML
+# from django.http import HttpResponse
+
+# def generate_admission_pdfs(request):
+#     search = request.GET.get("search", "")
+#     session = request.GET.get("session")
+#     program = request.GET.get("program")
+#     group = request.GET.get("group")
+
+#     students = HscAdmissions.objects.all()
+
+#     if search:
+#         students = students.filter(
+#             Q(add_name__icontains=search) |
+#             Q(add_class_roll__icontains=search) |
+#             Q(add_mobile__icontains=search)
+#         )
+
+#     if session:
+#         students = students.filter(add_session_id=session)
+#     if program:
+#         students = students.filter(add_program_id=program)
+#     if group:
+#         students = students.filter(add_admission_group=group)
+
+#     # 🔄 HTML render
+#     html_string = render_to_string("hsc/admission_pdf_bulk.html", {
+#         "students": students
+#     })
+
+#     # 📄 Generate PDF
+#     pdf_file = HTML(string=html_string).write_pdf()
+
+#     response = HttpResponse(pdf_file, content_type="application/pdf")
+#     response["Content-Disposition"] = "inline; filename=admissions.pdf"
+#     return response

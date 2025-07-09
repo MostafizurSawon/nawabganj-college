@@ -8,4 +8,12 @@ urlpatterns = [
     # 👇 Update and delete
     path('admitted-students/<int:pk>/edit/', views.HscAdmissionUpdateView.as_view(), name='hsc_admission_update'),
     path('admitted-students/<int:pk>/delete/', views.HscAdmissionDeleteView.as_view(), name='hsc_admission_delete'),
+
+    # Arts Update and delete
+    path('admitted-students/<int:pk>/edit/arts/', views.HscAdmissionUpdateArtsView.as_view(), name='hsc_admission_update_arts'),
+
+    # bulk pdf admission form
+    path("admissions/export/pdf/", views.admission_pdf_preview, name="generate_admission_pdfs"),
+
+
 ]

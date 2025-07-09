@@ -1,0 +1,285 @@
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admitted Students Report</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    @media print {
+      .page-break {
+        page-break-after: always;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    .student-card {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .profile-img {
+      width: 120px;
+      height: 150px;
+      object-fit: cover;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container my-4">
+  <div class="d-flex justify-content-end mb-3 no-print">
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Print or Save PDF</button>
+  </div>
+
+  {% for student in students %}
+    <div class="student-card mb-5">
+      <div class="row">
+        <!-- Image -->
+        <div class="col-md-3 text-center">
+          {% if student.add_photo %}
+            <img src="{{ student.add_photo.url }}" alt="Photo" class="profile-img mb-2">
+          {% else %}
+            <div class="text-muted">No Photo</div>
+          {% endif %}
+        </div>
+
+        <!-- Info -->
+        <div class="col-md-9">
+          <h4>{{ student.add_name }}</h4>
+          <p><strong>Mobile:</strong> {{ student.add_mobile }}</p>
+          <p><strong>Group:</strong> {{ student.add_admission_group|title }}</p>
+          <p><strong>Program:</strong> {{ student.add_program.pro_name }}</p>
+          <p><strong>Class Roll:</strong> {{ student.add_class_roll }}</p>
+          <p><strong>Session:</strong> {{ student.add_session.ses_name }}</p>
+
+          <!-- Subjects -->
+          <div class="mt-2">
+            <p><strong>Main Subject:</strong>
+              {% if student.main_subject %} {{ student.main_subject.sub_name }} {% else %}N/A{% endif %}
+            </p>
+            <p><strong>Fourth Subject:</strong>
+              {% if student.fourth_subject %} {{ student.fourth_subject.sub_name }} {% else %}N/A{% endif %}
+            </p>
+          </div>
+
+          <!-- Address -->
+          <div class="mt-3">
+            <p><strong>Address:</strong> {{ student.add_village }}, {{ student.add_post }}, {{ student.add_upojella }}, {{ student.add_distric }}</p>
+          </div>
+
+           <td>SSC</td>
+            <td>{{ student.add_ssc_roll }}</td>
+            <td>{{ student.add_ssc_board }}</td>
+            <td>{{ student.add_ssc_gpa }}</td>
+            <td>{{ student.add_ssc_passyear }}</td>
+
+          <!-- Guardian Info -->
+          <div class="mt-3">
+            <p><strong>Guardian:</strong> {{ student.add_parent }}</p>
+            <p><strong>Guardian Mobile:</strong> {{ student.add_parent_mobile }}</p>
+            <p><strong>Relation:</strong> {{ student.add_parent_relation }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+  {% endfor %}
+</div>
+
+</body>
+</html>
+ {% endcomment %}
+
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>ভর্তির আবেদন ফরম</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap');
+
+    body {
+      font-family: 'Noto Sans Bengali', sans-serif;
+      margin: 20px;
+    }
+
+    .form-container {
+      border: 1px solid #000;
+      padding: 20px;
+      width: 800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+    }
+
+    .header h2 {
+      margin-bottom: 5px;
+    }
+
+    .logo-photo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      border: 1px solid #000;
+    }
+
+    .photo-box {
+      width: 100px;
+      height: 120px;
+      border: 1px solid #000;
+      {% comment %} text-align: center; {% endcomment %}
+      {% comment %} font-size: 12px; {% endcomment %}
+      {% comment %} padding-top: 40px; {% endcomment %}
+    }
+
+    .form-section {
+      margin-top: 15px;
+    }
+
+    .form-section label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .form-section p {
+      border-bottom: 1px dotted #000;
+      padding-bottom: 2px;
+      margin-top: 3px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    .table th, .table td {
+      border: 1px solid #000;
+      padding: 4px 6px;
+      text-align: center;
+    }
+
+    .signatures {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 50px;
+    }
+
+    .signatures div {
+      width: 40%;
+      text-align: center;
+    }
+
+    @media print {
+      .page-break {
+        page-break-after: always;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="d-flex justify-content-end mb-3 no-print">
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Print or Save PDF</button>
+  </div>
+
+  {% for student in students %}
+  <div class="form-container page-break">
+
+    <div class="logo-photo">
+      <div class="logo">লোগো</div>
+      <div class="header">
+        <h2>পিপলস কলেজ, মুকসুদপুর</h2>
+        <p>প্রতিষ্ঠিত ১৯৬৩ খ্রি.</p>
+        <p><strong>ভর্তির আবেদন ফরম</strong></p>
+      </div>
+      <div class="photo-box">
+        <img src="{{ student.add_photo.url }}" alt="" style="height: 100%; width: 100%;">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <label>মোবাইল নম্বর:</label>
+      <p>{{ student.add_mobile }}</p>
+
+      <label>নাম (বাংলা):</label>
+      <p>{{ student.add_name_bangla }}</p>
+
+      <label>নাম (ইংরেজি):</label>
+      <p>{{ student.add_name }}</p>
+
+      <label>পিতার নাম:</label>
+      <p>{{ student.add_father_bangla }}</p>
+
+      <label>মাতার নাম:</label>
+      <p>{{ student.add_mother_bangla }}</p>
+
+      <label>ঠিকানা:</label>
+      <p>{{ student.add_village }}, {{ student.add_post }}, {{ student.add_upojella }}, {{ student.add_distric }}</p>
+
+      <label>জন্ম তারিখ:</label>
+      <p>{{ student.add_birthdate }}</p>
+
+      <label>জাতীয়তা / ধর্ম:</label>
+      <p>{{ student.add_nationality }} / {{ student.add_religion }}</p>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>শ্রেণি</th>
+          <th>রোল নম্বর</th>
+          <th>SSC বোর্ড</th>
+          <th>GPA</th>
+          <th>পাসের সাল</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SSC</td>
+          <td>{{ student.add_ssc_roll }}</td>
+          <td>{{ student.add_ssc_board }}</td>
+          <td>{{ student.add_ssc_gpa }}</td>
+          <td>{{ student.add_ssc_passyear }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="form-section">
+      <label>বিষয় সমূহ:</label>
+      <ul>
+        {% for sub in student.subjects.all %}
+          <li>{{ sub.sub_name }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="signatures">
+      <div>আবেদনকারীর স্বাক্ষর</div>
+      <div>অভিভাবকের স্বাক্ষর</div>
+    </div>
+  </div>
+  {% endfor %}
+</body>
+</html>

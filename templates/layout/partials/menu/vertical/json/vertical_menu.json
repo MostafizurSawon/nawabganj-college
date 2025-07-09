@@ -29,6 +29,33 @@
       ]
     },
     {
+      "name": "Admissions",
+      "icon": "menu-icon tf-icons ti ti-file-text",
+      "slug": "admission",
+      "submenu": [
+        {
+          "url": "ba_admission_create",
+          "name": "Ba Admission",
+          "slug": "ba_admission_create"
+        },
+        {
+          "url": "bss_admission_create",
+          "name": "Bss Admission",
+          "slug": "bss_admission_create"
+        },
+        {
+          "url": "bsc_admission_create",
+          "name": "Bsc Admission",
+          "slug": "bsc_admission_create"
+        },
+        {
+          "url": "bbs_admission_create",
+          "name": "Bbs Admission",
+          "slug": "bbs_admission_create"
+        }
+      ]
+    },
+    {
       "name": "Academy",
       "icon": "menu-icon tf-icons ti ti-school",
       "slug": "academy",

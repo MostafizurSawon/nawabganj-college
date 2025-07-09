@@ -289,11 +289,366 @@ class HscAdmissionCreateArtsView(FormView):
 
 
 
+# Honours Admission Section
+
+
+class AdmissionBaCreateView(FormView):
+    template_name = "admissions_others/admission_form_honours.html"
+    form_class = HscAdmissionForm
+    success_url = reverse_lazy("hsc_admission_create")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Layout
+        context = TemplateLayout.init(self, context)
+        context["layout"] = "vertical"
+        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+
+        # Subject filter for group = "science"
+        group = "science"
+        status = "active"
+
+        context["subjects_all"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="all"
+        )
+        context["subjects_optional"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="optional"
+        )
+
+        context["subjects_main"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="main"
+        )
+
+        context["subjects_fourth"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="fourth"
+        )
+
+        return context
+
+    def form_valid(self, form):
+        # Set program manually (assumes HSC exists and is unique)
+        try:
+            hsc_program = Programs.objects.get(pro_name__iexact="hsc")
+            form.instance.add_program = hsc_program
+            form.instance.add_admission_group = "science"
+
+        except Programs.DoesNotExist:
+            form.add_error(None, "HSC program not found. Please add it from admin.")
+            return self.form_invalid(form)
+
+        # Set admission fee (based on session and group)
+        session_id = self.request.POST.get("add_session")
+        try:
+            fee = Fee.objects.get(
+                fee_session_id=session_id,
+                fee_program=hsc_program,
+                fee_group__group_name__iexact="science"
+            )
+            form.instance.add_amount = fee.amount
+        except Fee.DoesNotExist:
+            form.instance.add_amount = 0
+
+        # Save subjects
+        form.instance.main_subject_id = self.request.POST.get("main_subject")
+        form.instance.fourth_subject_id = self.request.POST.get("fourth_subject")
+        self.object = form.save()
+
+        # Auto-select all related subjects
+        subjects_all = Subjects.objects.filter(
+            group="science",
+            sub_status="active",
+            sub_select__in=["all", "optional"]
+        )
+        self.object.subjects.set(subjects_all)
+
+        messages.success(self.request, "Admission submitted successfully.")
+        return redirect(self.success_url)
+
+    def form_invalid(self, form):
+        print("⛔ Form INVALID")
+        print(form.errors)
+        return super().form_invalid(form)
+
+
+# Bss
+class AdmissionBssCreateView(FormView):
+    template_name = "admissions_others/admission_form_honours.html"
+    form_class = HscAdmissionForm
+    success_url = reverse_lazy("hsc_admission_create")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Layout
+        context = TemplateLayout.init(self, context)
+        context["layout"] = "vertical"
+        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+
+        # Subject filter for group = "science"
+        group = "science"
+        status = "active"
+
+        context["subjects_all"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="all"
+        )
+        context["subjects_optional"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="optional"
+        )
+
+        context["subjects_main"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="main"
+        )
+
+        context["subjects_fourth"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="fourth"
+        )
+
+        return context
+
+    def form_valid(self, form):
+        # Set program manually (assumes HSC exists and is unique)
+        try:
+            hsc_program = Programs.objects.get(pro_name__iexact="hsc")
+            form.instance.add_program = hsc_program
+            form.instance.add_admission_group = "science"
+
+        except Programs.DoesNotExist:
+            form.add_error(None, "HSC program not found. Please add it from admin.")
+            return self.form_invalid(form)
+
+        # Set admission fee (based on session and group)
+        session_id = self.request.POST.get("add_session")
+        try:
+            fee = Fee.objects.get(
+                fee_session_id=session_id,
+                fee_program=hsc_program,
+                fee_group__group_name__iexact="science"
+            )
+            form.instance.add_amount = fee.amount
+        except Fee.DoesNotExist:
+            form.instance.add_amount = 0
+
+        # Save subjects
+        form.instance.main_subject_id = self.request.POST.get("main_subject")
+        form.instance.fourth_subject_id = self.request.POST.get("fourth_subject")
+        self.object = form.save()
+
+        # Auto-select all related subjects
+        subjects_all = Subjects.objects.filter(
+            group="science",
+            sub_status="active",
+            sub_select__in=["all", "optional"]
+        )
+        self.object.subjects.set(subjects_all)
+
+        messages.success(self.request, "Admission submitted successfully.")
+        return redirect(self.success_url)
+
+    def form_invalid(self, form):
+        print("⛔ Form INVALID")
+        print(form.errors)
+        return super().form_invalid(form)
+
+
+# Bsc
+class AdmissionBscCreateView(FormView):
+    template_name = "admissions_others/admission_form_honours.html"
+    form_class = HscAdmissionForm
+    success_url = reverse_lazy("hsc_admission_create")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Layout
+        context = TemplateLayout.init(self, context)
+        context["layout"] = "vertical"
+        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+
+        # Subject filter for group = "science"
+        group = "science"
+        status = "active"
+
+        context["subjects_all"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="all"
+        )
+        context["subjects_optional"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="optional"
+        )
+
+        context["subjects_main"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="main"
+        )
+
+        context["subjects_fourth"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="fourth"
+        )
+
+        return context
+
+    def form_valid(self, form):
+        # Set program manually (assumes HSC exists and is unique)
+        try:
+            hsc_program = Programs.objects.get(pro_name__iexact="hsc")
+            form.instance.add_program = hsc_program
+            form.instance.add_admission_group = "science"
+
+        except Programs.DoesNotExist:
+            form.add_error(None, "HSC program not found. Please add it from admin.")
+            return self.form_invalid(form)
+
+        # Set admission fee (based on session and group)
+        session_id = self.request.POST.get("add_session")
+        try:
+            fee = Fee.objects.get(
+                fee_session_id=session_id,
+                fee_program=hsc_program,
+                fee_group__group_name__iexact="science"
+            )
+            form.instance.add_amount = fee.amount
+        except Fee.DoesNotExist:
+            form.instance.add_amount = 0
+
+        # Save subjects
+        form.instance.main_subject_id = self.request.POST.get("main_subject")
+        form.instance.fourth_subject_id = self.request.POST.get("fourth_subject")
+        self.object = form.save()
+
+        # Auto-select all related subjects
+        subjects_all = Subjects.objects.filter(
+            group="science",
+            sub_status="active",
+            sub_select__in=["all", "optional"]
+        )
+        self.object.subjects.set(subjects_all)
+
+        messages.success(self.request, "Admission submitted successfully.")
+        return redirect(self.success_url)
+
+    def form_invalid(self, form):
+        print("⛔ Form INVALID")
+        print(form.errors)
+        return super().form_invalid(form)
+
+# Bbs
+class AdmissionBbsCreateView(FormView):
+    template_name = "admissions_others/admission_form_honours.html"
+    form_class = HscAdmissionForm
+    success_url = reverse_lazy("hsc_admission_create")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Layout
+        context = TemplateLayout.init(self, context)
+        context["layout"] = "vertical"
+        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+
+        # Subject filter for group = "science"
+        group = "science"
+        status = "active"
+
+        context["subjects_all"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="all"
+        )
+        context["subjects_optional"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="optional"
+        )
+
+        context["subjects_main"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="main"
+        )
+
+        context["subjects_fourth"] = Subjects.objects.filter(
+            group=group,
+            sub_status=status,
+            sub_select="fourth"
+        )
+
+        return context
+
+    def form_valid(self, form):
+        # Set program manually (assumes HSC exists and is unique)
+        try:
+            hsc_program = Programs.objects.get(pro_name__iexact="hsc")
+            form.instance.add_program = hsc_program
+            form.instance.add_admission_group = "science"
+
+        except Programs.DoesNotExist:
+            form.add_error(None, "HSC program not found. Please add it from admin.")
+            return self.form_invalid(form)
+
+        # Set admission fee (based on session and group)
+        session_id = self.request.POST.get("add_session")
+        try:
+            fee = Fee.objects.get(
+                fee_session_id=session_id,
+                fee_program=hsc_program,
+                fee_group__group_name__iexact="science"
+            )
+            form.instance.add_amount = fee.amount
+        except Fee.DoesNotExist:
+            form.instance.add_amount = 0
+
+        # Save subjects
+        form.instance.main_subject_id = self.request.POST.get("main_subject")
+        form.instance.fourth_subject_id = self.request.POST.get("fourth_subject")
+        self.object = form.save()
+
+        # Auto-select all related subjects
+        subjects_all = Subjects.objects.filter(
+            group="science",
+            sub_status="active",
+            sub_select__in=["all", "optional"]
+        )
+        self.object.subjects.set(subjects_all)
+
+        messages.success(self.request, "Admission submitted successfully.")
+        return redirect(self.success_url)
+
+    def form_invalid(self, form):
+        print("⛔ Form INVALID")
+        print(form.errors)
+        return super().form_invalid(form)
 
 
 
 
 
+
+
+
+# Fee Section
 
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy

@@ -1,6 +1,7 @@
 from web_project.views import SystemView
 from django.urls import path
 from .views import HscAdmissionCreateView, get_admission_fee, FeeListView, FeeCreateView, FeeUpdateView, FeeDeleteView, HscAdmissionCreateCommerceView,HscAdmissionCreateArtsView
+from . import views
 
 urlpatterns = [
     #Admission Fee Api
@@ -11,9 +12,16 @@ urlpatterns = [
     path('fees/<int:pk>/update/', FeeUpdateView.as_view(), name='fee_update'),
     path('fees/<int:pk>/delete/', FeeDeleteView.as_view(), name='fee_delete'),
 
+    # Hsc Apply
     path('apply/science/', HscAdmissionCreateView.as_view(), name='hsc_admission_create'),
     path('apply/commerce/', HscAdmissionCreateCommerceView.as_view(), name='hsc_admission_create_commerce'),
     path('apply/arts/', HscAdmissionCreateArtsView.as_view(), name='hsc_admission_create_arts'),
+
+    # Honours Apply
+    path('apply/ba/', views.AdmissionBaCreateView.as_view(), name='ba_admission_create'),
+    path('apply/bss/', views.AdmissionBssCreateView.as_view(), name='bss_admission_create'),
+    path('apply/bsc/', views.AdmissionBscCreateView.as_view(), name='bsc_admission_create'),
+    path('apply/bbs/', views.AdmissionBbsCreateView.as_view(), name='bbs_admission_create'),
 
 ]
 
