@@ -66,8 +66,8 @@
  {% comment %} d-flex align-items-center justify-content-around {% endcomment %}
 <!-- Totals -->
 <div class=" row  mb-3">
-  <div class="col-md-6 text-success "><strong>Total Income:</strong> ৳{{ total_income }}</div>
-  <div class="col-md-6 text-danger text-end"><strong>Total Expense:</strong> ৳{{ total_expense }}</div>
+  <div class="col-md-6 text-success "><strong> Total Income: {{ total_income }} ৳</strong> </div>
+  <div class="col-md-6 text-danger text-end"><strong>Total Expense: {{ total_expense }} ৳</strong></div>
 </div>
 
 <!-- Ledger Table -->
@@ -91,7 +91,7 @@
             <td>{{ i.date|date:"j/n/Y" }}</td>
             <td>{{ i.income_category.name }}</td>
             <td>{{ i.income_name }}</td>
-            <td class="text-success">+৳{{ i.amount }}</td>
+            <td class="text-success" style="flex-wrap: wrap;">{{ i.amount }} ৳</td>
             <td>{{ i.note|safe }}</td>
           </tr>
           {% empty %}
@@ -144,7 +144,7 @@
             <td>{{ e.date|date:"j/n/Y" }}</td>
             <td>{{ e.exp_category.name }}</td>
             <td>{{ e.exp_name }}</td>
-            <td class="text-danger">-৳{{ e.amount }}</td>
+            <td class="text-danger">{{ e.amount }} ৳</td>
             <td>{{ e.note|safe }}</td>
           </tr>
           {% empty %}

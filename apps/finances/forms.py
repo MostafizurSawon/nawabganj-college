@@ -2,6 +2,7 @@ from django import forms
 from .models import Expense, ExpenseCategory, Income, IncomeCategory
 
 
+
 class ExpenseCategoryForm(forms.ModelForm):
     class Meta:
         model = ExpenseCategory

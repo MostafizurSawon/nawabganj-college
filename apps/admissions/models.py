@@ -1,34 +1,218 @@
 from django.db import models
 
 # Create your models here.
-class HscFeeType(models.Model):
-    fee_type = models.CharField(max_length=50, unique=True)
-    amount = models.IntegerField()
+
+# Hsc
+class Programs(models.Model):
+    pro_name = models.CharField(max_length=20, null=True, blank=True)
+    pro_status = models.CharField(max_length=15, choices=[
+        ('active', 'Active'),
+        ('inactive', 'Inactive')
+    ],blank=True, null=True)
+    pro_year = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.fee_type} - {self.amount} BDT"
+        return f"{self.pro_name}"
 
-
-
-class HscSession(models.Model):
-    session = models.CharField(max_length=9, unique=True)
-    fee = models.ForeignKey(HscFeeType, on_delete=models.CASCADE, related_name='hsc_sessions_fee', null=True, blank=True)
+# Degree
+class DegreePrograms(models.Model):
+    deg_name = models.CharField(max_length=20, null=True, blank=True)
+    deg_status = models.CharField(max_length=15, choices=[
+        ('active', 'Active'),
+        ('inactive', 'Inactive')
+    ],blank=True, null=True)
+    deg_year = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.session}"
+        return f"{self.deg_name} ({self.deg_status}) - {self.deg_year}"
+
+# Session (2024-25)      ***** Sesssion Wise Filter Full Menu (Except income expense)
+class Session(models.Model):
+    ses_name = models.CharField(max_length=20, null=True, blank=True)
+    ses_status = models.CharField(max_length=15, choices=[
+        ('active', 'Active'),
+        ('inactive', 'Inactive')
+    ],blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.ses_name}"
+
+class Group(models.Model):
+    group_name = models.CharField(max_length=20, choices=[
+        ('Science', 'Science'),
+        ('Arts', 'Arts'),
+        ('Commerce', 'Commerce'),
+    ], null=True, blank= True)
+
+    def __str__(self):
+        return f"{self.group_name}"
+
+# All Subjects (Science, arts, commerce, Degree)
+class Subjects(models.Model):
+    sub_name = models.CharField(max_length=30, null=True, blank=True)
+    group = models.CharField(max_length=20, choices=[
+        ('science', 'Science'),
+        ('arts', 'Arts'),
+        ('commerce', 'Commerce'),
+    ], null=True, blank= True)
+    code = models.CharField(max_length=20, null=True, blank= True)
+    sub_select = models.CharField(max_length=15, choices=[
+        ('main', 'Main'),
+        ('fourth', 'Fourth'),
+        ('optional', 'Optional'),
+        ('optional2', 'Optional2'),
+        ('all', 'All'),
+    ], blank=True, null=True)
+
+    sub_status = models.CharField(max_length=15, choices=[
+        ('active', 'Active'),
+        ('inactive', 'Inactive')
+    ],blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.sub_name} ({self.code}) - {self.sub_select} - {self.group}"
 
 
-class HscAdmissionScience(models.Model):
-    program = models.CharField(max_length=20, default='HSC', editable=False)
-    type = models.CharField(max_length=10, default='Science', editable=False)
-    ssc_roll = models.IntegerField(unique=True)
-    hsc_session = models.ForeignKey(HscSessionForPayment, on_delete=models.CASCADE)
-    class_roll = models.IntegerField(unique=True)
+
+class Fee(models.Model):
+    fee_session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='fee_session', verbose_name="Fee Session", null=True, blank=True)
+    fee_program = models.ForeignKey(Programs, on_delete=models.CASCADE, related_name='fee_program', verbose_name="Fee Program", null=True, blank=True)    #Hsc
+    fee_group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='fee_group', verbose_name="Fee Group", null=True, blank=True)
+    amount = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.fee_group.group_name
+
+
+
+
+
+# Admission Form
+class HscAdmissions(models.Model):
+    add_program = models.ForeignKey(Programs, on_delete=models.CASCADE, null=True, blank=True)     # Hsc
+    add_admission_group = models.CharField(
+        max_length=20,
+        choices=[
+            ('science', 'Science'),
+            ('commerce', 'Commerce'),
+            ('arts', 'Arts'),
+        ],
+        null=True,
+        blank=True
+    )
+    add_session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, blank=True)   # session
     merit_position = models.IntegerField()
-    name = models.CharField(max_length=100)
-    name_bangla = models.CharField(max_length=100, null=True, blank=True)
-    mobile = models.CharField(max_length=11, validators=[numeric_validator])
-    blood_group = models.CharField(max_length=3, choices=[
+    add_name_bangla = models.CharField(max_length=100, null=True, blank=True)
+    add_name = models.CharField(max_length=100)
+    add_mobile = models.CharField(max_length=14, null=True, blank=True)
+
+    # parent - conditional
+    add_father_bangla = models.CharField(max_length=100, null=True, blank=True)
+    add_father = models.CharField(max_length=100, null=True, blank=True)
+    add_father_mobile = models.CharField(max_length=14, null=True, blank=True)
+
+    add_mother_bangla = models.CharField(max_length=100, null=True, blank=True)
+    add_mother = models.CharField(max_length=100, null=True, blank=True)
+    add_mother_mobile = models.CharField(max_length=14, null=True, blank=True)
+
+    add_parent_select = models.CharField(
+        max_length=10,
+        choices=[
+            ('father', 'Father'),
+            ('mother', 'Mother'),
+            ('other', 'Other'),
+        ],
+        null=True,
+        blank=True
+    )
+
+    add_parent = models.CharField(max_length=100, null=True, blank=True)
+    add_parent_mobile = models.CharField(max_length=14, null=True, blank=True)
+    add_parent_relation = models.CharField(max_length=20, null=True, blank=True)
+
+    add_parent_service = models.CharField(max_length=30, null=True, blank=True)
+    add_parent_income = models.IntegerField(null=True)
+
+    add_parent_land_agri = models.CharField(max_length=30, null=True, blank=True)
+    add_parent_land_nonagri = models.CharField(max_length=30, null=True, blank=True)
+    # Total from view/form
+
+    # Address
+    add_village = models.CharField(max_length=30, null=True, blank=True)
+    add_post = models.CharField(max_length=30, null=True, blank=True)
+    add_upojella = models.CharField(max_length=30, null=True, blank=True)
+    add_distric= models.CharField(max_length=30, null=True, blank=True)
+
+    add_address_same = models.BooleanField(default=False)
+
+    add_village_per = models.CharField(max_length=30, null=True, blank=True)
+    add_post_per = models.CharField(max_length=30, null=True, blank=True)
+    add_upojella_per = models.CharField(max_length=30, null=True, blank=True)
+    add_distric_per= models.CharField(max_length=30, null=True, blank=True)
+
+    add_birthdate = models.DateField(null=True, blank=True) # ssc sonod Onujayi
+    add_marital_status = models.CharField(max_length=10, choices=[
+        ('Single', 'Single'),
+        ('Married', 'Married'),
+        ('Divorced', 'Divorced'),
+    ], null=True, blank=True)
+
+
+    # Academic
+    subjects = models.ManyToManyField('Subjects', blank=True, related_name='admitted_students')
+    main_subject = models.ForeignKey('Subjects', on_delete=models.SET_NULL, null=True, blank=True, related_name='main_selected')
+    fourth_subject = models.ForeignKey('Subjects', on_delete=models.SET_NULL, null=True, blank=True, related_name='fourth_selected')
+
+    optional_subject = models.ForeignKey(
+        'Subjects',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='optional_selected_1'
+    )
+
+    optional_subject_2 = models.ForeignKey(
+        'Subjects',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='optional_selected_2'
+    )
+
+
+
+    add_ssc_roll = models.IntegerField(null=True)
+    add_ssc_reg = models.IntegerField(null=True)
+    add_ssc_session = models.CharField(max_length=30, null=True, blank=True)
+    add_ssc_gpa = models.CharField(max_length=10, null=True, blank=True)
+    add_ssc_group = models.CharField(max_length=10, choices=[
+        ('science', 'Science'),
+        ('arts', 'Arts'),
+        ('commerce', 'Commerce'),
+    ], null=True, blank=True)
+    add_ssc_board = models.CharField(max_length=10, null=True, blank=True)
+    add_ssc_passyear = models.CharField(max_length=10, null=True, blank=True)
+
+    add_payment_method = models.CharField(max_length=15, choices=[
+        ('bkash', 'Bkash'),
+        ('rocket', 'Rocket'),
+        ('nagad', 'Nagad'),
+        ('bank', 'Bank'),
+        ('others', 'Others'),
+    ], null=True, blank=True)
+    add_amount = models.PositiveIntegerField(null=True)      #ekhane admission fee auto boshbe. readonly forms.py a korbo
+    add_trxid = models.CharField(max_length=50, null=True, blank=True)
+    add_slip = models.CharField(max_length=150, null=True, blank=True)
+
+
+
+    add_class_roll = models.IntegerField(null=True)
+    add_hsc_year = models.CharField(max_length=10, choices=[
+        ('1st', '1st'),
+        ('2nd', '2nd')
+    ], default='1st', null=True, blank=True)
+
+    add_blood_group = models.CharField(max_length=3, choices=[
         ('A+', 'A+'),
         ('A-', 'A-'),
         ('B+', 'B+'),
@@ -38,27 +222,40 @@ class HscAdmissionScience(models.Model):
         ('AB+', 'AB+'),
         ('AB-', 'AB-'),
     ])
-    birth_certificate_no = models.CharField(max_length=50)
-    birthdate = models.DateField()
-    marital_status = models.CharField(max_length=10, choices=[
-        ('Single', 'Single'),
-        ('Married', 'Married'),
-        ('Divorced', 'Divorced'),
-    ])
-    gender = models.CharField(max_length=10, choices=[
+    add_birth_certificate_no = models.CharField(max_length=50, null=True, blank=True)
+
+    add_gender = models.CharField(max_length=10, choices=[
         ('Male', 'Male'),
-        ('Female', 'Female'),
-        ('Other', 'Other'),
+        ('Female', 'Female')
     ])
-    nationality = models.CharField(max_length=50)
-    religion = models.CharField(max_length=20, choices=[
+    add_nationality = models.CharField(max_length=50)
+    add_religion = models.CharField(max_length=20, choices=[
         ('Islam', 'Islam'),
         ('Hindu', 'Hindu'),
         ('Christian', 'Christian'),
         ('Buddhist', 'Buddhist'),
         ('Other', 'Other'),
     ])
-    photo = models.ImageField(upload_to='hsc-science/')
+    add_photo = models.ImageField(upload_to='admissions/hsc-science/%Y/%m/%d/')
 
     def __str__(self):
-        return f"Name: {self.name} | Group: Science | Class Roll: {self.class_roll} | Session: {self.hsc_session.session}"
+        return f"Name: {self.add_name} | Group: {self.add_admission_group} | Class Roll: {self.add_class_roll} | Session: {self.add_ssc_session}"
+
+
+
+
+
+
+
+
+    # add_hsc_roll = models.IntegerField(null=True)
+    # add_hsc_reg = models.IntegerField(null=True)
+    # add_hsc_session = models.CharField(max_length=30, null=True, blank=True)
+    # add_hsc_gpa = models.CharField(max_length=10, null=True, blank=True)
+    # add_hsc_group = models.CharField(max_length=10, choices=[
+    #     ('science', 'Science'),
+    #     ('arts', 'Arts'),
+    #     ('commerce', 'Commerce'),
+    # ], null=True, blank=True)
+    # add_hsc_board = models.CharField(max_length=10, null=True, blank=True)
+    # add_hsc_passyear = models.CharField(max_length=10, null=True, blank=True)

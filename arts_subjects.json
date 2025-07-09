@@ -1,0 +1,322 @@
+[
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "অর্থনীতি",
+      "group": "arts",
+      "code": "১০৯ - ১১০",
+      "sub_select": "optional",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "অর্থনীতি",
+      "group": "arts",
+      "code": "১০৯ - ১১০",
+      "sub_select": "optional2",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "অর্থনীতি",
+      "group": "arts",
+      "code": "১০৯ - ১১০",
+      "sub_select": "main",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "অর্থনীতি",
+      "group": "arts",
+      "code": "১০৯ - ১১০",
+      "sub_select": "fourth",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "পৌরনীতি ও সুশাসন",
+      "group": "arts",
+      "code": "২৬৯ - ২৭০",
+      "sub_select": "optional",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "পৌরনীতি ও সুশাসন",
+      "group": "arts",
+      "code": "২৬৯ - ২৭০",
+      "sub_select": "optional2",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "পৌরনীতি ও সুশাসন",
+      "group": "arts",
+      "code": "২৬৯ - ২৭০",
+      "sub_select": "main",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "পৌরনীতি ও সুশাসন",
+      "group": "arts",
+      "code": "২৬৯ - ২৭০",
+      "sub_select": "fourth",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "সমাজবিজ্ঞান",
+      "group": "arts",
+      "code": "১১৭ - ১১৮",
+      "sub_select": "optional",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "সমাজবিজ্ঞান",
+      "group": "arts",
+      "code": "১১৭ - ১১৮",
+      "sub_select": "optional2",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "সমাজবিজ্ঞান",
+      "group": "arts",
+      "code": "১১৭ - ১১৮",
+      "sub_select": "main",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "সমাজবিজ্ঞান",
+      "group": "arts",
+      "code": "১১৭ - ১১৮",
+      "sub_select": "fourth",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "ইসলামের ইতিহাস ও সংস্কৃতি",
+      "group": "arts",
+      "code": "২৬৭ - ২৬৮",
+      "sub_select": "optional",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "ইসলামের ইতিহাস ও সংস্কৃতি",
+      "group": "arts",
+      "code": "২৬৭ - ২৬৮",
+      "sub_select": "optional2",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "ইসলামের ইতিহাস ও সংস্কৃতি",
+      "group": "arts",
+      "code": "২৬৭ - ২৬৮",
+      "sub_select": "main",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "ইসলামের ইতিহাস ও সংস্কৃতি",
+      "group": "arts",
+      "code": "২৬৭ - ২৬৮",
+      "sub_select": "fourth",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "ভূগোল ও পরিবেশ",
+      "group": "arts",
+      "code": "১২৫ - ১২৬",
+      "sub_select": "optional",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "ভূগোল ও পরিবেশ",
+      "group": "arts",
+      "code": "১২৫ - ১২৬",
+      "sub_select": "optional2",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "ভূগোল ও পরিবেশ",
+      "group": "arts",
+      "code": "১২৫ - ১২৬",
+      "sub_select": "main",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "ভূগোল ও পরিবেশ",
+      "group": "arts",
+      "code": "১২৫ - ১২৬",
+      "sub_select": "fourth",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "মুক্তিযুদ্ধ",
+      "group": "arts",
+      "code": "১২১ - ১২২",
+      "sub_select": "optional",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "মুক্তিযুদ্ধ",
+      "group": "arts",
+      "code": "১২১ - ১২২",
+      "sub_select": "optional2",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "মুক্তিযুদ্ধ",
+      "group": "arts",
+      "code": "১২১ - ১২২",
+      "sub_select": "main",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "মুক্তিযুদ্ধ",
+      "group": "arts",
+      "code": "১২১ - ১২২",
+      "sub_select": "fourth",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "মনোবিজ্ঞান",
+      "group": "arts",
+      "code": "১২৩ - ১২৪",
+      "sub_select": "optional",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "মনোবিজ্ঞান",
+      "group": "arts",
+      "code": "১২৩ - ১২৪",
+      "sub_select": "optional2",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "মনোবিজ্ঞান",
+      "group": "arts",
+      "code": "১২৩ - ১২৪",
+      "sub_select": "main",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "মনোবিজ্ঞান",
+      "group": "arts",
+      "code": "১২৩ - ১২৪",
+      "sub_select": "fourth",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "পরিসংখ্যান",
+      "group": "arts",
+      "code": "১২৯ - ১৩০",
+      "sub_select": "optional",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "পরিসংখ্যান",
+      "group": "arts",
+      "code": "১২৯ - ১৩০",
+      "sub_select": "optional2",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "পরিসংখ্যান",
+      "group": "arts",
+      "code": "১২৯ - ১৩০",
+      "sub_select": "main",
+      "sub_status": "active"
+    }
+  },
+  {
+    "model": "admissions.subjects",
+    "fields": {
+      "sub_name": "পরিসংখ্যান",
+      "group": "arts",
+      "code": "১২৯ - ১৩০",
+      "sub_select": "fourth",
+      "sub_status": "active"
+    }
+  }
+]

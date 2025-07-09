@@ -7,11 +7,10 @@ from django.db.models import Q
 from .models import Expense, ExpenseCategory, Income, IncomeCategory
 from .forms import ExpenseForm, ExpenseCategoryForm, IncomeForm, IncomeCategoryForm
 from web_project import TemplateLayout, TemplateHelper
-
+from django.http import JsonResponse
 
 # -------------------- EXPENSE VIEWS --------------------
 
-from django.http import JsonResponse
 
 from django.db.models import Sum
 

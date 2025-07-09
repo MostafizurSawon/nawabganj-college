@@ -2,13 +2,52 @@
   "menu": [
     {
       "url": "index",
-      "icon": "menu-icon tf-icons ti ti-layout-dashboard",
+      "icon": "menu-icon tf-icons ti ti-home",
       "name": "Dashboard",
       "slug": "index"
     },
     {
+      "name": "HSC Admissions",
+      "icon": "menu-icon tf-icons ti ti-file-text",
+      "slug": "admission",
+      "submenu": [
+        {
+          "url": "hsc_admission_create",
+          "name": "Science",
+          "slug": "hsc_admission_create"
+        },
+        {
+          "url": "hsc_admission_create_arts",
+          "name": "Arts",
+          "slug": "hsc_admission_create_arts"
+        },
+        {
+          "url": "hsc_admission_create_commerce",
+          "name": "Commerce",
+          "slug": "hsc_admission_create_commerce"
+        }
+      ]
+    },
+    {
+      "name": "Academy",
+      "icon": "menu-icon tf-icons ti ti-school",
+      "slug": "academy",
+      "submenu": [
+        {
+          "url": "admitted_students_list",
+          "name": "All Students",
+          "slug": "admitted_students_list"
+        },
+        {
+          "url": "fee_list",
+          "name": "Admission Fees",
+          "slug": "fee_list"
+        }
+      ]
+    },
+    {
       "name": "Income",
-      "icon": "menu-icon tf-icons ti ti-currency-dollar",
+      "icon": "menu-icon tf-icons ti ti-cash",
       "slug": "income-expense",
       "submenu": [
         {
@@ -25,7 +64,7 @@
     },
     {
       "name": "Expense",
-      "icon": "menu-icon tf-icons ti ti-report-money",
+      "icon": "menu-icon tf-icons ti ti-wallet",
       "slug": "income-expense",
       "submenu": [
         {
@@ -42,8 +81,8 @@
     },
     {
       "url": "ledger_view",
-      "icon": "menu-icon tf-icons ti ti-currency-exchange",
-      "name": "Income-expense Ledger",
+      "icon": "menu-icon tf-icons ti ti-report",
+      "name": "Income Expense Ledger",
       "slug": "ledger_view"
     }
   ]

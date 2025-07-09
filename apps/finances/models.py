@@ -1,5 +1,25 @@
 from django.db import models
 
+# College Fee
+class FeeCategory(models.Model):
+    fee_category = models.CharField(max_length=100, unique=True, verbose_name="Fee Category Main", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.fee_category
+
+class Fee(models.Model):
+    fee_category = models.ForeignKey(FeeCategory, on_delete=models.CASCADE, related_name='fee_cat', verbose_name="Fee Category")
+    fee_name = models.CharField(max_length=100)
+    amount = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.fee_name
+
+
+
+
+
 
 # Expense Section
 class ExpenseCategory(models.Model):

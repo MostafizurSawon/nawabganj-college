@@ -50,10 +50,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django.contrib.humanize',
     "apps.sample",
     "apps.pages",
     "apps.finances",
     "apps.admissions",
+    "apps.students",
 ]
 
 MIDDLEWARE = [
@@ -166,6 +168,9 @@ STATICFILES_DIRS = [
     BASE_DIR / "src" / "assets",
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default URL on which Django application runs for specific environment
 BASE_URL = os.environ.get("BASE_URL", default="http://127.0.0.1:8000")
 
@@ -184,3 +189,6 @@ THEME_VARIABLES = THEME_VARIABLES
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/login/'
