@@ -12,3 +12,13 @@ def get_cookie(request):
 # Add the 'ENVIRONMENT' setting to the template context
 def environment(request):
     return {'ENVIRONMENT': settings.ENVIRONMENT}
+
+
+
+# core/context_processors.py
+from apps.admissions.models import Session
+
+def session_list(request):
+    return {
+        'sessions': Session.objects.all()
+    }

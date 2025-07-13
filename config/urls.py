@@ -28,6 +28,8 @@ urlpatterns = [
     path("dashboard/", include("apps.admissions.urls")),
     path("dashboard/", include("apps.students.urls")),
     path("finances/", include("apps.finances.urls")),
+    path("exams/", include("apps.exams.urls")),
+    path("teachers/", include("apps.teachers.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = SystemView.as_view(template_name="pages_misc_error.html", status=404)

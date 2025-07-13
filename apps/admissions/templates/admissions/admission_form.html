@@ -8,9 +8,9 @@
   <h4 class="fw-bold py-3 mb-4">
     <span class="text-muted fw-light">HSC Admission /</span>
     {% if subjects_main.0.group == "commerce" %}
-      Commerce
+      Business Studies
     {% elif subjects_main.0.group == "arts" %}
-      Arts
+      Humanities
     {% elif subjects_main.0.group == "science" %}
       Science
     {% else %}
@@ -30,6 +30,12 @@
   {% endif %}
 
   <form method="post" enctype="multipart/form-data">
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
     {% csrf_token %}
 
     <div class="card mb-4">
@@ -49,6 +55,9 @@
         <div class="col-md-3">
           <label for="id_add_mobile" class="form-label">Mobile Number</label>
           {{ form.add_mobile }}
+          {% if form.add_mobile.errors %}
+            <div class="text-danger small">{{ form.add_mobile.errors.0 }}</div>
+          {% endif %}
         </div>
 
         <div class="col-md-3">
@@ -89,7 +98,11 @@
         <div class="col-md-6">
           <label for="id_add_photo" class="form-label">Upload Photo</label>
           {{ form.add_photo }}
+          {% if form.add_photo.errors %}
+            <div class="text-danger small">{{ form.add_photo.errors.0 }}</div>
+          {% endif %}
         </div>
+
 
       </div>
     </div>
@@ -110,6 +123,9 @@
       <div class="col-md-4">
         <label>Father's Mobile</label>
         {{ form.add_father_mobile }}
+        {% if form.add_father_mobile.errors %}
+          <div class="text-danger small">{{ form.add_father_mobile.errors.0 }}</div>
+        {% endif %}
       </div>
       <div class="col-md-4">
         <label>Mother's Name</label>
@@ -122,6 +138,9 @@
       <div class="col-md-4">
         <label>Mother's Mobile</label>
         {{ form.add_mother_mobile }}
+        {% if form.add_mother_mobile.errors %}
+          <div class="text-danger small">{{ form.add_mother_mobile.errors.0 }}</div>
+        {% endif %}
       </div>
       <div class="col-md-4">
         <label for="id_add_parent_select" class="form-label">Select Guardian</label>
@@ -136,6 +155,9 @@
       <div class="col-md-4">
         <label>Guardian Mobile</label>
         {{ form.add_parent_mobile }}
+        {% if form.add_parent_mobile.errors %}
+          <div class="text-danger small">{{ form.add_parent_mobile.errors.0 }}</div>
+        {% endif %}
       </div>
       <div class="col-md-4">
         <label>Guardian Relation</label>
@@ -265,22 +287,22 @@
   <div class="card mb-4">
     <div class="card-header"><h5 class="mb-0">College Info</h5></div>
     <div class="card-body row g-3">
-      <div class="col-md-3">
+      <div class="col-md-4">
         <label>Session</label>
         {{ form.add_session }}
       </div>
-      <div class="col-md-3">
+      <div class="col-md-4">
         <label>Merit Position</label>
         {{ form.merit_position }}
       </div>
-      <div class="col-md-3">
+      <div class="col-md-4">
         <label>Class Roll</label>
         {{ form.add_class_roll }}
       </div>
-      <div class="col-md-3">
+      {% comment %} <div class="col-md-3">
         <label>Year</label>
         {{ form.add_hsc_year }}
-      </div>
+      </div> {% endcomment %}
     </div>
   </div>
 

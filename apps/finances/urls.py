@@ -4,7 +4,7 @@ from .views import (
     IncomeView, IncomeDeleteView, IncomeCategoryView, IncomeCategoryDeleteView, LedgerView
 )
 
-from .views import ExpenseDataAPIView,ExpenseCategoryAjaxView,ExpenseDetailAjaxView, IncomeDataAPIView, IncomeDetailAjaxView, IncomeCategoryAjaxView
+from .views import ExpenseDataAPIView,ExpenseCategoryAjaxView,ExpenseDetailAjaxView, IncomeDataAPIView, IncomeDetailAjaxView, IncomeCategoryAjaxView, export_ledger_csv
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
@@ -38,4 +38,6 @@ urlpatterns = [
 
     # Ledger
     path('ledger/', login_required(LedgerView.as_view()), name='ledger_view'),
+
+    path('ledger/export-csv/', export_ledger_csv, name='ledger_export_csv'),
 ]

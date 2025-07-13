@@ -65,6 +65,10 @@
 </div>
  {% comment %} d-flex align-items-center justify-content-around {% endcomment %}
 <!-- Totals -->
+ <a href="{% url 'ledger_export_csv' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-primary ms-2 my-4">
+  📥 Export CSV
+</a>
+
 <div class=" row  mb-3">
   <div class="col-md-6 text-success "><strong> Total Income: {{ total_income }} ৳</strong> </div>
   <div class="col-md-6 text-danger text-end"><strong>Total Expense: {{ total_expense }} ৳</strong></div>

@@ -18,7 +18,7 @@
           <span class="app-brand-logo demo">
             {% include 'partials/logo.html' %}
           </span>
-          <span class="app-brand-text demo menu-text fw-bold">{% get_theme_variables 'template_name' %}</span>
+          <span class="app-brand-text demo menu-text text-sm fw-bold">{% get_theme_variables 'template_name' %}</span>
         </a>
 
         {% if menu_horizontal %}
@@ -68,6 +68,25 @@
         <!-- / Style Switcher-->
 
         <ul class="navbar-nav flex-row align-items-center ms-auto">
+          <li class="me-3">
+            <form method="POST" action="{% url 'set_session' %}">
+              {% csrf_token %}
+              <div class="input-group">
+                <label class="input-group-text" for="sessionSelect">Session</label>
+                <select class="form-select" id="sessionSelect" name="session" onchange="this.form.submit()">
+                  <option value="">All Sessions</option>
+                  {% for ses in sessions %}
+                    <option value="{{ ses.id }}" {% if active_session and active_session.id == ses.id %}selected{% endif %}>
+                      {{ ses.ses_name }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </form>
+          </li>
+
+
+
           <!-- User -->
          <li class="nav-item navbar-dropdown dropdown-user dropdown">
             <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">

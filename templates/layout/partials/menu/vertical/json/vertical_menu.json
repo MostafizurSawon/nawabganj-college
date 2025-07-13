@@ -8,67 +8,174 @@
     },
     {
       "name": "HSC Admissions",
-      "icon": "menu-icon tf-icons ti ti-file-text",
+      "icon": "menu-icon tf-icons ti ti-school",
       "slug": "admission",
       "submenu": [
         {
           "url": "hsc_admission_create",
-          "name": "Science",
+          "name": "Science Form",
           "slug": "hsc_admission_create"
         },
         {
           "url": "hsc_admission_create_arts",
-          "name": "Arts",
+          "name": "Humanities Form",
           "slug": "hsc_admission_create_arts"
         },
         {
           "url": "hsc_admission_create_commerce",
-          "name": "Commerce",
+          "name": "Business Studies Form",
           "slug": "hsc_admission_create_commerce"
         }
       ]
     },
     {
-      "name": "Admissions",
+      "name": "Degree Admissions",
       "icon": "menu-icon tf-icons ti ti-file-text",
       "slug": "admission",
       "submenu": [
         {
           "url": "ba_admission_create",
-          "name": "Ba Admission",
+          "name": "BA Form",
           "slug": "ba_admission_create"
         },
         {
           "url": "bss_admission_create",
-          "name": "Bss Admission",
+          "name": "BSS Form",
           "slug": "bss_admission_create"
         },
         {
           "url": "bsc_admission_create",
-          "name": "Bsc Admission",
+          "name": "BSC Form",
           "slug": "bsc_admission_create"
         },
         {
           "url": "bbs_admission_create",
-          "name": "Bbs Admission",
+          "name": "BBS Form",
           "slug": "bbs_admission_create"
         }
       ]
     },
     {
-      "name": "Academy",
-      "icon": "menu-icon tf-icons ti ti-school",
+      "name": "Students List",
+      "icon": "menu-icon tf-icons ti ti-users-group",
       "slug": "academy",
       "submenu": [
         {
           "url": "admitted_students_list",
-          "name": "All Students",
+          "name": "Hsc Students",
           "slug": "admitted_students_list"
+        },
+        {
+          "url": "degree_admitted_students_list",
+          "name": "Degree Students",
+          "slug": "degree_admitted_students_list"
         },
         {
           "url": "fee_list",
           "name": "Admission Fees",
           "slug": "fee_list"
+        }
+      ]
+    },
+    {
+      "name": "Fees and Payment",
+      "icon": "menu-icon tf-icons ti ti-receipt-2",
+      "slug": "academy",
+      "submenu": [
+        {
+          "url": "p1",
+          "name": "Add Payment",
+          "slug": "admitted_students_list"
+        },
+        {
+          "url": "p2",
+          "name": "Manual Payment",
+          "slug": "degree_admitted_students_list"
+        },
+        {
+          "url": "p3",
+          "name": "Invoice Generate",
+          "slug": "fee_list"
+        },
+        {
+          "url": "p4",
+          "name": "Invoice Purpose",
+          "slug": "fee_list"
+        }
+      ]
+    },
+    {
+      "name": "Exams",
+      "icon": "menu-icon tf-icons ti ti-file-check",
+      "slug": "academy",
+      "submenu": [
+        {
+          "url": "exam1",
+          "name": "Exam List",
+          "slug": "exam1"
+        },
+        {
+        "name": "Admit Card",
+        "icon": "menu-icon tf-icons ti ti-school",
+        "slug": "marks",
+        "submenu": [
+          {
+            "url": "exam2",
+            "name": "Admit Card (Front)",
+            "slug": "exam2"
+          },
+          {
+            "url": "exam3",
+            "name": "Admit Card (Back)",
+            "slug": "exam3"
+          }
+          ]
+        },
+
+        {
+          "url": "exam4",
+          "name": "Seat Plan",
+          "slug": "exam4"
+        },
+        {
+        "name": "Marks Related",
+        "icon": "menu-icon tf-icons ti ti-school",
+        "slug": "marks",
+        "submenu": [
+          {
+            "url": "exam5",
+            "name": "Add Marks",
+            "slug": "exam5"
+          },
+          {
+            "url": "exam6",
+            "name": "Marks Distribution",
+            "slug": "exam6"
+          },
+          {
+            "url": "exam7",
+            "name": "Mark Sheet",
+            "slug": "exam7"
+          },
+          {
+            "url": "exam8",
+            "name": "Tabulation Sheet",
+            "slug": "exam8"
+          }
+        ]
+      }
+
+      ]
+    },
+    {
+      "name": "Teachers",
+      "icon": "menu-icon tf-icons ti ti-user",
+      "slug": "income-expense",
+      "submenu": [
+        {
+          "url": "te1",
+          "name": "Teacher's List",
+          "slug": "te1"
         }
       ]
     },

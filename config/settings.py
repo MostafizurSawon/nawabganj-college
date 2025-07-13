@@ -35,7 +35,7 @@ DEBUG = os.environ.get("DEBUG", 'True').lower() in ['true', 'yes', '1']
 
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
+ALLOWED_HOSTS = ["*"]
 
 # Current DJANGO_ENVIRONMENT
 ENVIRONMENT = os.environ.get("DJANGO_ENVIRONMENT", default="local")
@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     "apps.finances",
     "apps.admissions",
     "apps.students",
+    "apps.exams",
+    "apps.teachers",
 ]
 
 MIDDLEWARE = [
@@ -79,6 +81,8 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "apps.admissions.context_processors.active_session",
+                'config.context_processors.session_list',
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",

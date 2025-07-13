@@ -7,6 +7,10 @@ urlpatterns = [
     #Admission Fee Api
     path('api/fee/admission/', get_admission_fee, name='get_admission_fee'),
 
+    # Degree Api
+    path('api/fee/degree/', views.get_degree_admission_fee, name='get_degree_admission_fee'),
+
+
     path('fees/', FeeListView.as_view(), name='fee_list'),
     path('fees/create/', FeeCreateView.as_view(), name='fee_create'),
     path('fees/<int:pk>/update/', FeeUpdateView.as_view(), name='fee_update'),
@@ -22,6 +26,10 @@ urlpatterns = [
     path('apply/bss/', views.AdmissionBssCreateView.as_view(), name='bss_admission_create'),
     path('apply/bsc/', views.AdmissionBscCreateView.as_view(), name='bsc_admission_create'),
     path('apply/bbs/', views.AdmissionBbsCreateView.as_view(), name='bbs_admission_create'),
+
+
+    # Global filter by session
+    path('set-session/', views.set_session_view, name='set_session'),
 
 ]
 

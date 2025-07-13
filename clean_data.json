@@ -1,0 +1,3120 @@
+[
+{
+  "model": "finances.feecategory",
+  "pk": 1,
+  "fields": {
+    "fee_category": "hsc admission",
+    "created_at": "2025-07-07T07:22:20.202Z"
+  }
+},
+{
+  "model": "finances.fee",
+  "pk": 1,
+  "fields": {
+    "fee_category": 1,
+    "fee_name": "admission",
+    "amount": 1200
+  }
+},
+{
+  "model": "finances.expensecategory",
+  "pk": 1,
+  "fields": {
+    "name": "Rent",
+    "created_at": "2025-07-03T07:20:41.059Z"
+  }
+},
+{
+  "model": "finances.expensecategory",
+  "pk": 2,
+  "fields": {
+    "name": "Electricity Bill",
+    "created_at": "2025-07-03T08:53:10.575Z"
+  }
+},
+{
+  "model": "finances.expensecategory",
+  "pk": 3,
+  "fields": {
+    "name": "Water Bil",
+    "created_at": "2025-07-03T08:53:34.958Z"
+  }
+},
+{
+  "model": "finances.expense",
+  "pk": 1,
+  "fields": {
+    "exp_category": 1,
+    "exp_name": "Rent",
+    "date": "2025-07-03",
+    "amount": 40000,
+    "note": "<p>edit working now 2</p>",
+    "created_at": "2025-07-03T07:22:10.335Z"
+  }
+},
+{
+  "model": "finances.expense",
+  "pk": 5,
+  "fields": {
+    "exp_category": 1,
+    "exp_name": "New Rent",
+    "date": "2025-07-09",
+    "amount": 400,
+    "note": "<p>New <strong>data </strong><strong style=\"background-color: rgb(255, 255, 0);\">Added</strong></p>",
+    "created_at": "2025-07-03T08:49:13.703Z"
+  }
+},
+{
+  "model": "finances.expense",
+  "pk": 6,
+  "fields": {
+    "exp_category": 1,
+    "exp_name": "Rent 4",
+    "date": "2025-07-03",
+    "amount": 4555,
+    "note": "<p>fdf <span style=\"background-color: rgb(255, 255, 0);\">fsdfsdf</span></p>",
+    "created_at": "2025-07-03T08:49:51.393Z"
+  }
+},
+{
+  "model": "finances.expense",
+  "pk": 12,
+  "fields": {
+    "exp_category": 1,
+    "exp_name": "bil 9",
+    "date": "2025-07-09",
+    "amount": 234234,
+    "note": "<ul><li>fsdf fsd sf sdf</li><li>fsdf</li></ul>",
+    "created_at": "2025-07-03T09:03:24.675Z"
+  }
+},
+{
+  "model": "finances.expense",
+  "pk": 13,
+  "fields": {
+    "exp_category": 1,
+    "exp_name": "bill 7",
+    "date": "2025-07-04",
+    "amount": 700,
+    "note": "<ul><li>fsafd </li><li>fsdf</li></ul>",
+    "created_at": "2025-07-03T09:10:22.767Z"
+  }
+},
+{
+  "model": "finances.expense",
+  "pk": 14,
+  "fields": {
+    "exp_category": 1,
+    "exp_name": "bill 8",
+    "date": "2025-07-12",
+    "amount": 600,
+    "note": "<p>fsfdsaaaa (Edited)</p>",
+    "created_at": "2025-07-03T09:10:42.441Z"
+  }
+},
+{
+  "model": "finances.expense",
+  "pk": 15,
+  "fields": {
+    "exp_category": 1,
+    "exp_name": "bill 10",
+    "date": "2025-07-15",
+    "amount": 555,
+    "note": "<p>sdfdsffsdafsdf (edited)</p>",
+    "created_at": "2025-07-03T09:58:03.500Z"
+  }
+},
+{
+  "model": "finances.incomecategory",
+  "pk": 2,
+  "fields": {
+    "name": "Exam Feee",
+    "created_at": "2025-07-03T11:19:29.122Z"
+  }
+},
+{
+  "model": "finances.income",
+  "pk": 1,
+  "fields": {
+    "income_category": 2,
+    "income_name": "March Exam Fee",
+    "date": "2025-07-14",
+    "amount": 20000,
+    "note": "<ol><li>March hsc <span style=\"background-color: rgb(230, 0, 0); color: rgb(255, 255, 255);\">exm</span><span style=\"color: rgb(255, 255, 255);\"> </span>fee</li><li>March Admission Fee</li><li>March Tution Fee</li></ol>",
+    "created_at": "2025-07-03T11:21:42.908Z"
+  }
+},
+{
+  "model": "finances.income",
+  "pk": 3,
+  "fields": {
+    "income_category": 2,
+    "income_name": "Demo 2",
+    "date": "2025-07-22",
+    "amount": 45000,
+    "note": "<p>Demo Des</p>",
+    "created_at": "2025-07-03T11:47:41.134Z"
+  }
+},
+{
+  "model": "admissions.programs",
+  "pk": 1,
+  "fields": {
+    "pro_name": "HSC",
+    "pro_status": "active",
+    "pro_year": "2024-25"
+  }
+},
+{
+  "model": "admissions.programs",
+  "pk": 2,
+  "fields": {
+    "pro_name": "Honours",
+    "pro_status": "active",
+    "pro_year": null
+  }
+},
+{
+  "model": "admissions.programs",
+  "pk": 3,
+  "fields": {
+    "pro_name": null,
+    "pro_status": null,
+    "pro_year": null
+  }
+},
+{
+  "model": "admissions.degreeprograms",
+  "pk": 1,
+  "fields": {
+    "deg_name": "Ba",
+    "deg_status": "active",
+    "deg_year": "2025"
+  }
+},
+{
+  "model": "admissions.degreeprograms",
+  "pk": 2,
+  "fields": {
+    "deg_name": "Bsc",
+    "deg_status": "active",
+    "deg_year": null
+  }
+},
+{
+  "model": "admissions.degreeprograms",
+  "pk": 3,
+  "fields": {
+    "deg_name": "Bbs",
+    "deg_status": "active",
+    "deg_year": null
+  }
+},
+{
+  "model": "admissions.degreeprograms",
+  "pk": 4,
+  "fields": {
+    "deg_name": "Bss",
+    "deg_status": "active",
+    "deg_year": null
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 1,
+  "fields": {
+    "ses_name": "2024-2025",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 2,
+  "fields": {
+    "ses_name": "2025-2026",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 3,
+  "fields": {
+    "ses_name": "2026-2027",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 4,
+  "fields": {
+    "ses_name": "2027-2028",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 5,
+  "fields": {
+    "ses_name": "2028-2029",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 6,
+  "fields": {
+    "ses_name": "2029-2030",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 7,
+  "fields": {
+    "ses_name": "2030-2031",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 8,
+  "fields": {
+    "ses_name": "2031-2032",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 9,
+  "fields": {
+    "ses_name": "2032-2033",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 10,
+  "fields": {
+    "ses_name": "2033-2034",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 11,
+  "fields": {
+    "ses_name": "2034-2035",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.session",
+  "pk": 12,
+  "fields": {
+    "ses_name": "2035-2036",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesession",
+  "pk": 1,
+  "fields": {
+    "ses_name": "2024-2025",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesession",
+  "pk": 2,
+  "fields": {
+    "ses_name": "2025-2026",
+    "ses_status": "active"
+  }
+},
+{
+  "model": "admissions.group",
+  "pk": 1,
+  "fields": {
+    "group_name": "science"
+  }
+},
+{
+  "model": "admissions.group",
+  "pk": 3,
+  "fields": {
+    "group_name": "commerce"
+  }
+},
+{
+  "model": "admissions.group",
+  "pk": 4,
+  "fields": {
+    "group_name": "Arts"
+  }
+},
+{
+  "model": "admissions.group",
+  "pk": 5,
+  "fields": {
+    "group_name": "Ba"
+  }
+},
+{
+  "model": "admissions.group",
+  "pk": 6,
+  "fields": {
+    "group_name": "Bss"
+  }
+},
+{
+  "model": "admissions.group",
+  "pk": 7,
+  "fields": {
+    "group_name": "Bbs"
+  }
+},
+{
+  "model": "admissions.group",
+  "pk": 8,
+  "fields": {
+    "group_name": "Bsc"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 1,
+  "fields": {
+    "sub_name": "বাংলা",
+    "group": "science",
+    "code": "১০১ - ১০২",
+    "sub_select": "all",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 2,
+  "fields": {
+    "sub_name": "ইংরেজি",
+    "group": "science",
+    "code": "১০৭ - ১০৮",
+    "sub_select": "all",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 3,
+  "fields": {
+    "sub_name": "তথ্য ও যোগাযোগ প্রযুক্তি",
+    "group": "science",
+    "code": "২৭৫",
+    "sub_select": "all",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 4,
+  "fields": {
+    "sub_name": "পদার্থ",
+    "group": "science",
+    "code": "১৭৪ ও ১৭৫",
+    "sub_select": "optional",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 5,
+  "fields": {
+    "sub_name": "রসায়ন",
+    "group": "science",
+    "code": "১৭৬ - ১৭৭",
+    "sub_select": "optional",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 6,
+  "fields": {
+    "sub_name": "জীববিজ্ঞান",
+    "group": "science",
+    "code": "১৭৮ - ১৭৯",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 7,
+  "fields": {
+    "sub_name": "জীববিজ্ঞান",
+    "group": "science",
+    "code": "১৭৮ - ১৭৯",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 8,
+  "fields": {
+    "sub_name": "উচ্চতর গণিত",
+    "group": "science",
+    "code": "২৬৫ - ২৬৬",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 9,
+  "fields": {
+    "sub_name": "উচ্চতর গণিত",
+    "group": "science",
+    "code": "২৬৫ - ২৬৬",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 10,
+  "fields": {
+    "sub_name": "পরিসংখ্যান",
+    "group": "science",
+    "code": "১২৯ - ১৩০",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 11,
+  "fields": {
+    "sub_name": "পরিসংখ্যান",
+    "group": "science",
+    "code": "১২৯ - ১৩০",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 12,
+  "fields": {
+    "sub_name": "মনোবিজ্ঞান",
+    "group": "science",
+    "code": "১২৩ - ১২৪",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 13,
+  "fields": {
+    "sub_name": "বাংলা",
+    "group": "commerce",
+    "code": "১০১ ও ১০২",
+    "sub_select": "all",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 14,
+  "fields": {
+    "sub_name": "ইংরেজি",
+    "group": "commerce",
+    "code": "১০৭ ও ১০৮",
+    "sub_select": "all",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 15,
+  "fields": {
+    "sub_name": "তথ্য ও যোগাযোগ প্রযুক্তি",
+    "group": "commerce",
+    "code": "২৭৫",
+    "sub_select": "all",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 16,
+  "fields": {
+    "sub_name": "হিসাববিজ্ঞান",
+    "group": "commerce",
+    "code": "২৫৩ - ২৫৪",
+    "sub_select": "optional",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 17,
+  "fields": {
+    "sub_name": "ব্যবসায় সংগঠন ও ব্যবস্থাপনা",
+    "group": "commerce",
+    "code": "২৭৭ - ২৭৮",
+    "sub_select": "optional",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 18,
+  "fields": {
+    "sub_name": "উৎপাদন ব্যবস্থাপনা ও বিপণন",
+    "group": "commerce",
+    "code": "২৮৬ - ২৮৭",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 19,
+  "fields": {
+    "sub_name": "ফিন্যান্স, ব্যাংকিং ও বিমা",
+    "group": "commerce",
+    "code": "২৯২ - ২৯৩",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 20,
+  "fields": {
+    "sub_name": "পরিসংখ্যান",
+    "group": "commerce",
+    "code": "১২৯ - ১৩০",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 21,
+  "fields": {
+    "sub_name": "উৎপাদন ব্যবস্থাপনা ও বিপণন",
+    "group": "commerce",
+    "code": "২৮৬ - ২৮৭",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 22,
+  "fields": {
+    "sub_name": "ফিন্যান্স, ব্যাংকিং ও বিমা",
+    "group": "commerce",
+    "code": "২৯২ - ২৯৩",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 23,
+  "fields": {
+    "sub_name": "পরিসংখ্যান",
+    "group": "commerce",
+    "code": "১২৯ - ১৩০",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 24,
+  "fields": {
+    "sub_name": "বাংলা",
+    "group": "arts",
+    "code": "১০১ - ১০২",
+    "sub_select": "all",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 25,
+  "fields": {
+    "sub_name": "ইংরেজি",
+    "group": "arts",
+    "code": "১০৭ - ১০৮",
+    "sub_select": "all",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 26,
+  "fields": {
+    "sub_name": "তথ্য ও যোগাযোগ প্রযুক্তি",
+    "group": "arts",
+    "code": "২৭৫",
+    "sub_select": "all",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 28,
+  "fields": {
+    "sub_name": "অর্থনীতি",
+    "group": "arts",
+    "code": "১০৯ - ১১০",
+    "sub_select": "optional",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 29,
+  "fields": {
+    "sub_name": "অর্থনীতি",
+    "group": "arts",
+    "code": "১০৯ - ১১০",
+    "sub_select": "optional2",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 30,
+  "fields": {
+    "sub_name": "অর্থনীতি",
+    "group": "arts",
+    "code": "১০৯ - ১১০",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 32,
+  "fields": {
+    "sub_name": "পৌরনীতি ও সুশাসন",
+    "group": "arts",
+    "code": "২৬৯ - ২৭০",
+    "sub_select": "optional",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 33,
+  "fields": {
+    "sub_name": "পৌরনীতি ও সুশাসন",
+    "group": "arts",
+    "code": "২৬৯ - ২৭০",
+    "sub_select": "optional2",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 34,
+  "fields": {
+    "sub_name": "পৌরনীতি ও সুশাসন",
+    "group": "arts",
+    "code": "২৬৯ - ২৭০",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 36,
+  "fields": {
+    "sub_name": "সমাজবিজ্ঞান",
+    "group": "arts",
+    "code": "১১৭ - ১১৮",
+    "sub_select": "optional",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 37,
+  "fields": {
+    "sub_name": "সমাজবিজ্ঞান",
+    "group": "arts",
+    "code": "১১৭ - ১১৮",
+    "sub_select": "optional2",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 38,
+  "fields": {
+    "sub_name": "সমাজবিজ্ঞান",
+    "group": "arts",
+    "code": "১১৭ - ১১৮",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 40,
+  "fields": {
+    "sub_name": "ইসলামের ইতিহাস ও সংস্কৃতি",
+    "group": "arts",
+    "code": "২৬৭ - ২৬৮",
+    "sub_select": "optional",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 41,
+  "fields": {
+    "sub_name": "ইসলামের ইতিহাস ও সংস্কৃতি",
+    "group": "arts",
+    "code": "২৬৭ - ২৬৮",
+    "sub_select": "optional2",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 42,
+  "fields": {
+    "sub_name": "ইসলামের ইতিহাস ও সংস্কৃতি",
+    "group": "arts",
+    "code": "২৬৭ - ২৬৮",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 43,
+  "fields": {
+    "sub_name": "ইসলামের ইতিহাস ও সংস্কৃতি",
+    "group": "arts",
+    "code": "২৬৭ - ২৬৮",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 44,
+  "fields": {
+    "sub_name": "ভূগোল ও পরিবেশ",
+    "group": "arts",
+    "code": "১২৫ - ১২৬",
+    "sub_select": "optional",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 45,
+  "fields": {
+    "sub_name": "ভূগোল ও পরিবেশ",
+    "group": "arts",
+    "code": "১২৫ - ১২৬",
+    "sub_select": "optional2",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 46,
+  "fields": {
+    "sub_name": "ভূগোল ও পরিবেশ",
+    "group": "arts",
+    "code": "১২৫ - ১২৬",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 47,
+  "fields": {
+    "sub_name": "ভূগোল ও পরিবেশ",
+    "group": "arts",
+    "code": "১২৫ - ১২৬",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 48,
+  "fields": {
+    "sub_name": "যুক্তিবিদ্যা",
+    "group": "arts",
+    "code": "১২১ - ১২২",
+    "sub_select": "optional",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 49,
+  "fields": {
+    "sub_name": "যুক্তিবিদ্যা",
+    "group": "arts",
+    "code": "১২১ - ১২২",
+    "sub_select": "optional2",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 50,
+  "fields": {
+    "sub_name": "যুক্তিবিদ্যা",
+    "group": "arts",
+    "code": "১২১ - ১২২",
+    "sub_select": "main",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 51,
+  "fields": {
+    "sub_name": "যুক্তিবিদ্যা",
+    "group": "arts",
+    "code": "১২১ - ১২২",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 55,
+  "fields": {
+    "sub_name": "মনোবিজ্ঞান",
+    "group": "arts",
+    "code": "১২৩ - ১২৪",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.subjects",
+  "pk": 59,
+  "fields": {
+    "sub_name": "পরিসংখ্যান",
+    "group": "arts",
+    "code": "১২৯ - ১৩০",
+    "sub_select": "fourth",
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 1,
+  "fields": {
+    "sub_name": "সমাজবিজ্ঞান",
+    "group": "Ba",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 2,
+  "fields": {
+    "sub_name": "সমাজবিজ্ঞান",
+    "group": "Bss",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 3,
+  "fields": {
+    "sub_name": "রাষ্ট্রবিজ্ঞান",
+    "group": "Ba",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 4,
+  "fields": {
+    "sub_name": "রাষ্ট্রবিজ্ঞান",
+    "group": "Bss",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 7,
+  "fields": {
+    "sub_name": "দর্শন",
+    "group": "Ba",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 8,
+  "fields": {
+    "sub_name": "দর্শন",
+    "group": "Bss",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 9,
+  "fields": {
+    "sub_name": "অর্থনীতি",
+    "group": "Ba",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 10,
+  "fields": {
+    "sub_name": "অর্থনীতি",
+    "group": "Bss",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 11,
+  "fields": {
+    "sub_name": "মনোবিজ্ঞান",
+    "group": "Ba",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 12,
+  "fields": {
+    "sub_name": "মনোবিজ্ঞান",
+    "group": "Bss",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 13,
+  "fields": {
+    "sub_name": "ভূগোল ও পরিবেশ",
+    "group": "Ba",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 14,
+  "fields": {
+    "sub_name": "ভূগোল ও পরিবেশ",
+    "group": "Bss",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 15,
+  "fields": {
+    "sub_name": "ইসলামের ইতিহাস ও সংস্কৃতি",
+    "group": "Ba",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 16,
+  "fields": {
+    "sub_name": "ইসলামের ইতিহাস ও সংস্কৃতি",
+    "group": "Bss",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 17,
+  "fields": {
+    "sub_name": "পদার্থবিজ্ঞান",
+    "group": "Bsc",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 18,
+  "fields": {
+    "sub_name": "রসায়ন",
+    "group": "Bsc",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 19,
+  "fields": {
+    "sub_name": "গণিত",
+    "group": "Bsc",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 20,
+  "fields": {
+    "sub_name": "ফিন্যান্স এবং ব্যাংকিং",
+    "group": "Bbs",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 21,
+  "fields": {
+    "sub_name": "হিসাববিজ্ঞান",
+    "group": "Bbs",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 22,
+  "fields": {
+    "sub_name": "মার্কেটিং",
+    "group": "Bbs",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.degreesubjects",
+  "pk": 23,
+  "fields": {
+    "sub_name": "ব্যবস্থাপনা",
+    "group": "Bbs",
+    "code": null,
+    "sub_status": "active"
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 1,
+  "fields": {
+    "fee_session": 1,
+    "fee_program": 1,
+    "fee_group": 1,
+    "amount": 1400
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 2,
+  "fields": {
+    "fee_session": 2,
+    "fee_program": 1,
+    "fee_group": 1,
+    "amount": 1550
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 3,
+  "fields": {
+    "fee_session": 1,
+    "fee_program": 1,
+    "fee_group": 3,
+    "amount": 1111
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 4,
+  "fields": {
+    "fee_session": 2,
+    "fee_program": 1,
+    "fee_group": 3,
+    "amount": 1222
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 5,
+  "fields": {
+    "fee_session": 1,
+    "fee_program": 1,
+    "fee_group": 4,
+    "amount": 800
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 6,
+  "fields": {
+    "fee_session": 2,
+    "fee_program": 1,
+    "fee_group": 4,
+    "amount": 900
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 8,
+  "fields": {
+    "fee_session": 1,
+    "fee_program": 2,
+    "fee_group": 5,
+    "amount": 2100
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 9,
+  "fields": {
+    "fee_session": 2,
+    "fee_program": 2,
+    "fee_group": 5,
+    "amount": 2300
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 10,
+  "fields": {
+    "fee_session": 1,
+    "fee_program": 2,
+    "fee_group": 6,
+    "amount": 2500
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 11,
+  "fields": {
+    "fee_session": 2,
+    "fee_program": 2,
+    "fee_group": 6,
+    "amount": 2600
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 12,
+  "fields": {
+    "fee_session": 1,
+    "fee_program": 2,
+    "fee_group": 8,
+    "amount": 2800
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 13,
+  "fields": {
+    "fee_session": 2,
+    "fee_program": 2,
+    "fee_group": 8,
+    "amount": 2900
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 14,
+  "fields": {
+    "fee_session": 1,
+    "fee_program": 2,
+    "fee_group": 7,
+    "amount": 3000
+  }
+},
+{
+  "model": "admissions.fee",
+  "pk": 15,
+  "fields": {
+    "fee_session": 2,
+    "fee_program": 2,
+    "fee_group": 7,
+    "amount": 3100
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 26,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "science",
+    "add_session": 2,
+    "merit_position": 62,
+    "add_name_bangla": "Deborah Rollins",
+    "add_name": "Emi Fry",
+    "add_mobile": "01854124578",
+    "add_father_bangla": "Md Abdul Awal",
+    "add_father": "Md Abdul Awal",
+    "add_father_mobile": "01854124578",
+    "add_mother_bangla": "Mrs Jorina Khatun",
+    "add_mother": "Mrs Jorina Khatun",
+    "add_mother_mobile": "01854124578",
+    "add_parent_select": "mother",
+    "add_parent": "Mrs Jorina Khatun",
+    "add_parent_mobile": "01854124578",
+    "add_parent_relation": "Mother",
+    "add_parent_service": "Job",
+    "add_parent_income": 932,
+    "add_parent_land_agri": "3 Acre",
+    "add_parent_land_nonagri": "2 Acre",
+    "add_village": "village",
+    "add_post": "post",
+    "add_upojella": "Rajshahi",
+    "add_distric": "Rajshahi",
+    "add_address_same": true,
+    "add_village_per": "village",
+    "add_post_per": "post",
+    "add_upojella_per": "Rajshahi",
+    "add_distric_per": "Rajshahi",
+    "add_birthdate": "2003-08-20",
+    "add_marital_status": "Single",
+    "main_subject": 11,
+    "fourth_subject": 7,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 4,
+    "add_ssc_reg": 22,
+    "add_ssc_session": "2023-2024",
+    "add_ssc_gpa": "5.00",
+    "add_ssc_group": "science",
+    "add_ssc_board": "Dhaka",
+    "add_ssc_passyear": "2024",
+    "add_payment_method": "rocket",
+    "add_amount": 1550,
+    "add_trxid": "4234",
+    "add_slip": "full nisi",
+    "add_class_roll": 42,
+    "add_hsc_year": "1st",
+    "add_blood_group": "B-",
+    "add_birth_certificate_no": "234234",
+    "add_gender": "Female",
+    "add_nationality": "Ullamco consequatur eligendi aliquid irure ipsum",
+    "add_religion": "Hindu",
+    "add_photo": "admissions/hsc-science/2025/07/09/12_yjc1dCx.png",
+    "subjects": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 27,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "commerce",
+    "add_session": 2,
+    "merit_position": 38,
+    "add_name_bangla": "Chloe Waller",
+    "add_name": "Sebastian Martin",
+    "add_mobile": "01924152687",
+    "add_father_bangla": "Ea amet",
+    "add_father": "Unde beatae",
+    "add_father_mobile": "01845214578",
+    "add_mother_bangla": "Eu architecto",
+    "add_mother": "Magni et",
+    "add_mother_mobile": "01658745896",
+    "add_parent_select": "father",
+    "add_parent": "Unde beatae",
+    "add_parent_mobile": "01845214578",
+    "add_parent_relation": "Father",
+    "add_parent_service": "Business",
+    "add_parent_income": 25000,
+    "add_parent_land_agri": "3 Acre",
+    "add_parent_land_nonagri": "1 Acre",
+    "add_village": "demo",
+    "add_post": "demo",
+    "add_upojella": "demo",
+    "add_distric": "Rajshahi",
+    "add_address_same": true,
+    "add_village_per": "demo",
+    "add_post_per": "demo",
+    "add_upojella_per": "demo",
+    "add_distric_per": "Rajshahi",
+    "add_birthdate": "2001-09-11",
+    "add_marital_status": "Single",
+    "main_subject": 19,
+    "fourth_subject": 21,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 156502,
+    "add_ssc_reg": 698515,
+    "add_ssc_session": "2022-2023",
+    "add_ssc_gpa": "4.50",
+    "add_ssc_group": "science",
+    "add_ssc_board": "Dhaka",
+    "add_ssc_passyear": "2023",
+    "add_payment_method": "bank",
+    "add_amount": 1222,
+    "add_trxid": "trxID8364",
+    "add_slip": "Tk nisi",
+    "add_class_roll": 72,
+    "add_hsc_year": "1st",
+    "add_blood_group": "A+",
+    "add_birth_certificate_no": "45432423",
+    "add_gender": "Female",
+    "add_nationality": "BD",
+    "add_religion": "Hindu",
+    "add_photo": "admissions/hsc-science/2025/07/09/10_qfbL70D.png",
+    "subjects": [
+      13,
+      14,
+      15,
+      16,
+      17
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 28,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "science",
+    "add_session": 1,
+    "merit_position": 42,
+    "add_name_bangla": "Drake Webb",
+    "add_name": "Jael Thomas",
+    "add_mobile": "796",
+    "add_father_bangla": "Illo in sed ipsum quis quia soluta vero est aut enim",
+    "add_father": "Molestiae magnam saepe eos quia impedit officia rerum voluptas provident qui pariatur At veniam",
+    "add_father_mobile": "Est sapiente",
+    "add_mother_bangla": "Exercitation dolores quo animi nobis laboriosam nisi doloribus suscipit deleniti voluptas sint qui",
+    "add_mother": "Quam dolor itaque possimus laborum culpa qui obcaecati ullam quibusdam cupiditate ipsam animi beat",
+    "add_mother_mobile": "Qui corrupti",
+    "add_parent_select": "mother",
+    "add_parent": "Quam dolor itaque possimus laborum culpa qui obcaecati ullam quibusdam cupiditate ipsam animi beat",
+    "add_parent_mobile": "Qui corrupti",
+    "add_parent_relation": "Mother",
+    "add_parent_service": "Excepturi itaque nesciunt dig",
+    "add_parent_income": 214,
+    "add_parent_land_agri": "Qui quaerat ea porro dolore qu",
+    "add_parent_land_nonagri": "Accusamus dolor obcaecati arch",
+    "add_village": "Perspiciatis ipsum porro quos",
+    "add_post": "Provident enim qui quos delen",
+    "add_upojella": "Officia mollit ipsa dolores n",
+    "add_distric": "Reprehenderit atque eius vel p",
+    "add_address_same": true,
+    "add_village_per": "Delectus in atque veritatis c",
+    "add_post_per": "Velit commodo cum odio itaque",
+    "add_upojella_per": "Deleniti ipsam excepteur dolor",
+    "add_distric_per": "Officia dolor officia sint es",
+    "add_birthdate": "1988-09-05",
+    "add_marital_status": "Single",
+    "main_subject": 6,
+    "fourth_subject": 8,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 5,
+    "add_ssc_reg": 77,
+    "add_ssc_session": "Error omnis aliquam fugit Nam",
+    "add_ssc_gpa": "Ex dolore",
+    "add_ssc_group": "science",
+    "add_ssc_board": "Impedit e",
+    "add_ssc_passyear": "1977",
+    "add_payment_method": "nagad",
+    "add_amount": 1400,
+    "add_trxid": "Eum doloribus quis dolores iure nobis culpa et dig",
+    "add_slip": "Dolor voluptas sit inventore tenetur quis numquam nemo eu iste vitae unde ex",
+    "add_class_roll": 15,
+    "add_hsc_year": "2nd",
+    "add_blood_group": "AB+",
+    "add_birth_certificate_no": "Consequatur commodi tenetur iste aut nulla non a",
+    "add_gender": "Male",
+    "add_nationality": "Odit esse nulla mollitia sit in quo aliquip est m",
+    "add_religion": "Other",
+    "add_photo": "admissions/hsc-science/2025/07/09/3.png",
+    "subjects": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 29,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "commerce",
+    "add_session": 2,
+    "merit_position": 34,
+    "add_name_bangla": "Jena Reyes",
+    "add_name": "Samantha Knight",
+    "add_mobile": "58",
+    "add_father_bangla": "Sed consequatur itaque et voluptatem architecto reprehenderit sunt aspernatur blanditiis sint sint",
+    "add_father": "Amet commodi voluptatem Ipsum do architecto tenetur eiusmod ducimus repudiandae aliqua Quos qua",
+    "add_father_mobile": "Non qui quod i",
+    "add_mother_bangla": "Hic modi dolor rerum proident est minim dicta sunt rerum qui voluptas",
+    "add_mother": "Quia voluptate et consequat Qui molestiae dolore",
+    "add_mother_mobile": "Deleniti nihil",
+    "add_parent_select": "mother",
+    "add_parent": "Quia voluptate et consequat Qui molestiae dolore",
+    "add_parent_mobile": "Deleniti nihil",
+    "add_parent_relation": "Mother",
+    "add_parent_service": "Proident fugiat eligendi sit",
+    "add_parent_income": 543,
+    "add_parent_land_agri": "Ea veniam sit qui voluptatem",
+    "add_parent_land_nonagri": "Iure dolore non adipisicing ve",
+    "add_village": "Dignissimos ex omnis earum do",
+    "add_post": "Quia consequatur aspernatur e",
+    "add_upojella": "Officia minima delectus tenet",
+    "add_distric": "Nihil qui laboriosam dolorem",
+    "add_address_same": false,
+    "add_village_per": "Eligendi facere fugiat nostru",
+    "add_post_per": "Id vel cupiditate eu beatae s",
+    "add_upojella_per": "Dolore facere est reprehender",
+    "add_distric_per": "Omnis nulla eos impedit libe",
+    "add_birthdate": "1982-03-18",
+    "add_marital_status": "Divorced",
+    "main_subject": 19,
+    "fourth_subject": 21,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 70,
+    "add_ssc_reg": 23,
+    "add_ssc_session": "Veniam est sunt dignissimos a",
+    "add_ssc_gpa": "Soluta sae",
+    "add_ssc_group": "science",
+    "add_ssc_board": "Quos nisi",
+    "add_ssc_passyear": "2005",
+    "add_payment_method": "nagad",
+    "add_amount": 1222,
+    "add_trxid": "Exercitation cillum iusto ducimus ea do cumque se",
+    "add_slip": "Sed voluptas cum magna adipisci error nobis sint quam voluptas minima velit minim aliquam elit qui quia",
+    "add_class_roll": 42,
+    "add_hsc_year": "2nd",
+    "add_blood_group": "A-",
+    "add_birth_certificate_no": "Ratione temporibus magna impedit minus ut at proi",
+    "add_gender": "Female",
+    "add_nationality": "Voluptas molestias ducimus eos dolore quo elit d",
+    "add_religion": "Buddhist",
+    "add_photo": "admissions/hsc-science/2025/07/09/2.png",
+    "subjects": [
+      13,
+      14,
+      15,
+      16,
+      17
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 30,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "commerce",
+    "add_session": 2,
+    "merit_position": 213,
+    "add_name_bangla": "Hayfa Austin",
+    "add_name": "Harrison Phillips",
+    "add_mobile": "598",
+    "add_father_bangla": "Dolor nulla ab nemo accusantium",
+    "add_father": "Unde iusto voluptas excepteur aliqua Dolore hic cupiditate odit maxime fugiat laudantium cupidita",
+    "add_father_mobile": "Magnam occaeca",
+    "add_mother_bangla": "Sapiente itaque at anim voluptatem elit provident ratione quia laborum officia magni ut reprehend",
+    "add_mother": "Quo exercitationem non tempora enim accusantium nostrum fugiat delectus aliquam reprehenderit occ",
+    "add_mother_mobile": "Esse voluptate",
+    "add_parent_select": "other",
+    "add_parent": null,
+    "add_parent_mobile": null,
+    "add_parent_relation": null,
+    "add_parent_service": "Fugiat nostrum quas ullamco N",
+    "add_parent_income": 69,
+    "add_parent_land_agri": "Et minim dolorum accusamus fug",
+    "add_parent_land_nonagri": "Adipisci sunt ipsa pariatur",
+    "add_village": "Lorem provident amet quam qu",
+    "add_post": "Vero quo ab non asperiores et",
+    "add_upojella": "Veritatis eu anim ipsa ipsa",
+    "add_distric": "Exercitation illum iste quaer",
+    "add_address_same": true,
+    "add_village_per": "Occaecat ullamco dolorum cupid",
+    "add_post_per": "Illo officiis omnis facere rem",
+    "add_upojella_per": "Dolore alias totam quis anim i",
+    "add_distric_per": "Commodi iste doloremque mollit",
+    "add_birthdate": "1990-11-23",
+    "add_marital_status": "Divorced",
+    "main_subject": 19,
+    "fourth_subject": 23,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 87,
+    "add_ssc_reg": 28,
+    "add_ssc_session": "Omnis maxime tempora voluptate",
+    "add_ssc_gpa": "Necessitat",
+    "add_ssc_group": "arts",
+    "add_ssc_board": "Reiciendis",
+    "add_ssc_passyear": "1975",
+    "add_payment_method": "nagad",
+    "add_amount": 1222,
+    "add_trxid": "Voluptatem velit accusamus accusamus numquam cons",
+    "add_slip": "Lorem qui omnis ad non iure pariatur Sed veniam ex qui facilis omnis nostrum unde enim",
+    "add_class_roll": 41,
+    "add_hsc_year": "2nd",
+    "add_blood_group": "O+",
+    "add_birth_certificate_no": "Fugit voluptatem Sapiente harum sint fugiat non",
+    "add_gender": "Female",
+    "add_nationality": "Labore aute id sed molestiae non sit dolor dolore",
+    "add_religion": "Christian",
+    "add_photo": "admissions/hsc-science/2025/07/09/6.png",
+    "subjects": [
+      13,
+      14,
+      15,
+      16,
+      17
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 31,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "arts",
+    "add_session": 2,
+    "merit_position": 53,
+    "add_name_bangla": "Grady Tate",
+    "add_name": "Neville Dudley",
+    "add_mobile": "229",
+    "add_father_bangla": "Aliquip excepturi tenetur est aut pariatur A dolor voluptate quo ad dignissimos sapiente ullam vel",
+    "add_father": "In et sint est eveniet non voluptatem quia reiciendis eaque",
+    "add_father_mobile": "Accusamus modi",
+    "add_mother_bangla": "Blanditiis exercitationem deserunt sed labore cupidatat quis non debitis magna",
+    "add_mother": "Ex voluptatibus ea sit nisi amet voluptatum libero id rerum culpa voluptatibus aliquid consequatu",
+    "add_mother_mobile": "Officia nulla",
+    "add_parent_select": "father",
+    "add_parent": "In et sint est eveniet non voluptatem quia reiciendis eaque",
+    "add_parent_mobile": "Accusamus modi",
+    "add_parent_relation": "Father",
+    "add_parent_service": "Vel distinctio Ut sint enim a",
+    "add_parent_income": 255,
+    "add_parent_land_agri": "Laborum Neque delectus aut d",
+    "add_parent_land_nonagri": "Aliquam dolor vel et est volup",
+    "add_village": "Rerum impedit sed cupidatat u",
+    "add_post": "Sit culpa est aliquip dolores",
+    "add_upojella": "Blanditiis dolor aute illo id",
+    "add_distric": "Quis est rerum totam occaecat",
+    "add_address_same": true,
+    "add_village_per": "Rerum impedit sed cupidatat u",
+    "add_post_per": "Sit culpa est aliquip dolores",
+    "add_upojella_per": "Blanditiis dolor aute illo id",
+    "add_distric_per": "Quis est rerum totam occaecat",
+    "add_birthdate": "1993-08-25",
+    "add_marital_status": "Married",
+    "main_subject": 30,
+    "fourth_subject": 55,
+    "optional_subject": 44,
+    "optional_subject_2": 41,
+    "add_ssc_roll": 48,
+    "add_ssc_reg": 62,
+    "add_ssc_session": "Adipisci qui illo commodo et c",
+    "add_ssc_gpa": "Et veritat",
+    "add_ssc_group": "arts",
+    "add_ssc_board": "Molestiae",
+    "add_ssc_passyear": "2017",
+    "add_payment_method": "bank",
+    "add_amount": 900,
+    "add_trxid": "Error voluptatem voluptate neque quia iure qui el",
+    "add_slip": "Amet qui perferendis quibusdam mollitia vero aute aut ad quos omnis quisquam quod ex ut eum ea do",
+    "add_class_roll": 68,
+    "add_hsc_year": "1st",
+    "add_blood_group": "A+",
+    "add_birth_certificate_no": "Ipsum aute quasi iusto omnis in sequi quia aut",
+    "add_gender": "Male",
+    "add_nationality": "Ut quaerat neque itaque provident minima consequa",
+    "add_religion": "Christian",
+    "add_photo": "admissions/hsc-science/2025/07/09/7.png",
+    "subjects": [
+      24,
+      25,
+      26,
+      41,
+      44
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 32,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "arts",
+    "add_session": 2,
+    "merit_position": 85,
+    "add_name_bangla": "Steel Gillespie",
+    "add_name": "Claire Woods",
+    "add_mobile": "743",
+    "add_father_bangla": "Quia laudantium voluptatem blanditiis fugit voluptate blanditiis deserunt molestiae deserunt cons",
+    "add_father": "Labore velit autem vel dolorem incididunt et est sed libero ipsa dolore est non consequatur saepe",
+    "add_father_mobile": "Omnis officia",
+    "add_mother_bangla": "Tempor autem Nam et laboriosam numquam nihil ex excepteur qui qui saepe voluptate adipisicing",
+    "add_mother": "Anim recusandae Et aperiam voluptas ut est tenetur reprehenderit corrupti sit non veniam quod s",
+    "add_mother_mobile": "Dolor et asper",
+    "add_parent_select": "other",
+    "add_parent": null,
+    "add_parent_mobile": null,
+    "add_parent_relation": null,
+    "add_parent_service": "Qui quos eu assumenda saepe et",
+    "add_parent_income": 863,
+    "add_parent_land_agri": "Non aliquid consequatur rerum",
+    "add_parent_land_nonagri": "Laborum quia ut voluptate sint",
+    "add_village": "Incidunt iste facilis et dist",
+    "add_post": "Labore ut labore autem consect",
+    "add_upojella": "Anim voluptatum dicta quam vel",
+    "add_distric": "Eius error Nam ratione ad enim",
+    "add_address_same": true,
+    "add_village_per": "Incidunt iste facilis et dist",
+    "add_post_per": "Labore ut labore autem consect",
+    "add_upojella_per": "Anim voluptatum dicta quam vel",
+    "add_distric_per": "Eius error Nam ratione ad enim",
+    "add_birthdate": "1979-01-03",
+    "add_marital_status": "Divorced",
+    "main_subject": 38,
+    "fourth_subject": 47,
+    "optional_subject": 36,
+    "optional_subject_2": 37,
+    "add_ssc_roll": 38,
+    "add_ssc_reg": 56,
+    "add_ssc_session": "Aut minus ipsum quidem repudi",
+    "add_ssc_gpa": "Atque veri",
+    "add_ssc_group": "science",
+    "add_ssc_board": "Corrupti",
+    "add_ssc_passyear": "2002",
+    "add_payment_method": "bank",
+    "add_amount": 900,
+    "add_trxid": "Eius irure laboriosam ut consequatur Expedita et",
+    "add_slip": "Doloribus culpa placeat sit labore dolorem adipisci aut ut",
+    "add_class_roll": 20,
+    "add_hsc_year": "2nd",
+    "add_blood_group": "AB-",
+    "add_birth_certificate_no": "Officia id illum sint vero velit reiciendis aut s",
+    "add_gender": "Male",
+    "add_nationality": "Consectetur autem culpa ut anim nihil saepe dolor",
+    "add_religion": "Buddhist",
+    "add_photo": "admissions/hsc-science/2025/07/09/7_wZ2nc3x.png",
+    "subjects": [
+      24,
+      25,
+      26,
+      36,
+      37
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 33,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "arts",
+    "add_session": 2,
+    "merit_position": 86,
+    "add_name_bangla": "Ifeoma Holden",
+    "add_name": "Graiden Rosario",
+    "add_mobile": "513",
+    "add_father_bangla": "Nobis et modi dolores numquam velit veritatis nesciunt non natus vitae debitis iste at aspernatur a",
+    "add_father": "Sit omnis aut illo irure voluptas voluptatem autem do do ipsum fuga Tempor commodi ad sit id sint",
+    "add_father_mobile": "Dolorem quia s",
+    "add_mother_bangla": "Modi minim ut irure fugiat ex voluptatibus sit consequatur reprehenderit",
+    "add_mother": "Aliquam iusto ut ut dignissimos voluptates molestiae praesentium dolorem animi nihil",
+    "add_mother_mobile": "Rerum debitis",
+    "add_parent_select": "mother",
+    "add_parent": "Aliquam iusto ut ut dignissimos voluptates molestiae praesentium dolorem animi nihil",
+    "add_parent_mobile": "Rerum debitis",
+    "add_parent_relation": "Mother",
+    "add_parent_service": "Dolor culpa neque est veniam",
+    "add_parent_income": 303,
+    "add_parent_land_agri": "Magnam qui soluta incididunt p",
+    "add_parent_land_nonagri": "Voluptatem minima sunt corpor",
+    "add_village": "Amet eveniet non dolor archi",
+    "add_post": "Modi dicta temporibus fugiat",
+    "add_upojella": "Perspiciatis nesciunt nulla",
+    "add_distric": "Elit nemo lorem aliqua Quia",
+    "add_address_same": false,
+    "add_village_per": "Quis numquam alias maxime dolo",
+    "add_post_per": "Voluptas ea dicta pariatur Si",
+    "add_upojella_per": "In aliquid rerum enim dolor fu",
+    "add_distric_per": "Eu est itaque quia sed expedi",
+    "add_birthdate": "1974-08-25",
+    "add_marital_status": "Divorced",
+    "main_subject": 42,
+    "fourth_subject": 47,
+    "optional_subject": 28,
+    "optional_subject_2": 33,
+    "add_ssc_roll": 93,
+    "add_ssc_reg": 79,
+    "add_ssc_session": "Numquam facere dolor assumenda",
+    "add_ssc_gpa": "Pariatur",
+    "add_ssc_group": "commerce",
+    "add_ssc_board": "Magna simi",
+    "add_ssc_passyear": "2007",
+    "add_payment_method": "bkash",
+    "add_amount": 900,
+    "add_trxid": "Consequatur Et molestias illo mollitia similique",
+    "add_slip": "Ut ducimus rerum culpa possimus blanditiis",
+    "add_class_roll": 43,
+    "add_hsc_year": "2nd",
+    "add_blood_group": "B-",
+    "add_birth_certificate_no": "Aut delectus et quos sunt tempora molestiae possi",
+    "add_gender": "Female",
+    "add_nationality": "Tenetur minim architecto tempor amet numquam",
+    "add_religion": "Buddhist",
+    "add_photo": "admissions/hsc-science/2025/07/09/15.png",
+    "subjects": [
+      24,
+      25,
+      26
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 34,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "science",
+    "add_session": 2,
+    "merit_position": 94,
+    "add_name_bangla": "Evan Dorsey",
+    "add_name": "Drake Moses",
+    "add_mobile": "640",
+    "add_father_bangla": "Odit odit est molestiae ut laboriosam est aut consequatur cupiditate Nam non corrupti cumque aliq",
+    "add_father": "Quis mollitia sed ut sint eum fugit sapiente totam quia aut inventore sunt quis exercitation",
+    "add_father_mobile": "Et ducimus qu",
+    "add_mother_bangla": "Non adipisci nostrum odio minus rerum minus non enim cupidatat",
+    "add_mother": "Minim ut dolor sunt tempora est veritatis",
+    "add_mother_mobile": "Iure reprehend",
+    "add_parent_select": "mother",
+    "add_parent": "Minim ut dolor sunt tempora est veritatis",
+    "add_parent_mobile": "Iure reprehend",
+    "add_parent_relation": "Mother",
+    "add_parent_service": "Optio minim ducimus quaerat",
+    "add_parent_income": 746,
+    "add_parent_land_agri": "Ea in quod quibusdam magnam bl",
+    "add_parent_land_nonagri": "Et consectetur assumenda tota",
+    "add_village": "Et consequatur autem culpa no",
+    "add_post": "Aliquid sunt veniam in asperi",
+    "add_upojella": "Inventore nobis error cillum m",
+    "add_distric": "Illo quis excepturi consequat",
+    "add_address_same": false,
+    "add_village_per": "Ad aute consectetur voluptatum",
+    "add_post_per": "Animi quis et consequuntur en",
+    "add_upojella_per": "Sint ratione deleniti laborum",
+    "add_distric_per": "Ex et aut debitis quos sit en",
+    "add_birthdate": "1998-07-25",
+    "add_marital_status": "Divorced",
+    "main_subject": 6,
+    "fourth_subject": 10,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 14,
+    "add_ssc_reg": 85,
+    "add_ssc_session": "Assumenda exercitationem exerc",
+    "add_ssc_gpa": "Neque aut",
+    "add_ssc_group": "arts",
+    "add_ssc_board": "Ea ab itaq",
+    "add_ssc_passyear": "2016",
+    "add_payment_method": "bkash",
+    "add_amount": 1550,
+    "add_trxid": "Quasi porro alias aut voluptatum praesentium moles",
+    "add_slip": "Aut labore veritatis vero consequatur",
+    "add_class_roll": 72,
+    "add_hsc_year": "2nd",
+    "add_blood_group": "A-",
+    "add_birth_certificate_no": "Enim eveniet aut sint reiciendis cillum doloremqu",
+    "add_gender": "Female",
+    "add_nationality": "Possimus quia cumque eum quod aut deleniti",
+    "add_religion": "Islam",
+    "add_photo": "admissions/hsc-science/2025/07/09/10_qAiy7ps.png",
+    "subjects": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 35,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "arts",
+    "add_session": 2,
+    "merit_position": 15,
+    "add_name_bangla": "Avye Patterson",
+    "add_name": "Ina Greer",
+    "add_mobile": "01851425189",
+    "add_father_bangla": "Et deserunt ratione velit adipisci necessitatibus nisi",
+    "add_father": "Quo dolor necessitatibus magni dolor perspiciatis et molestiae",
+    "add_father_mobile": "Vitae mollitia",
+    "add_mother_bangla": "Voluptas molestias nisi nostrud dolorem quis doloremque ut ipsum reiciendis ea dolores pariatur Iu",
+    "add_mother": "Iste voluptatibus repudiandae eius est officia error accusantium maiores irure reprehenderit tempor",
+    "add_mother_mobile": "Quaerat volupt",
+    "add_parent_select": "mother",
+    "add_parent": "Iste voluptatibus repudiandae eius est officia error accusantium maiores irure reprehenderit tempor",
+    "add_parent_mobile": "Quaerat volupt",
+    "add_parent_relation": "Mother",
+    "add_parent_service": "Ex consequat Ipsam in ut dese",
+    "add_parent_income": 505,
+    "add_parent_land_agri": "Nostrum et laborum Quo praese",
+    "add_parent_land_nonagri": "Quis doloremque anim dicta des",
+    "add_village": "Incididunt officiis eos quis",
+    "add_post": "Ipsa non perferendis reiciend",
+    "add_upojella": "Quas hic dolores harum magna l",
+    "add_distric": "Sit nisi praesentium consequat",
+    "add_address_same": true,
+    "add_village_per": "Laboriosam adipisci enim non",
+    "add_post_per": "Excepteur deserunt dolores et",
+    "add_upojella_per": "Odio exercitation deserunt lab",
+    "add_distric_per": "Quidem at officiis laborum nec",
+    "add_birthdate": "1994-07-09",
+    "add_marital_status": "Single",
+    "main_subject": 30,
+    "fourth_subject": 55,
+    "optional_subject": 40,
+    "optional_subject_2": 37,
+    "add_ssc_roll": 48,
+    "add_ssc_reg": 56,
+    "add_ssc_session": "Ut sit incididunt excepturi e",
+    "add_ssc_gpa": "Asperiores",
+    "add_ssc_group": "science",
+    "add_ssc_board": "Quo aut et",
+    "add_ssc_passyear": "1994",
+    "add_payment_method": "bank",
+    "add_amount": 900,
+    "add_trxid": "Tempore provident sit mollit voluptatum officia",
+    "add_slip": "Voluptatem ut et temporibus soluta non id maiores porro iusto quis cum tempor harum qui",
+    "add_class_roll": 90,
+    "add_hsc_year": "1st",
+    "add_blood_group": "O-",
+    "add_birth_certificate_no": "Nesciunt aliquid maiores aspernatur quo architect",
+    "add_gender": "Female",
+    "add_nationality": "Veniam recusandae Quisquam dolore ut voluptatem",
+    "add_religion": "Islam",
+    "add_photo": "admissions/hsc-science/2025/07/09/4.png",
+    "subjects": [
+      24,
+      25,
+      26,
+      37,
+      40
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 37,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "science",
+    "add_session": 1,
+    "merit_position": 5,
+    "add_name_bangla": "Emery Foreman",
+    "add_name": "Yetta Goodman",
+    "add_mobile": "399",
+    "add_father_bangla": "Rem voluptatibus sapiente veniam officiis sit non ea id",
+    "add_father": "Iste velit illo tenetur ad aut",
+    "add_father_mobile": "Perspiciatis",
+    "add_mother_bangla": "Vitae id quasi veniam ut quam et consequat Doloremque officiis quo qui incididunt sit",
+    "add_mother": "In modi cum sint in dolores",
+    "add_mother_mobile": "Quaerat ipsum",
+    "add_parent_select": "mother",
+    "add_parent": "In modi cum sint in dolores",
+    "add_parent_mobile": "Quaerat ipsum",
+    "add_parent_relation": "Mother",
+    "add_parent_service": "Et quis voluptatum hic incidun",
+    "add_parent_income": 877,
+    "add_parent_land_agri": "Magni fugiat explicabo Quis r",
+    "add_parent_land_nonagri": "Esse magna dolores reiciendis",
+    "add_village": "Eos laborum Molestiae vel id",
+    "add_post": "Sit nostrud reprehenderit et",
+    "add_upojella": "Ullamco rerum facilis in ad vo",
+    "add_distric": "Maxime beatae architecto ut qu",
+    "add_address_same": true,
+    "add_village_per": "Eos laborum Molestiae vel id",
+    "add_post_per": "Sit nostrud reprehenderit et",
+    "add_upojella_per": "Ullamco rerum facilis in ad vo",
+    "add_distric_per": "Maxime beatae architecto ut qu",
+    "add_birthdate": "1976-02-26",
+    "add_marital_status": "Married",
+    "main_subject": 6,
+    "fourth_subject": 10,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 65,
+    "add_ssc_reg": 83,
+    "add_ssc_session": "Minima nemo in modi eligendi i",
+    "add_ssc_gpa": "Blanditiis",
+    "add_ssc_group": "commerce",
+    "add_ssc_board": "Barishal",
+    "add_ssc_passyear": "1987",
+    "add_payment_method": "bank",
+    "add_amount": 1400,
+    "add_trxid": "Culpa nisi excepturi ducimus minim repudiandae b",
+    "add_slip": "Asperiores aperiam illo accusantium placeat",
+    "add_class_roll": 81,
+    "add_hsc_year": "2nd",
+    "add_blood_group": "AB+",
+    "add_birth_certificate_no": "Quia incididunt quia sed ex culpa est consequuntur",
+    "add_gender": "Male",
+    "add_nationality": "Sit excepteur ipsum qui sunt illum id quaerat ex",
+    "add_religion": "Other",
+    "add_photo": "admissions/hsc-science/2025/07/10/9.png",
+    "subjects": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 38,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "science",
+    "add_session": 1,
+    "merit_position": 51,
+    "add_name_bangla": "Ori Cherry",
+    "add_name": "Irene Massey",
+    "add_mobile": "01624512451",
+    "add_father_bangla": "Excepturi aliquam ex voluptate non et voluptatem doloribus placeat duis mollit fuga Qui sit exerc",
+    "add_father": "Placeat ipsa nihil delectus excepteur laboriosam similique consectetur in nostrum itaque corpori",
+    "add_father_mobile": "01624512451",
+    "add_mother_bangla": "Laboriosam tempor beatae velit alias eum illum dolores veritatis sint quis",
+    "add_mother": "Quia lorem dolore provident aliquip laboris proident aut maiores voluptatum alias",
+    "add_mother_mobile": "01624512451",
+    "add_parent_select": "father",
+    "add_parent": "Placeat ipsa nihil delectus excepteur laboriosam similique consectetur in nostrum itaque corpori",
+    "add_parent_mobile": "01624512451",
+    "add_parent_relation": "Father",
+    "add_parent_service": "Facilis doloribus similique au",
+    "add_parent_income": 463,
+    "add_parent_land_agri": "Quas necessitatibus accusamus",
+    "add_parent_land_nonagri": "Quaerat perspiciatis quia ass",
+    "add_village": "Et vitae in cupiditate aute qu",
+    "add_post": "Id illo commodi necessitatibus",
+    "add_upojella": "Ut sunt magna distinctio Nem",
+    "add_distric": "Assumenda eum et aut libero ut",
+    "add_address_same": true,
+    "add_village_per": "Vel consectetur aliquid dolore",
+    "add_post_per": "Voluptatem nemo nostrud culpa",
+    "add_upojella_per": "Laborum suscipit fuga In nemo",
+    "add_distric_per": "Ratione aute id perspiciatis",
+    "add_birthdate": "2005-06-03",
+    "add_marital_status": "Married",
+    "main_subject": 9,
+    "fourth_subject": 10,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 52,
+    "add_ssc_reg": 81,
+    "add_ssc_session": "In eos consectetur perspiciati",
+    "add_ssc_gpa": "Quod cum a",
+    "add_ssc_group": "arts",
+    "add_ssc_board": "Cumilla",
+    "add_ssc_passyear": "1987",
+    "add_payment_method": "bank",
+    "add_amount": 1400,
+    "add_trxid": "Ullamco voluptatibus labore commodi maiores explic",
+    "add_slip": "Atque voluptate exercitation sed cillum dolorem et pariatur Eaque nobis doloribus ea",
+    "add_class_roll": 52,
+    "add_hsc_year": "1st",
+    "add_blood_group": "AB-",
+    "add_birth_certificate_no": "Fugiat deserunt cum expedita sit aliquam ea place",
+    "add_gender": "Male",
+    "add_nationality": "Et in doloremque tempor laboris qui cum",
+    "add_religion": "Christian",
+    "add_photo": "admissions/hsc-science/2025/07/10/3.png",
+    "subjects": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 39,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "science",
+    "add_session": 2,
+    "merit_position": 98,
+    "add_name_bangla": "Slade Warren",
+    "add_name": "Nerea Austin",
+    "add_mobile": "01854125632",
+    "add_father_bangla": "Perferendis quia sit harum sunt et ea enim aspernatur voluptatibus quia esse totam voluptatem od",
+    "add_father": "Iusto dolores sint dolor ut exercitationem sunt deserunt totam dolorum est eos eius sed labore deb",
+    "add_father_mobile": "01854125632",
+    "add_mother_bangla": "Quia quos dolore sed ea",
+    "add_mother": "Facilis fugiat suscipit eligendi quam enim labore velit enim modi libero qui non consequatur",
+    "add_mother_mobile": "01652325412",
+    "add_parent_select": "father",
+    "add_parent": "Iusto dolores sint dolor ut exercitationem sunt deserunt totam dolorum est eos eius sed labore deb",
+    "add_parent_mobile": "01854125632",
+    "add_parent_relation": "Father",
+    "add_parent_service": "Est saepe illum nostrud ut au",
+    "add_parent_income": 325,
+    "add_parent_land_agri": "Perspiciatis nulla consequatu",
+    "add_parent_land_nonagri": "Unde consequatur Molestias ut",
+    "add_village": "Eum tenetur beatae cupidatat q",
+    "add_post": "Quas quia magna eos beatae sit",
+    "add_upojella": "Consequat Soluta enim Nam off",
+    "add_distric": "Perferendis occaecat obcaecati",
+    "add_address_same": true,
+    "add_village_per": "Similique blanditiis ea dolore",
+    "add_post_per": "Voluptatibus inventore aute vo",
+    "add_upojella_per": "Ut eligendi expedita aute accu",
+    "add_distric_per": "Qui autem totam minim qui ea e",
+    "add_birthdate": "1992-03-30",
+    "add_marital_status": "Divorced",
+    "main_subject": 9,
+    "fourth_subject": 7,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 35,
+    "add_ssc_reg": 60,
+    "add_ssc_session": "Adipisicing quia ea ex aut ea",
+    "add_ssc_gpa": "Nulla in m",
+    "add_ssc_group": "commerce",
+    "add_ssc_board": "Sylhet",
+    "add_ssc_passyear": "1985",
+    "add_payment_method": "nagad",
+    "add_amount": 1550,
+    "add_trxid": "Omnis reprehenderit molestiae tempora velit tenetu",
+    "add_slip": "Ipsam consectetur ea nemo sunt neque sed eos dicta reprehenderit in aut qui voluptatem Culpa deserunt fugiat",
+    "add_class_roll": 11,
+    "add_hsc_year": "1st",
+    "add_blood_group": "A+",
+    "add_birth_certificate_no": "Culpa ipsum asperiores autem magna laborum Aut s",
+    "add_gender": "Male",
+    "add_nationality": "Voluptates fugiat molestiae quos error necessitat",
+    "add_religion": "Hindu",
+    "add_photo": "admissions/hsc-science/2025/07/10/12.png",
+    "subjects": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 40,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "science",
+    "add_session": 2,
+    "merit_position": 78,
+    "add_name_bangla": "Zachery Buck",
+    "add_name": "Marshall Levy",
+    "add_mobile": "01625412589",
+    "add_father_bangla": "Qui veritatis reiciendis et ex dolorem architecto officia impedit labore adipisicing soluta volupta",
+    "add_father": "Est excepteur voluptas eu atque quae labore ea quasi corrupti",
+    "add_father_mobile": "01587412548",
+    "add_mother_bangla": "Officiis vitae iusto dolorem voluptatem non qui velit unde ratione ipsum eos suscipit voluptate la",
+    "add_mother": "Ab error quaerat sint velit eos sit perferendis",
+    "add_mother_mobile": "01632147896",
+    "add_parent_select": "father",
+    "add_parent": "Est excepteur voluptas eu atque quae labore ea quasi corrupti",
+    "add_parent_mobile": "01587412548",
+    "add_parent_relation": "Father",
+    "add_parent_service": "Labore consequatur Ut sunt eu",
+    "add_parent_income": 616,
+    "add_parent_land_agri": "Aspernatur non aliquam qui ex",
+    "add_parent_land_nonagri": "Ullam iure sit maiores in ut v",
+    "add_village": "Ipsum dignissimos est eum nu",
+    "add_post": "Tenetur vitae sed asperiores a",
+    "add_upojella": "Ullam neque quibusdam atque al",
+    "add_distric": "Amet ex deserunt ducimus hic",
+    "add_address_same": false,
+    "add_village_per": "Sed quasi id laborum Quam fu",
+    "add_post_per": "Facilis labore quos ducimus d",
+    "add_upojella_per": "Omnis iusto obcaecati ullamco",
+    "add_distric_per": "Sed alias vero quae quia",
+    "add_birthdate": "1996-04-27",
+    "add_marital_status": "Single",
+    "main_subject": 6,
+    "fourth_subject": 10,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 86,
+    "add_ssc_reg": 23,
+    "add_ssc_session": "Maiores neque sint dolorum sit",
+    "add_ssc_gpa": "Ea nulla m",
+    "add_ssc_group": "arts",
+    "add_ssc_board": "Sylhet",
+    "add_ssc_passyear": "1995",
+    "add_payment_method": "bank",
+    "add_amount": 1550,
+    "add_trxid": "Ea non sit doloremque corrupti sunt possimus la",
+    "add_slip": "Quam culpa eius enim ut quam culpa cupidatat quis eu possimus quos maxime labore et",
+    "add_class_roll": 67,
+    "add_hsc_year": "2nd",
+    "add_blood_group": "B-",
+    "add_birth_certificate_no": "Dolores iure qui dolorem dolore ipsum est",
+    "add_gender": "Male",
+    "add_nationality": "Sint et ut maiores laudantium mollitia cumque tem",
+    "add_religion": "Islam",
+    "add_photo": "admissions/hsc-science/2025/07/10/10.png",
+    "subjects": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 41,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "science",
+    "add_session": 2,
+    "merit_position": 77,
+    "add_name_bangla": "Roth Larsen",
+    "add_name": "Cynthia Petersen",
+    "add_mobile": "01458745214",
+    "add_father_bangla": "Tenetur corporis eu minim consequat Voluptatibus maiores consequuntur assumenda eaque aut sit adip",
+    "add_father": "Ducimus distinctio Autem voluptatem soluta do ducimus voluptatem Quos qui iste suscipit enim tem",
+    "add_father_mobile": "01458745214",
+    "add_mother_bangla": "Dolore culpa facere ut et sapiente veniam iure tenetur iusto voluptatem dolorum non dolore ipsam te",
+    "add_mother": "Assumenda aliquam sunt sit fugiat voluptatem",
+    "add_mother_mobile": "01458745211",
+    "add_parent_select": "mother",
+    "add_parent": "Assumenda aliquam sunt sit fugiat voluptatem",
+    "add_parent_mobile": "01458745211",
+    "add_parent_relation": "Mother",
+    "add_parent_service": "Impedit esse a voluptas ea d",
+    "add_parent_income": 283,
+    "add_parent_land_agri": "Incidunt dolor voluptas nihil",
+    "add_parent_land_nonagri": "Aut deleniti voluptatum libero",
+    "add_village": "Libero dolore porro praesentiu",
+    "add_post": "Fugit reprehenderit quibusda",
+    "add_upojella": "Provident ut quo amet aut et",
+    "add_distric": "Commodo ad eligendi nulla aute",
+    "add_address_same": true,
+    "add_village_per": "Id aperiam enim qui obcaecati",
+    "add_post_per": "Pariatur Dolore esse earum e",
+    "add_upojella_per": "Perferendis esse rerum asperi",
+    "add_distric_per": "Laborum Suscipit in quam saep",
+    "add_birthdate": "1990-05-03",
+    "add_marital_status": "Married",
+    "main_subject": 9,
+    "fourth_subject": 7,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 64,
+    "add_ssc_reg": 41,
+    "add_ssc_session": "Laborum Laborum Quaerat exer",
+    "add_ssc_gpa": "Dolor aut",
+    "add_ssc_group": "science",
+    "add_ssc_board": "Dinajpur",
+    "add_ssc_passyear": "2004",
+    "add_payment_method": "bkash",
+    "add_amount": 1550,
+    "add_trxid": "Veniam ab ut quae voluptatem Delectus est reru",
+    "add_slip": "Omnis non laborum Occaecat dolor quam mollitia rerum voluptas voluptas lorem lorem",
+    "add_class_roll": 27,
+    "add_hsc_year": "2nd",
+    "add_blood_group": "O+",
+    "add_birth_certificate_no": "Consectetur quidem fugiat anim eos consectetur",
+    "add_gender": "Male",
+    "add_nationality": "Officiis dolorem exercitationem nostrum aut ullam",
+    "add_religion": "Islam",
+    "add_photo": "admissions/hsc-science/2025/07/10/11.png",
+    "subjects": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 42,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "arts",
+    "add_session": 2,
+    "merit_position": 56,
+    "add_name_bangla": "Joan Carpenter",
+    "add_name": "Kim Tyson",
+    "add_mobile": "01458215478",
+    "add_father_bangla": "Voluptates quia soluta similique illum suscipit ad placeat sint quia in voluptatum ut reiciendis o",
+    "add_father": "Perferendis labore quibusdam odit minus quod minima ipsum laborum Quaerat aliquip temporibus",
+    "add_father_mobile": "01458215478",
+    "add_mother_bangla": "Ex debitis aut expedita aut sequi id sed cupidatat ullamco commodo rerum rerum aut sint velit",
+    "add_mother": "Qui fugit in expedita dignissimos voluptate deleniti anim aut illo porro ea ea",
+    "add_mother_mobile": "01458215478",
+    "add_parent_select": "father",
+    "add_parent": "Perferendis labore quibusdam odit minus quod minima ipsum laborum Quaerat aliquip temporibus",
+    "add_parent_mobile": "01458215478",
+    "add_parent_relation": "Father",
+    "add_parent_service": "Possimus Nam enim nihil excep",
+    "add_parent_income": 93,
+    "add_parent_land_agri": "Est quia fugiat ipsum impedit",
+    "add_parent_land_nonagri": "Et proident illo dolor magni",
+    "add_village": "Nihil aliquam et quia id culpa",
+    "add_post": "Dolore vel harum magni occaeca",
+    "add_upojella": "Dolore magnam ab repudiandae d",
+    "add_distric": "Voluptates labore incididunt q",
+    "add_address_same": true,
+    "add_village_per": "Sit minima rem alias omnis ne",
+    "add_post_per": "Amet fugiat exercitationem s",
+    "add_upojella_per": "Soluta fuga Ab nostrum adipis",
+    "add_distric_per": "Natus officia non consequatur",
+    "add_birthdate": "2014-08-05",
+    "add_marital_status": "Divorced",
+    "main_subject": 34,
+    "fourth_subject": 59,
+    "optional_subject": 28,
+    "optional_subject_2": 45,
+    "add_ssc_roll": 12,
+    "add_ssc_reg": 26,
+    "add_ssc_session": "At officia esse autem quas ve",
+    "add_ssc_gpa": "Consequatu",
+    "add_ssc_group": "science",
+    "add_ssc_board": "Chattogram",
+    "add_ssc_passyear": "2000",
+    "add_payment_method": "bank",
+    "add_amount": 900,
+    "add_trxid": "Dolor pariatur Laborum Qui ea",
+    "add_slip": "Harum rerum quo nihil totam laudantium esse exercitation deserunt quis iste odit deleniti reiciendis culpa consequat Hic quisquam dolorem accusanti",
+    "add_class_roll": 67,
+    "add_hsc_year": "1st",
+    "add_blood_group": "B-",
+    "add_birth_certificate_no": "Veritatis aliquip quia adipisicing adipisci labori",
+    "add_gender": "Male",
+    "add_nationality": "Dolorem asperiores enim qui reiciendis illo tempor",
+    "add_religion": "Hindu",
+    "add_photo": "admissions/hsc-science/2025/07/10/10_XPxhHoT.png",
+    "subjects": [
+      24,
+      25,
+      26
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 43,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "commerce",
+    "add_session": 2,
+    "merit_position": 72,
+    "add_name_bangla": "Abbot Webb",
+    "add_name": "Candice Park",
+    "add_mobile": "01854124578",
+    "add_father_bangla": "Qui animi deleniti magna minim ex tempora nobis",
+    "add_father": "Ut laborum Et qui quod nulla",
+    "add_father_mobile": "01854124578",
+    "add_mother_bangla": "Nulla rerum ex cupiditate dolorum eu error esse sunt minima amet eos sunt",
+    "add_mother": "Amet quo vitae officiis labore distinctio Qui dolorem eaque in deserunt proident consequatur plac",
+    "add_mother_mobile": "01854124578",
+    "add_parent_select": "mother",
+    "add_parent": "Amet quo vitae officiis labore distinctio Qui dolorem eaque in deserunt proident consequatur plac",
+    "add_parent_mobile": "01854124578",
+    "add_parent_relation": "Mother",
+    "add_parent_service": "Rerum qui mollitia sed digniss",
+    "add_parent_income": 3,
+    "add_parent_land_agri": "Est exercitationem ut impedit",
+    "add_parent_land_nonagri": "Sunt quis rem veritatis fuga",
+    "add_village": "Explicabo Excepturi sit labor",
+    "add_post": "Quidem officia et qui aut cons",
+    "add_upojella": "Pariatur In molestiae autem i",
+    "add_distric": "Qui laborum iure consequuntur",
+    "add_address_same": true,
+    "add_village_per": "Ipsam vel temporibus eiusmod s",
+    "add_post_per": "Beatae sit laboriosam non sed",
+    "add_upojella_per": "Rerum nulla sint esse qui est",
+    "add_distric_per": "Deserunt eveniet laboriosam",
+    "add_birthdate": "2015-08-17",
+    "add_marital_status": "Single",
+    "main_subject": 18,
+    "fourth_subject": 23,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 54,
+    "add_ssc_reg": 41,
+    "add_ssc_session": "Impedit ipsam ut et quas qui",
+    "add_ssc_gpa": "Saepe sit",
+    "add_ssc_group": "arts",
+    "add_ssc_board": "Dhaka",
+    "add_ssc_passyear": "1978",
+    "add_payment_method": "office",
+    "add_amount": 1222,
+    "add_trxid": "Iure deserunt amet quidem nostrum perspiciatis s",
+    "add_slip": "Aute adipisicing",
+    "add_class_roll": 60,
+    "add_hsc_year": "1st",
+    "add_blood_group": "B+",
+    "add_birth_certificate_no": "Ipsa esse commodo excepturi similique irure ducim",
+    "add_gender": "Female",
+    "add_nationality": "Nemo est deserunt laborum Id veniam mollitia vol",
+    "add_religion": "Other",
+    "add_photo": "admissions/hsc-science/2025/07/13/2.png",
+    "subjects": [
+      13,
+      14,
+      15,
+      16,
+      17
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 44,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "science",
+    "add_session": 2,
+    "merit_position": 64,
+    "add_name_bangla": "Alea Curtis",
+    "add_name": "Melyssa Vincent",
+    "add_mobile": "01632124578",
+    "add_father_bangla": "Eaque cupiditate ut amet Nam quidem fugiat quia doloribus asperiores error pariatur Harum",
+    "add_father": "Dolorum Nam quo sit omnis ipsum eiusmod iste facilis",
+    "add_father_mobile": "01632124578",
+    "add_mother_bangla": "Dolor et hic eum nisi nisi dicta maiores quam cumque ab sint minus quisquam ut autem excepteur sed d",
+    "add_mother": "Porro quam sunt quae ducimus quia porro nostrum incididunt et beatae quidem quae aliquid dolor",
+    "add_mother_mobile": "01632124578",
+    "add_parent_select": "father",
+    "add_parent": "Dolorum Nam quo sit omnis ipsum eiusmod iste facilis",
+    "add_parent_mobile": "01632124578",
+    "add_parent_relation": "Father",
+    "add_parent_service": "Laudantium atque laboriosam",
+    "add_parent_income": 176,
+    "add_parent_land_agri": "Et ad rerum maiores inventore",
+    "add_parent_land_nonagri": "Quas sint nulla autem incidun",
+    "add_village": "Dolor incidunt nostrum provid",
+    "add_post": "Perferendis corrupti similiqu",
+    "add_upojella": "Qui est veniam laborum ut",
+    "add_distric": "Necessitatibus voluptatem sim",
+    "add_address_same": true,
+    "add_village_per": "Dolor incidunt nostrum provid",
+    "add_post_per": "Perferendis corrupti similiqu",
+    "add_upojella_per": "Qui est veniam laborum ut",
+    "add_distric_per": "Necessitatibus voluptatem sim",
+    "add_birthdate": "1987-10-09",
+    "add_marital_status": "Married",
+    "main_subject": 6,
+    "fourth_subject": 12,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 41,
+    "add_ssc_reg": 91,
+    "add_ssc_session": "Tempor culpa eum quis est aut",
+    "add_ssc_gpa": "Labore ill",
+    "add_ssc_group": "commerce",
+    "add_ssc_board": "Dinajpur",
+    "add_ssc_passyear": "1986",
+    "add_payment_method": "bank",
+    "add_amount": 1550,
+    "add_trxid": "Quibusdam incidunt nostrum exercitationem ut ipsu",
+    "add_slip": "Ut qui eaque quaerat veritatis autem rerum rerum corrupti dolorum reprehenderit aut proident hic dolorum quas veritatis sunt",
+    "add_class_roll": 1,
+    "add_hsc_year": "1st",
+    "add_blood_group": "O+",
+    "add_birth_certificate_no": "3532532",
+    "add_gender": "Male",
+    "add_nationality": "Minim",
+    "add_religion": "Hindu",
+    "add_photo": "admissions/hsc-science/2025/07/13/1.png",
+    "subjects": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "admissions.hscadmissions",
+  "pk": 45,
+  "fields": {
+    "add_program": 1,
+    "add_admission_group": "science",
+    "add_session": 1,
+    "merit_position": 43,
+    "add_name_bangla": "Md Saju",
+    "add_name": "Md Saju",
+    "add_mobile": "01854785412",
+    "add_father_bangla": "Md Muiz",
+    "add_father": "Md Muiz",
+    "add_father_mobile": "01854785412",
+    "add_mother_bangla": "Mrs Hafsa",
+    "add_mother": "Mrs Hafsa",
+    "add_mother_mobile": "01854785412",
+    "add_parent_select": "father",
+    "add_parent": "Md Muiz",
+    "add_parent_mobile": "01854785412",
+    "add_parent_relation": "Father",
+    "add_parent_service": "Business",
+    "add_parent_income": 50000,
+    "add_parent_land_agri": "3 Acre",
+    "add_parent_land_nonagri": "4 Acre",
+    "add_village": "village",
+    "add_post": "post",
+    "add_upojella": "Natore Sadar",
+    "add_distric": "Natore",
+    "add_address_same": true,
+    "add_village_per": "village",
+    "add_post_per": "post",
+    "add_upojella_per": "Natore Sadar",
+    "add_distric_per": "Natore",
+    "add_birthdate": "2008-07-07",
+    "add_marital_status": "Single",
+    "main_subject": 6,
+    "fourth_subject": 10,
+    "optional_subject": null,
+    "optional_subject_2": null,
+    "add_ssc_roll": 4334,
+    "add_ssc_reg": 23432,
+    "add_ssc_session": "2024-2025",
+    "add_ssc_gpa": "5.00",
+    "add_ssc_group": "science",
+    "add_ssc_board": "Dhaka",
+    "add_ssc_passyear": "2025",
+    "add_payment_method": "office",
+    "add_amount": 1400,
+    "add_trxid": "4234",
+    "add_slip": "hmm",
+    "add_class_roll": 5,
+    "add_hsc_year": "1st",
+    "add_blood_group": "A+",
+    "add_birth_certificate_no": "23234",
+    "add_gender": "Male",
+    "add_nationality": "Bangladeshi",
+    "add_religion": "Islam",
+    "add_photo": "admissions/hsc-science/2025/07/13/1_So4TcgF.png",
+    "subjects": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+},
+{
+  "model": "admissions.degreeadmission",
+  "pk": 2,
+  "fields": {
+    "add_name": "Fulton Robles",
+    "add_name_bangla": "Ursa Mayo",
+    "add_mobile": "924",
+    "add_photo": "degree/student_photos/8_5JRRi2t.png",
+    "add_blood_group": "B+",
+    "add_birth_certificate_no": "Eiusmod omnis provident voluptate quae labore cul",
+    "add_gender": "Male",
+    "add_nationality": "Quasi in consequat Cum ut qui dolore et ipsum ani",
+    "add_religion": "Other",
+    "add_ssc_roll": "Fugiat voluptatibus",
+    "add_ssc_reg": "Quia id nisi saepe a",
+    "add_ssc_session": "Blanditiis delectus ut deleni",
+    "add_ssc_gpa": "Laudantium",
+    "add_ssc_board": "Rajshahi",
+    "add_ssc_group": "commerce",
+    "add_ssc_passyear": "1980",
+    "add_father_bangla": "Quidem aliquip vel deserunt blanditiis fugit molestiae expedita nesciunt possimus accusantium sin",
+    "add_father": "Exercitationem est repellendus Non magni qui exercitation dolor eius quam sed adipisicing id praese",
+    "add_father_mobile": "Praesentium il",
+    "add_mother_bangla": "Ex nostrum deserunt aperiam quaerat veniam ullamco consectetur elit corrupti",
+    "add_mother": "Irure consequuntur est sint irure soluta eaque inventore sapiente facilis laborum Voluptatem",
+    "add_mother_mobile": "Pariatur Cons",
+    "add_parent_select": "father",
+    "add_parent": "Sit molestiae debitis fugiat dolor enim dolore omnis obcaecati laudantium Nam sit eos quae cumque",
+    "add_parent_mobile": "Praesentium et",
+    "add_parent_relation": "Eos sint reiciendis",
+    "add_parent_service": "Quas quam et quam id odio irur",
+    "add_parent_income": 587,
+    "add_parent_land_agri": "Ullam consequatur quis alias e",
+    "add_parent_land_nonagri": "Aliquip voluptate nostrum eos",
+    "add_hsc_roll": "Enim perspiciatis m",
+    "add_hsc_reg": "Et harum eos in est",
+    "add_hsc_session": "Quibusdam eius laboris esse il",
+    "add_hsc_gpa": "Enim conse",
+    "add_hsc_board": "Madrasah",
+    "add_hsc_group": "arts",
+    "add_hsc_passyear": "2019",
+    "add_village": "Tempore et atque tenetur volu",
+    "add_post": "Qui pariatur Soluta commodi p",
+    "add_upojella": "Dolor dolorem exercitation vol",
+    "add_distric": "Iste est fugiat sit soluta d",
+    "add_address_same": true,
+    "add_village_per": "Modi eveniet molestiae incidi",
+    "add_post_per": "Fugiat facere qui sunt atque e",
+    "add_upojella_per": "Sit enim odit voluptatum iure",
+    "add_distric_per": "Dolore qui nisi qui quo autem",
+    "add_birthdate": "1976-07-02",
+    "add_marital_status": "Married",
+    "add_program": 1,
+    "add_admission_group": "Ba",
+    "add_session": 1,
+    "main_subject": null,
+    "add_class_roll": "Sed minima magnam ne",
+    "merit_position": "Et ipsum",
+    "add_amount": "0.00",
+    "add_payment_method": "Esse repellendus N",
+    "add_trxid": "Laudantium qui tenetur vel id tempore quis",
+    "add_slip": "Vel sint voluptates",
+    "created_at": "2025-07-10T05:59:23.864Z",
+    "subjects": [
+      1,
+      3,
+      13
+    ]
+  }
+},
+{
+  "model": "admissions.degreeadmission",
+  "pk": 3,
+  "fields": {
+    "add_name": "Kevyn Joseph",
+    "add_name_bangla": "Eric Rocha",
+    "add_mobile": "79",
+    "add_photo": "degree/student_photos/9.png",
+    "add_blood_group": "O+",
+    "add_birth_certificate_no": "Tempor sed aut velit vel voluptatibus sit enim qui",
+    "add_gender": "Male",
+    "add_nationality": "Sit consectetur aliquid eu non irure",
+    "add_religion": "Hindu",
+    "add_ssc_roll": "Molestiae labore ver",
+    "add_ssc_reg": "Nostrud impedit pro",
+    "add_ssc_session": "Voluptatem cumque sit laborum",
+    "add_ssc_gpa": "Ut eu quod",
+    "add_ssc_board": "Dhaka",
+    "add_ssc_group": "arts",
+    "add_ssc_passyear": "1973",
+    "add_father_bangla": "Voluptatem Aliqua Provident neque mollitia sint quia et ullam quis sint adipisicing numquam rerum",
+    "add_father": "Pariatur Incididunt blanditiis ut sed veritatis",
+    "add_father_mobile": "Hic et fugiat",
+    "add_mother_bangla": "Provident quod totam necessitatibus possimus totam omnis explicabo Eiusmod a sit sunt",
+    "add_mother": "Saepe eum commodi saepe velit itaque explicabo Labore facere ut",
+    "add_mother_mobile": "Dolor sint cu",
+    "add_parent_select": "other",
+    "add_parent": "Non tempor magnam lorem laborum",
+    "add_parent_mobile": "Aliquam aut ve",
+    "add_parent_relation": "Adipisicing qui reru",
+    "add_parent_service": "Et non commodi exercitation iu",
+    "add_parent_income": 969,
+    "add_parent_land_agri": "Beatae sit labore qui dolorem",
+    "add_parent_land_nonagri": "Cum maiores doloremque quae po",
+    "add_hsc_roll": "Ut minim veritatis q",
+    "add_hsc_reg": "Est exercitationem v",
+    "add_hsc_session": "Accusamus voluptas aut aliquam",
+    "add_hsc_gpa": "Natus reru",
+    "add_hsc_board": "Jashore",
+    "add_hsc_group": "arts",
+    "add_hsc_passyear": "2014",
+    "add_village": "Aliquip quaerat laboriosam a",
+    "add_post": "Quos ea ad fuga Eos cupidata",
+    "add_upojella": "Vel quo ut dolore ut quisquam",
+    "add_distric": "Amet qui veniam ut proident",
+    "add_address_same": false,
+    "add_village_per": "Sit cumque dolorem voluptatibu",
+    "add_post_per": "Est eum ea in at",
+    "add_upojella_per": "Dolore deserunt quis nemo dolo",
+    "add_distric_per": "Voluptatem Sit proident tem",
+    "add_birthdate": "2017-10-15",
+    "add_marital_status": "Married",
+    "add_program": 1,
+    "add_admission_group": "Ba",
+    "add_session": 2,
+    "main_subject": null,
+    "add_class_roll": "Quia in sed optio r",
+    "merit_position": "Occaecat e",
+    "add_amount": "0.00",
+    "add_payment_method": "Aut aperiam officiis",
+    "add_trxid": "Reprehenderit perspiciatis ea in aute est ut nul",
+    "add_slip": "Ut dolore non libero",
+    "created_at": "2025-07-10T06:19:09.717Z",
+    "subjects": [
+      1,
+      3,
+      13
+    ]
+  }
+},
+{
+  "model": "admissions.degreeadmission",
+  "pk": 4,
+  "fields": {
+    "add_name": "Ciaran Duffy",
+    "add_name_bangla": "Isabelle Harvey",
+    "add_mobile": "52",
+    "add_photo": "",
+    "add_blood_group": "A+",
+    "add_birth_certificate_no": "Quisquam sapiente eaque culpa libero quia volupta",
+    "add_gender": "Female",
+    "add_nationality": "Vero ex alias a ea beatae sunt voluptatem omnis",
+    "add_religion": "Hindu",
+    "add_ssc_roll": "Pariatur Eaque even",
+    "add_ssc_reg": "Porro qui ipsum dele",
+    "add_ssc_session": "Aliqua Nisi voluptatum maiore",
+    "add_ssc_gpa": "Saepe ut v",
+    "add_ssc_board": "Madrasah",
+    "add_ssc_group": "commerce",
+    "add_ssc_passyear": "2012",
+    "add_father_bangla": "Accusantium esse quae enim qui sunt suscipit sed ullamco",
+    "add_father": "Et pariatur Reprehenderit officia quia voluptatem dolore corrupti laudantium quia ut exercitatio",
+    "add_father_mobile": "Rerum atque in",
+    "add_mother_bangla": "Excepturi asperiores dolorem ut est voluptas",
+    "add_mother": "Minima obcaecati mollitia voluptate neque voluptate",
+    "add_mother_mobile": "Incididunt qui",
+    "add_parent_select": "mother",
+    "add_parent": "In enim perspiciatis fugiat molestiae ea fugiat ipsam ad odio sunt illo consequuntur voluptates",
+    "add_parent_mobile": "Eu soluta id q",
+    "add_parent_relation": "Voluptatibus molesti",
+    "add_parent_service": "Voluptatum consectetur dolorem",
+    "add_parent_income": 717,
+    "add_parent_land_agri": "Deserunt corporis consequat A",
+    "add_parent_land_nonagri": "Expedita soluta quo sequi et l",
+    "add_hsc_roll": "Modi qui consequuntu",
+    "add_hsc_reg": "Omnis rerum exercita",
+    "add_hsc_session": "Deserunt est veritatis placeat",
+    "add_hsc_gpa": "Omnis vel",
+    "add_hsc_board": "Sylhet",
+    "add_hsc_group": "science",
+    "add_hsc_passyear": "1985",
+    "add_village": "Consectetur et enim iure est",
+    "add_post": "Velit rerum proident consequa",
+    "add_upojella": "Sed necessitatibus ut inventor",
+    "add_distric": "Magnam assumenda numquam asper",
+    "add_address_same": true,
+    "add_village_per": "Architecto temporibus eu quo v",
+    "add_post_per": "Dolores voluptas aute aperiam",
+    "add_upojella_per": "Quidem minus quam delectus er",
+    "add_distric_per": "Vel aliquip vel elit cillum n",
+    "add_birthdate": "1994-08-03",
+    "add_marital_status": "Single",
+    "add_program": 1,
+    "add_admission_group": "Ba",
+    "add_session": 1,
+    "main_subject": null,
+    "add_class_roll": "Occaecat asperiores",
+    "merit_position": "Magni dolo",
+    "add_amount": "0.00",
+    "add_payment_method": "Quia quia cum amet",
+    "add_trxid": "Aut nulla ea delectus enim non dolor a tempor con",
+    "add_slip": "Consequuntur repelle",
+    "created_at": "2025-07-10T06:19:24.068Z",
+    "subjects": [
+      1,
+      3,
+      9
+    ]
+  }
+},
+{
+  "model": "admissions.degreeadmission",
+  "pk": 6,
+  "fields": {
+    "add_name": "Ocean Whitney",
+    "add_name_bangla": "Madeson Farrell",
+    "add_mobile": "850",
+    "add_photo": "degree/student_photos/3.png",
+    "add_blood_group": "B-",
+    "add_birth_certificate_no": "Dignissimos velit id voluptatem Necessitatibus ut",
+    "add_gender": "Male",
+    "add_nationality": "Qui mollit recusandae Labore beatae dignissimos f",
+    "add_religion": "Islam",
+    "add_ssc_roll": "Explicabo Beatae do",
+    "add_ssc_reg": "Eum voluptas vel nos",
+    "add_ssc_session": "Sint voluptates in praesentium",
+    "add_ssc_gpa": "Illo neque",
+    "add_ssc_board": "Chattogram",
+    "add_ssc_group": "commerce",
+    "add_ssc_passyear": "2010",
+    "add_father_bangla": "Dolorem nihil dolores molestias sit porro do et soluta eu",
+    "add_father": "Labore qui veritatis consectetur est commodi quasi duis",
+    "add_father_mobile": "Corrupti magn",
+    "add_mother_bangla": "Consequat Voluptatem aliqua Pariatur Laboris sunt dolorem reiciendis enim consequuntur qui tenet",
+    "add_mother": "Sunt dolorum inventore deserunt ab ea sed error nesciunt",
+    "add_mother_mobile": "Commodi et asp",
+    "add_parent_select": "other",
+    "add_parent": null,
+    "add_parent_mobile": null,
+    "add_parent_relation": null,
+    "add_parent_service": "Nostrum adipisicing cupidatat",
+    "add_parent_income": 851,
+    "add_parent_land_agri": "Quia eos minus culpa dolor no",
+    "add_parent_land_nonagri": "Magnam qui illum sunt id blan",
+    "add_hsc_roll": "Et quasi consequat",
+    "add_hsc_reg": "Commodo itaque in du",
+    "add_hsc_session": "Sapiente ipsam cupiditate eius",
+    "add_hsc_gpa": "Lorem blan",
+    "add_hsc_board": "Mymensingh",
+    "add_hsc_group": "commerce",
+    "add_hsc_passyear": "1981",
+    "add_village": "Dolorem et ipsum voluptatem",
+    "add_post": "Facere qui voluptate qui recus",
+    "add_upojella": "Rerum qui laboriosam quaerat",
+    "add_distric": "Et sit in iste voluptate vero",
+    "add_address_same": true,
+    "add_village_per": "Repudiandae sunt dolor saepe",
+    "add_post_per": "Libero saepe consequatur magna",
+    "add_upojella_per": "Quam id magni quia ea assumend",
+    "add_distric_per": "Sed odit reprehenderit proiden",
+    "add_birthdate": "1999-01-13",
+    "add_marital_status": "Single",
+    "add_program": 4,
+    "add_admission_group": "Bss",
+    "add_session": 1,
+    "main_subject": null,
+    "add_class_roll": "Necessitatibus inven",
+    "merit_position": "Quia est",
+    "add_amount": "0.00",
+    "add_payment_method": "Ut quaerat ab doloru",
+    "add_trxid": "Delectus nihil in dolorem placeat ratione aliqua",
+    "add_slip": "Quidem cumque doloru",
+    "created_at": "2025-07-10T06:58:56.116Z",
+    "subjects": [
+      10,
+      12,
+      14
+    ]
+  }
+},
+{
+  "model": "admissions.degreeadmission",
+  "pk": 7,
+  "fields": {
+    "add_name": "Melinda Duncan",
+    "add_name_bangla": "Ian Boyle",
+    "add_mobile": "434",
+    "add_photo": "degree/student_photos/3_GeWOpgT.png",
+    "add_blood_group": "AB+",
+    "add_birth_certificate_no": "Alias sequi quam voluptatem suscipit dolores eius",
+    "add_gender": "Male",
+    "add_nationality": "Deserunt eligendi veniam molestiae libero sed dol",
+    "add_religion": "Hindu",
+    "add_ssc_roll": "Voluptatem qui minus",
+    "add_ssc_reg": "Dignissimos officia",
+    "add_ssc_session": "Exercitation ut amet quia est",
+    "add_ssc_gpa": "Ut tempor",
+    "add_ssc_board": "Dinajpur",
+    "add_ssc_group": "science",
+    "add_ssc_passyear": "1977",
+    "add_father_bangla": "Dolore sint aliqua Sit veritatis tempor laboriosam doloremque",
+    "add_father": "Ut tempore Nam magna esse reiciendis dolores qui incidunt Nam iusto proident consequatur sunt",
+    "add_father_mobile": "Blanditiis exe",
+    "add_mother_bangla": "Eius eum ipsam commodo ut sit ipsum",
+    "add_mother": "Est dolor et numquam cupidatat minima ducimus enim ad facilis qui velit ad reiciendis maiores dolo",
+    "add_mother_mobile": "Illum fugiat",
+    "add_parent_select": "mother",
+    "add_parent": "Est dolor et numquam cupidatat minima ducimus enim ad facilis qui velit ad reiciendis maiores dolo",
+    "add_parent_mobile": "Illum fugiat",
+    "add_parent_relation": "Mother",
+    "add_parent_service": "Aspernatur quibusdam aperiam q",
+    "add_parent_income": 121,
+    "add_parent_land_agri": "Qui deleniti quidem est volup",
+    "add_parent_land_nonagri": "Do fugiat enim officia incidid",
+    "add_hsc_roll": "Ex proident excepte",
+    "add_hsc_reg": "Amet molestiae quia",
+    "add_hsc_session": "Laboris reprehenderit eaque m",
+    "add_hsc_gpa": "Cupiditate",
+    "add_hsc_board": "Rajshahi",
+    "add_hsc_group": "arts",
+    "add_hsc_passyear": "2002",
+    "add_village": "Quaerat quia aperiam accusanti",
+    "add_post": "Culpa elit facere vel debitis",
+    "add_upojella": "Et sed quod quod est et enim",
+    "add_distric": "Sint consequuntur iusto aliqu",
+    "add_address_same": true,
+    "add_village_per": "Quaerat quia aperiam accusanti",
+    "add_post_per": "Culpa elit facere vel debitis",
+    "add_upojella_per": "Et sed quod quod est et enim",
+    "add_distric_per": "Sint consequuntur iusto aliqu",
+    "add_birthdate": "2002-07-27",
+    "add_marital_status": "Single",
+    "add_program": 2,
+    "add_admission_group": "Bsc",
+    "add_session": 2,
+    "main_subject": null,
+    "add_class_roll": "Consequat Quis aliq",
+    "merit_position": "Proident",
+    "add_amount": "0.00",
+    "add_payment_method": "Dicta laboris sit q",
+    "add_trxid": "Iusto earum lorem sed ipsam optio odio quia cum n",
+    "add_slip": "Rerum voluptatem cum",
+    "created_at": "2025-07-10T07:13:08.951Z",
+    "subjects": [
+      17,
+      18,
+      19
+    ]
+  }
+},
+{
+  "model": "admissions.degreeadmission",
+  "pk": 8,
+  "fields": {
+    "add_name": "Daria Gilmore",
+    "add_name_bangla": "Craig Vega",
+    "add_mobile": "01632547854",
+    "add_photo": "degree/student_photos/11.png",
+    "add_blood_group": "B-",
+    "add_birth_certificate_no": "Beatae cillum beatae tempore lorem pariatur Dolo",
+    "add_gender": "Male",
+    "add_nationality": "Voluptate aut voluptatem sint libero autem perfe",
+    "add_religion": "Christian",
+    "add_ssc_roll": "Nulla do est id ap",
+    "add_ssc_reg": "Quae doloribus quis",
+    "add_ssc_session": "Nihil veritatis eu et porro pa",
+    "add_ssc_gpa": "Aut dolore",
+    "add_ssc_board": "Madrasah",
+    "add_ssc_group": "commerce",
+    "add_ssc_passyear": "2004",
+    "add_father_bangla": "Sit voluptas rem sunt voluptatum voluptas voluptas aperiam adipisci",
+    "add_father": "Mollit do quia magna quia",
+    "add_father_mobile": "01632541254",
+    "add_mother_bangla": "Deserunt aut maiores cum quisquam in id quam eiusmod nisi iusto cum at",
+    "add_mother": "Debitis labore velit Nam officia ipsum id eos aut et velit voluptates illum dolore minima rerum l",
+    "add_mother_mobile": "01965245214",
+    "add_parent_select": "other",
+    "add_parent": null,
+    "add_parent_mobile": null,
+    "add_parent_relation": null,
+    "add_parent_service": "Harum iusto voluptate cumque a",
+    "add_parent_income": 344,
+    "add_parent_land_agri": "Ipsa dolore dolor molestias d",
+    "add_parent_land_nonagri": "Vitae minus sapiente laborum",
+    "add_hsc_roll": "Eligendi repudiandae",
+    "add_hsc_reg": "In dolor ut dolorem",
+    "add_hsc_session": "Fugiat nesciunt earum sed cup",
+    "add_hsc_gpa": "Irure dolo",
+    "add_hsc_board": "Madrasah",
+    "add_hsc_group": "science",
+    "add_hsc_passyear": "1980",
+    "add_village": "Eiusmod fugiat vel consequatur",
+    "add_post": "Tempora reprehenderit delectu",
+    "add_upojella": "Eveniet amet eiusmod magnam",
+    "add_distric": "Minim et fugiat aspernatur ac",
+    "add_address_same": true,
+    "add_village_per": "Sapiente architecto sunt et po",
+    "add_post_per": "Commodi optio eveniet illo q",
+    "add_upojella_per": "Iusto non eum quia quas ad vol",
+    "add_distric_per": "Molestiae vero maxime explicab",
+    "add_birthdate": "1988-02-09",
+    "add_marital_status": "Divorced",
+    "add_program": 3,
+    "add_admission_group": "Bbs",
+    "add_session": 1,
+    "main_subject": null,
+    "add_class_roll": "Aliquip eius totam n",
+    "merit_position": "Dolores im",
+    "add_amount": "0.00",
+    "add_payment_method": "Dolore voluptatem ir",
+    "add_trxid": "Vel illo aliquid quod consequat Voluptatem esse i",
+    "add_slip": "Omnis facilis dolore",
+    "created_at": "2025-07-10T09:41:05.246Z",
+    "subjects": [
+      20,
+      21,
+      22
+    ]
+  }
+},
+{
+  "model": "admissions.degreeadmission",
+  "pk": 9,
+  "fields": {
+    "add_name": "Thaddeus Schroeder",
+    "add_name_bangla": "Timon Greene",
+    "add_mobile": "01452145785",
+    "add_photo": "degree/student_photos/10.png",
+    "add_blood_group": "O+",
+    "add_birth_certificate_no": "Repellendus Aspernatur vitae sit quasi ipsam asp",
+    "add_gender": "Female",
+    "add_nationality": "Officiis commodo deserunt deleniti dolor sit ut n",
+    "add_religion": "Islam",
+    "add_ssc_roll": "Dolores tempor adipi",
+    "add_ssc_reg": "Similique tempor sun",
+    "add_ssc_session": "Quia sed maxime elit minim pe",
+    "add_ssc_gpa": "Aspernatur",
+    "add_ssc_board": "Barishal",
+    "add_ssc_group": "science",
+    "add_ssc_passyear": "1972",
+    "add_father_bangla": "Id ex enim quia tempora adipisicing nostrum ipsam ex consequatur Minus",
+    "add_father": "Quis unde nostrum minus quis cupidatat illo aliquam excepteur qui et et",
+    "add_father_mobile": "01452145785",
+    "add_mother_bangla": "Explicabo Officia itaque exercitationem cum facere",
+    "add_mother": "Lorem mollit eos qui sit irure qui quisquam in et provident deleniti commodi vero",
+    "add_mother_mobile": "01452145785",
+    "add_parent_select": "mother",
+    "add_parent": "Lorem mollit eos qui sit irure qui quisquam in et provident deleniti commodi vero",
+    "add_parent_mobile": "01452145785",
+    "add_parent_relation": "Mother",
+    "add_parent_service": "Qui ex corrupti aut eiusmod q",
+    "add_parent_income": 581,
+    "add_parent_land_agri": "Dolor elit adipisci accusanti",
+    "add_parent_land_nonagri": "Sunt sed dolor suscipit volup",
+    "add_hsc_roll": "Dignissimos in liber",
+    "add_hsc_reg": "Omnis velit nisi eli",
+    "add_hsc_session": "Veniam quis dolor possimus e",
+    "add_hsc_gpa": "Consequatu",
+    "add_hsc_board": "Technical",
+    "add_hsc_group": "commerce",
+    "add_hsc_passyear": "1994",
+    "add_village": "Duis incidunt laborum Repreh",
+    "add_post": "Amet dolore ut earum illo sit",
+    "add_upojella": "Deserunt rem impedit possimus",
+    "add_distric": "Incididunt minus provident vo",
+    "add_address_same": false,
+    "add_village_per": "Laboriosam aut voluptate et m",
+    "add_post_per": "Veritatis sapiente adipisicing",
+    "add_upojella_per": "Aut quod et recusandae Provid",
+    "add_distric_per": "Vero sunt eos illum aute dolo",
+    "add_birthdate": "1988-06-19",
+    "add_marital_status": "Single",
+    "add_program": 1,
+    "add_admission_group": "Ba",
+    "add_session": 1,
+    "main_subject": null,
+    "add_class_roll": "Laudantium itaque t",
+    "merit_position": "Expedita i",
+    "add_amount": "0.00",
+    "add_payment_method": "Iure voluptatem Sus",
+    "add_trxid": "Ipsa ipsum officia exercitation voluptas quos la",
+    "add_slip": "Perferendis est temp",
+    "created_at": "2025-07-10T10:38:51.404Z",
+    "subjects": [
+      1,
+      9,
+      15
+    ]
+  }
+},
+{
+  "model": "admissions.degreeadmission",
+  "pk": 10,
+  "fields": {
+    "add_name": "Wanda Fuller",
+    "add_name_bangla": "Wynne Kidd",
+    "add_mobile": "01523652147",
+    "add_photo": "degree/student_photos/2.png",
+    "add_blood_group": "O-",
+    "add_birth_certificate_no": "Deleniti omnis possimus perspiciatis recusandae",
+    "add_gender": "Male",
+    "add_nationality": "Eum mollitia anim aut quia sapiente corporis nulla",
+    "add_religion": "Christian",
+    "add_ssc_roll": "Aliqua Asperiores e",
+    "add_ssc_reg": "Proident totam eos",
+    "add_ssc_session": "Modi quaerat enim sequi aut es",
+    "add_ssc_gpa": "Tenetur qu",
+    "add_ssc_board": "Dinajpur",
+    "add_ssc_group": "commerce",
+    "add_ssc_passyear": "1992",
+    "add_father_bangla": "Eligendi sed et ut libero vel similique sit voluptas qui impedit qui deserunt",
+    "add_father": "Error impedit aut maxime architecto sint velit deserunt sit earum elit quia",
+    "add_father_mobile": "01523652147",
+    "add_mother_bangla": "Et amet cumque ratione harum porro esse consequuntur eum fugiat modi officia qui culpa numquam",
+    "add_mother": "Veritatis est esse obcaecati consequat Quis",
+    "add_mother_mobile": "01523652147",
+    "add_parent_select": "father",
+    "add_parent": "Error impedit aut maxime architecto sint velit deserunt sit earum elit quia",
+    "add_parent_mobile": "01523652147",
+    "add_parent_relation": "Father",
+    "add_parent_service": "Perspiciatis qui dolor vel vo",
+    "add_parent_income": 750,
+    "add_parent_land_agri": "Et id magni recusandae Volup",
+    "add_parent_land_nonagri": "Voluptas porro et aliquam est",
+    "add_hsc_roll": "Delectus aperiam re",
+    "add_hsc_reg": "Voluptas eum dolor q",
+    "add_hsc_session": "Nihil veniam unde nulla velit",
+    "add_hsc_gpa": "Tenetur id",
+    "add_hsc_board": "Jashore",
+    "add_hsc_group": "commerce",
+    "add_hsc_passyear": "1999",
+    "add_village": "Tempor sunt possimus doloribu",
+    "add_post": "Debitis lorem porro iure tempo",
+    "add_upojella": "Nobis libero quia eum cumque e",
+    "add_distric": "Voluptatem Et ut placeat eum",
+    "add_address_same": false,
+    "add_village_per": "Dolore aspernatur et fugit ma",
+    "add_post_per": "Incidunt totam suscipit tempo",
+    "add_upojella_per": "Possimus dolores corrupti al",
+    "add_distric_per": "Ut corporis odio ut vel qui es",
+    "add_birthdate": "2022-12-14",
+    "add_marital_status": "Single",
+    "add_program": 1,
+    "add_admission_group": "Ba",
+    "add_session": 2,
+    "main_subject": null,
+    "add_class_roll": "Ad magna sint reici",
+    "merit_position": "Consequat",
+    "add_amount": "0.00",
+    "add_payment_method": "Ea sit atque elit",
+    "add_trxid": "Et iure sit repellendus Vel dolore modi reprehen",
+    "add_slip": "Eius nihil est expe",
+    "created_at": "2025-07-10T11:07:55.397Z",
+    "subjects": [
+      1,
+      3,
+      15
+    ]
+  }
+}
+]

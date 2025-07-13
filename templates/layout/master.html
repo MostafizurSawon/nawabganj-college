@@ -13,7 +13,8 @@
     <!-- Canonical SEO -->
     <link rel="canonical" href="{% get_theme_variables 'product_page' %}">
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon/favicon.ico' %}" />
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'cus/logo.jpg' %}" />
+    {% comment %} <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon/favicon.ico' %}" /> {% endcomment %}
 
     <!-- Include the styles partial -->
     {% include is_front|yesno:"./partials/styles_front.html,./partials/styles.html" %}
@@ -31,7 +32,7 @@
 
   <body>
 
-    
+
     <!-- beautify ignore:end -->
 
     {% block layout %}

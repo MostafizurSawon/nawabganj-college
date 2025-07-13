@@ -28,7 +28,7 @@
             <input type="text" name="search" class="form-control" placeholder="Search name/roll..." value="{{ request.GET.search }}">
           </div>
 
-          <div class="col-md-2">
+          {% comment %} <div class="col-md-3">
             <label class="form-label">Session</label>
             <select name="session" class="form-select">
               <option value="">All Sessions</option>
@@ -38,9 +38,9 @@
                 </option>
               {% endfor %}
             </select>
-          </div>
+          </div> {% endcomment %}
 
-          <div class="col-md-2">
+          {% comment %} <div class="col-md-2">
             <label class="form-label">Program</label>
             <select name="program" class="form-select">
               <option value="">All Programs</option>
@@ -50,14 +50,14 @@
                 </option>
               {% endfor %}
             </select>
-          </div>
+          </div> {% endcomment %}
 
-          <div class="col-md-2">
+          <div class="col-md-3">
             <label class="form-label">Group</label>
             <select name="group" class="form-select">
               <option value="">All Groups</option>
               {% for g in groups %}
-                <option value="{{ g }}" {% if request.GET.group == g %}selected{% endif %}>{{ g|title }}</option>
+                <option value="{{ g_display }}" {% if request.GET.group == g %}selected{% endif %}>{{ g|title }}</option>
               {% endfor %}
             </select>
           </div>
@@ -75,9 +75,9 @@
 
     <div class="table-responsive p-4">
       <p class="ms-4 text-muted">Total students: {{ page_obj.paginator.count }}</p>
-      <a href="{% url 'generate_admission_pdfs' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-primary mb-3">
+      {% comment %} <a href="{% url 'generate_admission_pdfs' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-primary mb-3">
         📄 Download PDF
-      </a>
+      </a> {% endcomment %}
 
 
       <table class="table table-hover table-bordered">
@@ -99,8 +99,8 @@
             <tr>
               <td>{{ forloop.counter }}</td>
               <td class="d-flex justify-content-between">
-                <a href="{% url 'hsc_admission_view' student.id %}" class="btn btn-icon btn-sm btn-outline-info me-1" title="View">
-                  <i class="ti ti-eye"></i>
+                <a href="{% url 'hsc_admission_view' student.id %}" target="_blank" class="btn btn-sm btn-outline-info me-1" title="View">
+                  {% comment %} <i class="ti ti-eye"></i> {% endcomment %} Print
                 </a>
 
 
@@ -128,7 +128,9 @@
               <td>{{ student.add_name }}</td>
               <td>{{ student.add_mobile }}</td>
               <td>{{ student.add_class_roll }}</td>
-              <td>{{ student.add_admission_group|title }}</td>
+              {% comment %} <td>{{ student.add_admission_group|title }}</td> {% endcomment %}
+              <td>{{ student.get_add_admission_group_display }}</td>
+
               <td>{{ student.add_session.ses_name }}</td>
               <td>{{ student.add_program.pro_name }}</td>
 

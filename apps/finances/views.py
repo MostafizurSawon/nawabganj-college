@@ -536,3 +536,56 @@ class LedgerView(View):
             "end_date": end_date,
         })
         return render(request, self.template_name, context)
+
+
+
+
+
+# views.py
+import csv
+from django.http import HttpResponse
+
+def export_ledger_csv(request):
+    # Create HTTP response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="ledger.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Type', 'Date', 'Category', 'Name', 'Amount', 'Note'])
+
+    # Get filters
+    search = request.GET.get("search")
+    income_cat = request.GET.get("income_category")
+    expense_cat = request.GET.get("expense_category")
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
+
+    # Apply filters to income
+    income_qs = Income.objects.all()
+    if income_cat:
+        income_qs = income_qs.filter(income_category_id=income_cat)
+    if start_date:
+        income_qs = income_qs.filter(date__gte=start_date)
+    if end_date:
+        income_qs = income_qs.filter(date__lte=end_date)
+    if search:
+        income_qs = income_qs.filter(Q(note__icontains=search) | Q(income_name__icontains=search))
+
+    for i in income_qs:
+        writer.writerow(['Income', i.date, i.income_category.name, i.income_name, i.amount, i.note])
+
+    # Apply filters to expense
+    expense_qs = Expense.objects.all()
+    if expense_cat:
+        expense_qs = expense_qs.filter(exp_category_id=expense_cat)
+    if start_date:
+        expense_qs = expense_qs.filter(date__gte=start_date)
+    if end_date:
+        expense_qs = expense_qs.filter(date__lte=end_date)
+    if search:
+        expense_qs = expense_qs.filter(Q(note__icontains=search) | Q(exp_name__icontains=search))
+
+    for e in expense_qs:
+        writer.writerow(['Expense', e.date, e.exp_category.name, e.exp_name, e.amount, e.note])
+
+    return response
