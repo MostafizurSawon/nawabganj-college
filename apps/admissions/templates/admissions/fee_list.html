@@ -20,8 +20,52 @@
     {% endfor %}
   {% endif %}
 
+  <div class="card p-3 mb-3">
+      <form method="get" class="row g-2">
+        <div class="col-md-2">
+          <select name="session" class="form-select">
+            <option value="">All Sessions</option>
+            {% for s in sessions %}
+              <option value="{{ s.id }}" {% if s.id|stringformat:"s" == selected_session %}selected{% endif %}>{{ s.ses_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select name="program" class="form-select">
+            <option value="">All Programs</option>
+            {% for p in programs %}
+              <option value="{{ p.id }}" {% if p.id|stringformat:"s" == selected_program %}selected{% endif %}>
+                {% if p.pro_name == "Honours" %}Degree{% else %}{{ p.pro_name }}{% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select name="group" class="form-select">
+            <option value="">All Groups</option>
+            {% for g in groups %}
+              <option value="{{ g.id }}" {% if g.id|stringformat:"s" == selected_group %}selected{% endif %}>
+                {% if g.group_name == "commerce" %}Business Studies
+                {% elif g.group_name == "arts" %}Humanities
+                {% else %}{{ g.group_name|upper }}{% endif %}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <input type="text" name="search" class="form-control" value="{{ search }}" placeholder="Search program or group">
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+          <button class="btn btn-primary w-100">Filter</button>
+          <a href="{% url 'fee_list' %}" class="btn btn-secondary w-100">Reset</a>
+        </div>
+      </form>
+    </div>
+
   <!-- Datatable -->
-  <div class="card">
+  <div class="card p-3">
+
+
     <div class="table-responsive">
       <table class="table table-bordered text-center">
         <thead class="table-light">
@@ -39,8 +83,14 @@
           <tr>
             <td>{{ forloop.counter }}</td>
             <td>{{ fee.fee_session.ses_name }}</td>
-            <td>{{ fee.fee_program.pro_name }}</td>
-            <td>{{ fee.fee_group.group_name }}</td>
+            <td>
+              {% if fee.fee_program.pro_name == 'Honours' %}
+                Degree
+              {% else %}
+                {{ fee.fee_program.pro_name }}
+              {% endif %}
+            </td>
+            <td>{{ fee.fee_group.group_name|upper }}</td>
             <td>{{ fee.amount|intcomma }} ৳</td>
             <td>
             <!-- Edit Icon Button -->
@@ -50,10 +100,17 @@
             </a>
 
             <!-- Delete Icon Button -->
-            <a href="{% url 'fee_delete' fee.pk %}" class=""
+            {% comment %} <a href="{% url 'fee_delete' fee.pk %}" class=""
               onclick="return confirm('Delete this fee?')">
               <i class="ti ti-trash text-danger"></i>
-            </a>
+            </a> {% endcomment %}
+            <form method="post" action="{% url 'fee_delete' fee.pk %}" style="display:inline;" onsubmit="return confirm('Delete this fee?');">
+              {% csrf_token %}
+              <button type="submit" style="border: none; background: none; padding: 0;">
+                <i class="ti ti-trash text-danger"></i>
+              </button>
+            </form>
+
           </td>
 
           </tr>
@@ -112,12 +169,48 @@
         </tbody>
       </table>
     </div>
+
+    <div class="mt-3">
+    {% if is_paginated %}
+      <nav>
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">«</a>
+            </li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+              <a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a>
+            </li>
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">»</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+  </div>
+
+
   </div>
 </div>
 
 <!-- Add Fee Modal -->
 <div class="modal fade" id="feeModal" tabindex="-1">
   <div class="modal-dialog">
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {% for error in form.non_field_errors %}
+          <div>{{ error }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
     <form method="post" action="{% url 'fee_create' %}">
       {% csrf_token %}
       <div class="modal-content">
@@ -126,8 +219,63 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          {{ form.as_p }}
-        </div>
+          {% comment %} {{ form.as_p }} {% endcomment %}
+          <!-- Session -->
+          <div class="mb-3">
+            <label for="fee_session" class="form-label">Session</label>
+            <select name="fee_session" id="fee_session" class="form-select">
+              {% for session in form.fields.fee_session.queryset %}
+                <option value="{{ session.id }}" {% if form.initial.fee_session.id == session.id %}selected{% endif %}>
+                  {{ session.ses_name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Program -->
+          <div class="mb-3">
+            <label for="fee_program" class="form-label">Program</label>
+            <select name="fee_program" id="fee_program" class="form-select">
+              {% for prog in form.fields.fee_program.queryset %}
+                <option value="{{ prog.id }}" {% if form.initial.fee_program.id == prog.id %}selected{% endif %}>
+                  {% if prog.pro_name == "Honours" %}
+                    Degree
+                  {% else %}
+                    {{ prog.pro_name }}
+                  {% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Groups -->
+          <div class="mb-3">
+            <label for="fee_group" class="form-label">Group</label>
+            <select name="fee_group" id="fee_group" class="form-select">
+              {% for grp in form.fields.fee_group.queryset %}
+                <option value="{{ grp.id }}" {% if form.initial.fee_group.id == grp.id %}selected{% endif %}>
+                  {% if grp.group_name == "commerce" %}
+                    Business Studies
+                  {% elif grp.group_name == "Arts" %}
+                    Humanities
+                  {% elif grp.group_name == "science" %}
+                    Science
+                  {% else %}
+                    {{ grp.group_name|upper }}
+                  {% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+
+          <!-- Amount -->
+          <div class="mb-3">
+            <label for="amount" class="form-label">Amount (৳)</label>
+            <input type="number" name="amount" id="amount" value="{{ form.initial.amount }}" class="form-control" required>
+          </div>
+
+
         <div class="modal-footer">
           <button type="submit" class="btn btn-success">Save</button>
         </div>
@@ -136,4 +284,73 @@
   </div>
 </div>
 
+
+{% comment %} <script>
+  {% if form and form.errors %}
+    var feeModal = new bootstrap.Modal(document.getElementById('feeModal'));
+    feeModal.show();
+  {% endif %}
+</script> {% endcomment %}
+
+<script>
+  // Automatically open modal if there's an error message
+  document.addEventListener("DOMContentLoaded", function () {
+    const alertBox = document.querySelector(".alert-danger");
+    if (alertBox) {
+      const myModal = new bootstrap.Modal(document.getElementById("feeModal"));
+      myModal.show();
+    }
+  });
+</script>
+
+
 {% endblock %}
+
+
+{% comment %} <form method="POST">
+  {% csrf_token %}
+
+  <!-- Session -->
+  <div class="mb-3">
+    <label for="fee_session" class="form-label">Session</label>
+    <select name="fee_session" id="fee_session" class="form-select">
+      {% for session in form.fields.fee_session.queryset %}
+        <option value="{{ session.id }}" {% if form.initial.fee_session.id == session.id %}selected{% endif %}>
+          {{ session.ses_name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Program -->
+  <div class="mb-3">
+    <label for="fee_program" class="form-label">Program</label>
+    <select name="fee_program" id="fee_program" class="form-select">
+      {% for prog in form.fields.fee_program.queryset %}
+        <option value="{{ prog.id }}" {% if form.initial.fee_program.id == prog.id %}selected{% endif %}>
+          {{ prog.pro_name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Group -->
+  <div class="mb-3">
+    <label for="fee_group" class="form-label">Group</label>
+    <select name="fee_group" id="fee_group" class="form-select">
+      {% for grp in form.fields.fee_group.queryset %}
+        <option value="{{ grp.id }}" {% if form.initial.fee_group.id == grp.id %}selected{% endif %}>
+          {{ grp.group_name|capfirst }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Amount -->
+  <div class="mb-3">
+    <label for="amount" class="form-label">Amount (৳)</label>
+    <input type="number" name="amount" id="amount" value="{{ form.initial.amount }}" class="form-control" required>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Save Fee</button>
+</form> {% endcomment %}

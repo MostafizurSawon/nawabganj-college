@@ -9,6 +9,257 @@ from .forms import ExpenseForm, ExpenseCategoryForm, IncomeForm, IncomeCategoryF
 from web_project import TemplateLayout, TemplateHelper
 from django.http import JsonResponse
 
+
+
+# Student Invoice List
+
+from django.views.generic import ListView
+from django.contrib.contenttypes.models import ContentType
+from apps.admissions.models import HscAdmissions, DegreeAdmission, Session
+from .models import StudentInvoice
+
+class StudentInvoiceListView(ListView):
+    model = StudentInvoice
+    template_name = 'students/student_invoice_list.html'
+    context_object_name = 'student_invoices'
+    paginate_by = 25
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related("invoice")
+
+        invoice_id = self.request.GET.get("invoice")
+        search = self.request.GET.get("search", "")
+        active_session_id = self.request.GET.get('session') or self.request.session.get('active_session_id')
+
+        # Filter by selected invoice
+        if invoice_id:
+            queryset = queryset.filter(invoice_id=invoice_id)
+
+        # Session filter via GenericRelation
+        if active_session_id:
+            # Get HSC students in session
+            hsc_ct = ContentType.objects.get_for_model(HscAdmissions)
+            hsc_ids = HscAdmissions.objects.filter(add_session_id=active_session_id).values_list("id", flat=True)
+
+            # Get Degree students in session
+            deg_ct = ContentType.objects.get_for_model(DegreeAdmission)
+            deg_ids = DegreeAdmission.objects.filter(add_session_id=active_session_id).values_list("id", flat=True)
+
+            queryset = queryset.filter(
+                Q(content_type=hsc_ct, object_id__in=hsc_ids) |
+                Q(content_type=deg_ct, object_id__in=deg_ids)
+            )
+
+        # Search filter
+        if search:
+            hsc_ct = ContentType.objects.get_for_model(HscAdmissions)
+            hsc_ids = HscAdmissions.objects.filter(
+                Q(add_name__icontains=search) |
+                Q(add_name_bangla__icontains=search) |
+                Q(add_mobile__icontains=search)
+            ).values_list("id", flat=True)
+
+            deg_ct = ContentType.objects.get_for_model(DegreeAdmission)
+            deg_ids = DegreeAdmission.objects.filter(
+                Q(add_name__icontains=search) |
+                Q(add_name_bangla__icontains=search) |
+                Q(add_mobile__icontains=search)
+            ).values_list("id", flat=True)
+
+            queryset = queryset.filter(
+                Q(content_type=hsc_ct, object_id__in=hsc_ids) |
+                Q(content_type=deg_ct, object_id__in=deg_ids)
+            )
+
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Layout setup
+        context = TemplateLayout.init(self, context)
+        context["layout"] = "vertical"
+        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+
+        # Filter states
+        context["search"] = self.request.GET.get('search', '')
+        context["invoice_id"] = self.request.GET.get('invoice', '')
+        context["selected_session"] = self.request.GET.get('session') or self.request.session.get('active_session_id')
+        context["sessions"] = Session.objects.all()
+
+        return context
+
+
+
+
+from django.views.generic.edit import UpdateView
+from .models import StudentInvoice
+
+class StudentInvoiceUpdateView(UpdateView):
+    model = StudentInvoice
+    fields = []  # not using Django's form rendering
+    http_method_names = ['post']
+    template_name = None  # no page render, handled via modal
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        try:
+            amount = request.POST.get("amount")
+            note = request.POST.get("note", "")
+            is_paid = "is_paid" in request.POST
+
+            # Update related invoice amount (optional if you want to keep per-student override)
+            self.object.invoice.amount = amount
+            self.object.invoice.save()
+
+            self.object.note = note
+            self.object.is_paid = is_paid
+            self.object.save()
+
+            messages.success(request, "Student invoice updated.")
+        except Exception as e:
+            messages.error(request, f"Update failed: {str(e)}")
+
+        return redirect("student-invoice-list")
+
+
+
+# Invoice Section
+
+from django.views.generic import ListView
+
+from .models import Invoice, Purpose
+from .forms import InvoiceGenerateForm
+from .utils import assign_invoice_to_students
+
+from django.views.generic.edit import UpdateView
+from django.urls import reverse_lazy
+
+
+class InvoiceListCreateView(ListView):
+    model = Invoice
+    template_name = 'invoice/invoice_generate.html'
+    context_object_name = 'invoices'
+    paginate_by = 25
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = TemplateLayout.init(self, context)
+        context["layout"] = "vertical"
+        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+        context["form"] = InvoiceGenerateForm()
+
+        # 🔧 Add purpose list for modal dropdown
+        context["invoice_purpose_list"] = Purpose.objects.all()
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = InvoiceGenerateForm(request.POST)
+        if form.is_valid():
+            invoice = form.save()
+            assigned = assign_invoice_to_students(invoice)
+            messages.success(request, f"Invoice created and assigned to {assigned} students.")
+            return redirect('invoice-generate')  # replace with your URL name
+        else:
+            # 🔁 Re-render page with form errors + layout
+            context = self.get_context_data()
+            context["form"] = form
+            messages.error(self.request, "Failed!")
+            return self.render_to_response(context)
+
+
+
+class InvoiceUpdateView(UpdateView):
+    model = Invoice
+    form_class = InvoiceGenerateForm
+    http_method_names = ['post']
+    template_name = None  # Modal handles UI
+
+    def form_valid(self, form):
+        messages.success(self.request, "Invoice updated successfully.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Update failed. Please check the data.")
+        return super().form_invalid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('invoice-generate')
+
+
+# Invoice Purpose
+# views.py
+from django.views.generic import ListView
+from .forms import PurposeForm  # You’ll need a simple ModelForm
+
+class PurposeListCreateView(ListView):
+    model = Purpose
+    template_name = "invoice/purpose_invoice_page.html"
+    context_object_name = "purposes"
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = TemplateLayout.init(self, context)
+        context["layout"] = "vertical"
+        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+        context["form"] = PurposeForm()
+        context["edit_id"] = self.request.GET.get("edit")  # used to show edit modal if needed
+        return context
+
+    def post(self, request, *args, **kwargs):
+        edit_id = request.POST.get("edit_id")
+        if edit_id:
+            instance = get_object_or_404(Purpose, id=edit_id)
+            form = PurposeForm(request.POST, instance=instance)
+            msg = "updated"
+        else:
+            form = PurposeForm(request.POST)
+            msg = "created"
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Purpose {msg} successfully.")
+            return redirect("purpose-invoice-page")  # change if needed
+        else:
+            # Render page with errors
+            context = self.get_context_data()
+            context["form"] = form
+            return self.render_to_response(context)
+
+
+
+from django.views.generic import DeleteView
+
+class PurposeDeleteView(DeleteView):
+    model = Purpose
+    success_url = reverse_lazy("purpose-invoice-page")
+
+    def post(self, request, *args, **kwargs):
+        messages.success(request, "Purpose deleted.")
+        return super().post(request, *args, **kwargs)
+
+
+
+from django.views.generic.edit import DeleteView
+
+
+class InvoiceDeleteView(DeleteView):
+    model = Invoice
+    success_url = reverse_lazy('invoice-generate')
+    template_name = None  # No separate template needed
+
+    def post(self, request, *args, **kwargs):
+        messages.success(request, "Invoice deleted successfully.")
+        return super().post(request, *args, **kwargs)
+
+
+
+
+
 # -------------------- EXPENSE VIEWS --------------------
 
 

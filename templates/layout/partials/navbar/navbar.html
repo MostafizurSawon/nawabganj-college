@@ -74,7 +74,7 @@
               <div class="input-group">
                 <label class="input-group-text" for="sessionSelect">Session</label>
                 <select class="form-select" id="sessionSelect" name="session" onchange="this.form.submit()">
-                  <option value="">All Sessions</option>
+                  {% comment %} <option value="">All Sessions</option> {% endcomment %}
                   {% for ses in sessions %}
                     <option value="{{ ses.id }}" {% if active_session and active_session.id == ses.id %}selected{% endif %}>
                       {{ ses.ses_name }}

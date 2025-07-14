@@ -114,6 +114,10 @@ class Fee(models.Model):
     fee_group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='fee_group', verbose_name="Fee Group", null=True, blank=True)
     amount = models.PositiveIntegerField()
 
+    class Meta:
+        unique_together = ('fee_session', 'fee_program', 'fee_group')
+
+
     def __str__(self):
         return self.fee_group.group_name
 

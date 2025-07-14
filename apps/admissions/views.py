@@ -581,14 +581,39 @@ class AdmissionBbsCreateView(FormView):
 
 # Fee Section
 
+from django.db.models import Q
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .forms import FeeForm
 
 class FeeListView(ListView):
-    template_name = 'Admissions/fee_list.html'
+    template_name = 'admissions/fee_list.html'
     model = Fee
     context_object_name = 'fees'
+    paginate_by = 25  # 👈 enable pagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # Filters from GET
+        session = self.request.GET.get('session')
+        program = self.request.GET.get('program')
+        group = self.request.GET.get('group')
+        search = self.request.GET.get('search')
+
+        if session:
+            queryset = queryset.filter(fee_session_id=session)
+        if program:
+            queryset = queryset.filter(fee_program_id=program)
+        if group:
+            queryset = queryset.filter(fee_group_id=group)
+        if search:
+            queryset = queryset.filter(
+                Q(fee_program__pro_name__icontains=search) |
+                Q(fee_group__group_name__icontains=search)
+            )
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -596,20 +621,48 @@ class FeeListView(ListView):
         context["layout"] = "vertical"
         context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
         context["form"] = FeeForm()
+
+        # For filters
         context['sessions'] = Session.objects.all()
         context['programs'] = Programs.objects.all()
         context['groups'] = Group.objects.all()
 
+        # For repopulating filter fields
+        context['search'] = self.request.GET.get('search', '')
+        context['selected_session'] = self.request.GET.get('session', '')
+        context['selected_program'] = self.request.GET.get('program', '')
+        context['selected_group'] = self.request.GET.get('group', '')
+
         return context
+
+
+from django.db import IntegrityError
 
 class FeeCreateView(CreateView):
     model = Fee
     form_class = FeeForm
+    template_name = 'admissions/fee_list.html'
     success_url = reverse_lazy('fee_list')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = TemplateLayout.init(self, context)
+        context["layout"] = "vertical"
+        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+        context["fees"] = Fee.objects.all()
+        context["sessions"] = Session.objects.all()
+        context["programs"] = Programs.objects.all()
+        context["groups"] = Group.objects.all()
+        return context
+
     def form_valid(self, form):
-        messages.success(self.request, "Fee added successfully.")
-        return super().form_valid(form)
+        try:
+            return super().form_valid(form)
+        except IntegrityError:
+            # Re-render form with error inside fee_list.html
+            form.add_error(None, "Fee for this Session, Program, and Group already exists.")
+            return self.form_invalid(form)
+
 
 class FeeUpdateView(UpdateView):
     model = Fee
@@ -623,10 +676,14 @@ class FeeUpdateView(UpdateView):
 class FeeDeleteView(DeleteView):
     model = Fee
     success_url = reverse_lazy('fee_list')
+    template_name = None  # 👈 no HTML template used
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         messages.success(request, "Fee deleted successfully.")
-        return super().delete(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
+
+
+
 
 
 

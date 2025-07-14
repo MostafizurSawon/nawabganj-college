@@ -1,6 +1,6 @@
 from web_project.views import SystemView
 from django.urls import path
-from .views import HscAdmissionCreateView, get_admission_fee, FeeListView, FeeCreateView, FeeUpdateView, FeeDeleteView, HscAdmissionCreateCommerceView,HscAdmissionCreateArtsView
+from .views import HscAdmissionCreateView, get_admission_fee, FeeListView, FeeUpdateView, FeeDeleteView, HscAdmissionCreateCommerceView,HscAdmissionCreateArtsView, FeeCreateView
 from . import views
 
 urlpatterns = [

@@ -88,19 +88,19 @@
           "slug": "admitted_students_list"
         },
         {
-          "url": "p2",
+          "url": "student-invoice-list",
           "name": "Manual Payment",
-          "slug": "degree_admitted_students_list"
+          "slug": "student-invoice-list"
         },
         {
-          "url": "p3",
+          "url": "invoice-generate",
           "name": "Invoice Generate",
-          "slug": "fee_list"
+          "slug": "invoice-generate"
         },
         {
-          "url": "p4",
+          "url": "purpose-invoice-page",
           "name": "Invoice Purpose",
-          "slug": "fee_list"
+          "slug": "purpose-invoice-page"
         }
       ]
     },

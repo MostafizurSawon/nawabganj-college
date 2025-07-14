@@ -315,7 +315,6 @@ class DegreeAdmissionForm(forms.ModelForm):
 
 
 
-
 class FeeForm(forms.ModelForm):
     class Meta:
         model = Fee
@@ -326,6 +325,15 @@ class FeeForm(forms.ModelForm):
             'fee_group': forms.Select(attrs={'class': 'form-control'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        session = cleaned_data.get('fee_session')
+        program = cleaned_data.get('fee_program')
+        group = cleaned_data.get('fee_group')
+
+        if Fee.objects.filter(fee_session=session, fee_program=program, fee_group=group).exists():
+            raise ValidationError("This fee combination already exists.")
 
 
 

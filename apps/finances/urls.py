@@ -5,9 +5,27 @@ from .views import (
 )
 
 from .views import ExpenseDataAPIView,ExpenseCategoryAjaxView,ExpenseDetailAjaxView, IncomeDataAPIView, IncomeDetailAjaxView, IncomeCategoryAjaxView, export_ledger_csv
+from. import views
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
+    # Purpose
+    path('purpose-invoice/', views.PurposeListCreateView.as_view(), name='purpose-invoice-page'),
+    path('purpose/delete/<int:pk>/', views.PurposeDeleteView.as_view(), name='purpose-delete'),
+
+
+    # Students show as per invoice
+    path('student-invoices/', views.StudentInvoiceListView.as_view(), name='student-invoice-list'),
+    path('student-invoice/<int:pk>/update/', views.StudentInvoiceUpdateView.as_view(), name='student-invoice-update'),
+
+
+    # Invoice Section
+    path('invoice-generate/', views.InvoiceListCreateView.as_view(), name='invoice-generate'),
+    path('invoice/<int:pk>/edit/', views.InvoiceUpdateView.as_view(), name='invoice-edit'),
+    path('invoice/<int:pk>/delete/', views.InvoiceDeleteView.as_view(), name='invoice-delete'),
+
+
+
     # Expense
     path('expenses/data/', login_required(ExpenseDataAPIView.as_view()), name='expense_data'),
     path('expenses/data/<int:pk>/', login_required(ExpenseDetailAjaxView.as_view()), name='expense_detail_ajax'),
@@ -38,6 +56,5 @@ urlpatterns = [
 
     # Ledger
     path('ledger/', login_required(LedgerView.as_view()), name='ledger_view'),
-
     path('ledger/export-csv/', export_ledger_csv, name='ledger_export_csv'),
 ]

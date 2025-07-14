@@ -1,21 +1,43 @@
 from django.db import models
 
-# College Fee
-class FeeCategory(models.Model):
-    fee_category = models.CharField(max_length=100, unique=True, verbose_name="Fee Category Main", null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+from apps.admissions.models import Session, Programs, Group
+
+class Purpose(models.Model):
+    name = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return self.fee_category
+        return self.name
 
-class Fee(models.Model):
-    fee_category = models.ForeignKey(FeeCategory, on_delete=models.CASCADE, related_name='fee_cat', verbose_name="Fee Category")
-    fee_name = models.CharField(max_length=100)
+class Invoice(models.Model):
+    invoice_session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='invoice_session', verbose_name="invoice Session", null=True, blank=True)
+    invoice_program = models.ForeignKey(Programs, on_delete=models.CASCADE, related_name='invoice_program', verbose_name="invoice Program", null=True, blank=True)    #Hsc
+    invoice_group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='invoice_group', verbose_name="invoice Group", null=True, blank=True)
+    invoice_purpose = models.ForeignKey(Purpose, on_delete=models.CASCADE, related_name='invoice_purpose', verbose_name="invoice Purpose", null=True, blank=True)
     amount = models.PositiveIntegerField()
 
     def __str__(self):
-        return self.fee_name
+        return self.invoice_group.group_name
 
+
+
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+
+class StudentInvoice(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    student = GenericForeignKey('content_type', 'object_id')
+
+    invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE, related_name='student_invoices')
+    is_paid = models.BooleanField(default=False)
+    note = models.TextField(null=True, blank=True)
+    assigned_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('content_type', 'object_id', 'invoice')
+
+    def __str__(self):
+        return f"{self.student} | {self.invoice.invoice_purpose} | {self.invoice.amount} Tk"
 
 
 
