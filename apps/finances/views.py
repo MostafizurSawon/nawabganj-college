@@ -17,6 +17,7 @@ from django.views.generic import ListView
 from django.contrib.contenttypes.models import ContentType
 from apps.admissions.models import HscAdmissions, DegreeAdmission, Session
 from .models import StudentInvoice
+from django.utils.dateparse import parse_date
 
 class StudentInvoiceListView(ListView):
     model = StudentInvoice
@@ -24,24 +25,29 @@ class StudentInvoiceListView(ListView):
     context_object_name = 'student_invoices'
     paginate_by = 25
 
+
+
     def get_queryset(self):
         queryset = super().get_queryset().select_related("invoice")
 
-        invoice_id = self.request.GET.get("invoice")
+        invoice_id = self.request.GET.get("invoice")  # We’ll stop showing this on UI later if not needed
         search = self.request.GET.get("search", "")
         active_session_id = self.request.GET.get('session') or self.request.session.get('active_session_id')
+        group = self.request.GET.get('group')
+        purpose = self.request.GET.get('purpose')
+        is_paid = self.request.GET.get('is_paid')
+        assigned_from = self.request.GET.get('assigned_from')
+        assigned_to = self.request.GET.get('assigned_to')
 
-        # Filter by selected invoice
+        # Filter by invoice ID (optional)
         if invoice_id:
             queryset = queryset.filter(invoice_id=invoice_id)
 
-        # Session filter via GenericRelation
+        # Session filtering using GenericForeignKey model type
         if active_session_id:
-            # Get HSC students in session
             hsc_ct = ContentType.objects.get_for_model(HscAdmissions)
             hsc_ids = HscAdmissions.objects.filter(add_session_id=active_session_id).values_list("id", flat=True)
 
-            # Get Degree students in session
             deg_ct = ContentType.objects.get_for_model(DegreeAdmission)
             deg_ids = DegreeAdmission.objects.filter(add_session_id=active_session_id).values_list("id", flat=True)
 
@@ -50,7 +56,7 @@ class StudentInvoiceListView(ListView):
                 Q(content_type=deg_ct, object_id__in=deg_ids)
             )
 
-        # Search filter
+        # Search across student name/mobile/etc.
         if search:
             hsc_ct = ContentType.objects.get_for_model(HscAdmissions)
             hsc_ids = HscAdmissions.objects.filter(
@@ -71,8 +77,28 @@ class StudentInvoiceListView(ListView):
                 Q(content_type=deg_ct, object_id__in=deg_ids)
             )
 
+        # ✅ Filter by group (from student object)
+        if group:
+            queryset = queryset.filter(
+                Q(student__add_admission_group=group)
+            )
+
+        # ✅ Filter by purpose
+        if purpose:
+            queryset = queryset.filter(invoice__invoice_purpose_id=purpose)
+
+        # ✅ Filter by paid status
+        if is_paid in ["true", "false"]:
+            queryset = queryset.filter(is_paid=(is_paid == "true"))
+
+        # ✅ Filter by assigned date range
+        if assigned_from:
+            queryset = queryset.filter(assigned_at__date__gte=parse_date(assigned_from))
+        if assigned_to:
+            queryset = queryset.filter(assigned_at__date__lte=parse_date(assigned_to))
 
         return queryset
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -87,9 +113,41 @@ class StudentInvoiceListView(ListView):
         context["invoice_id"] = self.request.GET.get('invoice', '')
         context["selected_session"] = self.request.GET.get('session') or self.request.session.get('active_session_id')
         context["sessions"] = Session.objects.all()
+        context["groups"] = ['science', 'arts', 'commerce', 'ba', 'bss', 'bba', 'bbs', 'bsc']
+        context["purposes"] = Purpose.objects.all()
 
         return context
 
+from django.views.generic.detail import DetailView
+from .models import StudentInvoice
+
+class StudentInvoiceDetailView(DetailView):
+    model = StudentInvoice
+    template_name = 'students/student_invoice_detail.html'
+    context_object_name = 'invoice'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Optional: access student & differentiate types
+        student = self.object.student
+        context["student_type"] = (
+            "HSC" if isinstance(student, HscAdmissions)
+            else "Degree" if isinstance(student, DegreeAdmission)
+            else "Unknown"
+        )
+
+        # 🔢 Final payable amount (Invoice amount - Discount)
+        base_amount = self.object.invoice.amount or 0
+        discount = self.object.discount_amount or 0
+        context["final_amount"] = max(0, base_amount - discount)
+
+        # 📐 Layout logic
+        context = TemplateLayout.init(self, context)
+        context["layout"] = "vertical"
+        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+
+        return context
 
 
 
@@ -106,16 +164,18 @@ class StudentInvoiceUpdateView(UpdateView):
         self.object = self.get_object()
 
         try:
-            amount = request.POST.get("amount")
             note = request.POST.get("note", "")
             is_paid = "is_paid" in request.POST
-
-            # Update related invoice amount (optional if you want to keep per-student override)
-            self.object.invoice.amount = amount
-            self.object.invoice.save()
+            payment_method = request.POST.get("add_payment_method")
+            discount_amount = int(request.POST.get("discount_amount") or 0)
+            discount_reason = request.POST.get("discount_reason")
 
             self.object.note = note
             self.object.is_paid = is_paid
+            self.object.add_payment_method = payment_method
+            self.object.discount_amount = discount_amount
+            self.object.discount_reason = discount_reason
+
             self.object.save()
 
             messages.success(request, "Student invoice updated.")
@@ -126,10 +186,14 @@ class StudentInvoiceUpdateView(UpdateView):
 
 
 
+
+
+
 # Invoice Section
 
 from django.views.generic import ListView
 
+from apps.admissions.models import Programs
 from .models import Invoice, Purpose
 from .forms import InvoiceGenerateForm
 from .utils import assign_invoice_to_students
@@ -144,6 +208,34 @@ class InvoiceListCreateView(ListView):
     context_object_name = 'invoices'
     paginate_by = 25
 
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related(
+            'invoice_session', 'invoice_program', 'invoice_group', 'invoice_purpose'
+        )
+
+        search = self.request.GET.get('search', '')
+        purpose = self.request.GET.get('purpose')
+        program = self.request.GET.get('program')
+        session = self.request.GET.get('session')
+
+        if search:
+            queryset = queryset.filter(
+                Q(invoice_session__ses_name__icontains=search) |
+                Q(invoice_program__pro_name__icontains=search) |
+                Q(invoice_group__group_name__icontains=search) |
+                Q(invoice_purpose__name__icontains=search) |
+                Q(amount__icontains=search)
+            )
+
+        if purpose:
+            queryset = queryset.filter(invoice_purpose_id=purpose)
+        if program:
+            queryset = queryset.filter(invoice_program_id=program)
+        if session:
+            queryset = queryset.filter(invoice_session_id=session)
+
+        return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context = TemplateLayout.init(self, context)
@@ -151,10 +243,20 @@ class InvoiceListCreateView(ListView):
         context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
         context["form"] = InvoiceGenerateForm()
 
-        # 🔧 Add purpose list for modal dropdown
+        # 🔃 Add dropdown lists
         context["invoice_purpose_list"] = Purpose.objects.all()
+        context["session_list"] = Session.objects.all()
+        context["program_list"] = Programs.objects.all()
+
+        # 🪪 Repopulate filters
+        context["selected_search"] = self.request.GET.get("search", "")
+        context["selected_purpose"] = self.request.GET.get("purpose", "")
+        context["selected_program"] = self.request.GET.get("program", "")
+        context["selected_session"] = self.request.GET.get("session", "")
 
         return context
+
+
 
     def post(self, request, *args, **kwargs):
         form = InvoiceGenerateForm(request.POST)
@@ -501,7 +603,6 @@ class ExpenseCategoryDeleteView(View):
 # -------------------- INCOME VIEWS --------------------
 
 
-from django.utils.dateparse import parse_date
 
 
 class IncomeDataAPIView(View):
@@ -769,8 +870,8 @@ class LedgerView(View):
         total_expense = expenses.aggregate(total=Sum("amount"))["total"] or 0
 
         # Pagination
-        income_page = Paginator(incomes, 10).get_page(request.GET.get("income_page"))
-        expense_page = Paginator(expenses, 10).get_page(request.GET.get("expense_page"))
+        income_page = Paginator(incomes, 15).get_page(request.GET.get("income_page"))
+        expense_page = Paginator(expenses, 15).get_page(request.GET.get("expense_page"))
 
         # Context
         context.update({

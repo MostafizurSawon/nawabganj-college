@@ -1,5 +1,6 @@
 {% extends layout_path %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Ledger{% endblock %}
 
@@ -70,8 +71,8 @@
 </a>
 
 <div class=" row  mb-3">
-  <div class="col-md-6 text-success "><strong> Total Income: {{ total_income }} ৳</strong> </div>
-  <div class="col-md-6 text-danger text-end"><strong>Total Expense: {{ total_expense }} ৳</strong></div>
+  <div class="col-md-6 text-success "><strong> Total Income: {{ total_income|intcomma }} ৳</strong> </div>
+  <div class="col-md-6 text-danger text-end"><strong>Total Expense: {{ total_expense|intcomma }} ৳</strong></div>
 </div>
 
 <!-- Ledger Table -->
@@ -95,7 +96,7 @@
             <td>{{ i.date|date:"j/n/Y" }}</td>
             <td>{{ i.income_category.name }}</td>
             <td>{{ i.income_name }}</td>
-            <td class="text-success" style="flex-wrap: wrap;">{{ i.amount }} ৳</td>
+            <td class="text-success" style="flex-wrap: wrap;">{{ i.amount|intcomma }} ৳</td>
             <td>{{ i.note|safe }}</td>
           </tr>
           {% empty %}
@@ -103,28 +104,52 @@
           {% endfor %}
         </tbody>
       </table>
-      <div class="text-center">
+      <div class="text-center mt-5">
         {% if income_page.has_other_pages %}
-          <nav>
-            <ul class="pagination justify-content-center">
-              {% if income_page.has_previous %}
-                <li class="page-item">
-                  <a class="page-link" href="?income_page={{ income_page.previous_page_number }}&{{ request.GET.urlencode|safe }}">Prev</a>
-                </li>
-              {% endif %}
-              {% for num in income_page.paginator.page_range %}
+        <nav>
+          <ul class="pagination justify-content-center">
+            {% if income_page.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?income_page={{ income_page.previous_page_number }}&{{ request.GET.urlencode|safe }}">«</a>
+              </li>
+            {% endif %}
+
+            {# First page #}
+            {% if income_page.number > 3 %}
+              <li class="page-item">
+                <a class="page-link" href="?income_page=1&{{ request.GET.urlencode|safe }}">1</a>
+              </li>
+              <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+
+            {# Page numbers around current #}
+            {% for num in income_page.paginator.page_range %}
+              {% if num >= income_page.number|add:'-2' and num <= income_page.number|add:'2' %}
                 <li class="page-item {% if income_page.number == num %}active{% endif %}">
                   <a class="page-link" href="?income_page={{ num }}&{{ request.GET.urlencode|safe }}">{{ num }}</a>
                 </li>
-              {% endfor %}
-              {% if income_page.has_next %}
-                <li class="page-item">
-                  <a class="page-link" href="?income_page={{ income_page.next_page_number }}&{{ request.GET.urlencode|safe }}">Next</a>
-                </li>
               {% endif %}
-            </ul>
-          </nav>
+            {% endfor %}
+
+            {# Last page #}
+            {% if income_page.number < income_page.paginator.num_pages|add:'-2' %}
+              <li class="page-item disabled"><span class="page-link">...</span></li>
+              <li class="page-item">
+                <a class="page-link" href="?income_page={{ income_page.paginator.num_pages }}&{{ request.GET.urlencode|safe }}">
+                  {{ income_page.paginator.num_pages }}
+                </a>
+              </li>
+            {% endif %}
+
+            {% if income_page.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?income_page={{ income_page.next_page_number }}&{{ request.GET.urlencode|safe }}">»</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
         {% endif %}
+
       </div>
     </div>
   </div>
@@ -148,7 +173,7 @@
             <td>{{ e.date|date:"j/n/Y" }}</td>
             <td>{{ e.exp_category.name }}</td>
             <td>{{ e.exp_name }}</td>
-            <td class="text-danger">{{ e.amount }} ৳</td>
+            <td class="text-danger">{{ e.amount|intcomma }} ৳</td>
             <td>{{ e.note|safe }}</td>
           </tr>
           {% empty %}
@@ -156,28 +181,49 @@
           {% endfor %}
         </tbody>
       </table>
-      <div class="text-center">
+      <div class="text-center mt-5">
         {% if expense_page.has_other_pages %}
-          <nav>
-            <ul class="pagination justify-content-center">
-              {% if expense_page.has_previous %}
-                <li class="page-item">
-                  <a class="page-link" href="?expense_page={{ expense_page.previous_page_number }}&{{ request.GET.urlencode|safe }}">Prev</a>
-                </li>
-              {% endif %}
-              {% for num in expense_page.paginator.page_range %}
+        <nav>
+          <ul class="pagination justify-content-center">
+
+            {% if expense_page.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?expense_page={{ expense_page.previous_page_number }}&{{ request.GET.urlencode|safe }}">«</a>
+              </li>
+            {% endif %}
+
+            {% if expense_page.number > 3 %}
+              <li class="page-item">
+                <a class="page-link" href="?expense_page=1&{{ request.GET.urlencode|safe }}">1</a>
+              </li>
+              <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+
+            {% for num in expense_page.paginator.page_range %}
+              {% if num >= expense_page.number|add:'-2' and num <= expense_page.number|add:'2' %}
                 <li class="page-item {% if expense_page.number == num %}active{% endif %}">
                   <a class="page-link" href="?expense_page={{ num }}&{{ request.GET.urlencode|safe }}">{{ num }}</a>
                 </li>
-              {% endfor %}
-              {% if expense_page.has_next %}
-                <li class="page-item">
-                  <a class="page-link" href="?expense_page={{ expense_page.next_page_number }}&{{ request.GET.urlencode|safe }}">Next</a>
-                </li>
               {% endif %}
-            </ul>
-          </nav>
-        {% endif %}
+            {% endfor %}
+
+            {% if expense_page.number < expense_page.paginator.num_pages|add:'-2' %}
+              <li class="page-item disabled"><span class="page-link">...</span></li>
+              <li class="page-item">
+                <a class="page-link" href="?expense_page={{ expense_page.paginator.num_pages }}&{{ request.GET.urlencode|safe }}">{{ expense_page.paginator.num_pages }}</a>
+              </li>
+            {% endif %}
+
+            {% if expense_page.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?expense_page={{ expense_page.next_page_number }}&{{ request.GET.urlencode|safe }}">»</a>
+              </li>
+            {% endif %}
+
+          </ul>
+        </nav>
+      {% endif %}
+
       </div>
     </div>
   </div>

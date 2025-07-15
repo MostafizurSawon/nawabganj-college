@@ -56,11 +56,32 @@
             <label class="form-label">Group</label>
             <select name="group" class="form-select">
               <option value="">All Groups</option>
-              {% for g in groups %}
-                <option value="{{ g_display }}" {% if request.GET.group == g %}selected{% endif %}>{{ g|title }}</option>
+              {% for value, label in groups %}
+                <option value="{{ value }}" {% if request.GET.group == value %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
             </select>
           </div>
+
+
+          {% comment %} <div class="col-md-3">
+            <label class="form-label">Group</label>
+            <select name="group" class="form-select">
+              <option value="">All Groups</option>
+              {% for g in groups %}
+                {% if g == 'science' %}
+                  <option value="Science" {% if request.GET.group == 'Science' %}selected{% endif %}>Science</option>
+
+                {% elif g == 'arts' %}
+                  <option value="Arts" {% if request.GET.group == 'Arts' %}selected{% endif %}>Humanities</option>
+                {% elif g == 'commerce' %}
+                  <option value="Commerce" {% if request.GET.group == 'Commerce' %}selected{% endif %}>Business Studies</option>
+                {% else %}
+                  <option value="{{ g }}" {% if request.GET.group == g %}selected{% endif %}>{{ g }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div> {% endcomment %}
+
 
           <div class="col-md-3 d-flex gap-2">
             <button type="submit" class="btn btn-primary w-100">Filter</button>
@@ -146,11 +167,11 @@
     </div>
 
     <div class="alert alert-info mx-4">
-  Total records: {{ page_obj.paginator.count }},
-  Per page: {{ page_obj.paginator.per_page }},
-  Current page: {{ page_obj.number }},
-  Total pages: {{ page_obj.paginator.num_pages }}
-</div>
+      Total records: {{ page_obj.paginator.count }},
+      Per page: {{ page_obj.paginator.per_page }},
+      Current page: {{ page_obj.number }},
+      Total pages: {{ page_obj.paginator.num_pages }}
+    </div>
 
 
     <div class="card-footer d-flex justify-content-end">

@@ -57,14 +57,14 @@
             <select name="group" class="form-select">
               <option value="">All Groups</option>
               {% for g in groups %}
-                <option value="{{ g }}" {% if request.GET.group == g %}selected{% endif %}>{{ g|title }}</option>
+                <option value="{{ g }}" {% if request.GET.group == g %}selected{% endif %}>{{ g|upper }}</option>
               {% endfor %}
             </select>
           </div>
 
           <div class="col-md-3 d-flex gap-2">
             <button type="submit" class="btn btn-primary w-100">Filter</button>
-            <a href="{% url 'admitted_students_list' %}" class="btn btn-outline-secondary w-100">Reset</a>
+            <a href="{% url 'degree_admitted_students_list' %}" class="btn btn-outline-secondary w-100">Reset</a>
           </div>
 
         </div>
@@ -99,9 +99,13 @@
             <tr>
               <td>{{ forloop.counter }}</td>
               <td class="d-flex justify-content-between">
-                <a href="{% url 'degree_admission_view' student.id %}" class="btn btn-icon btn-sm btn-outline-info me-1" title="View">
-                  <i class="ti ti-eye"></i>
+                <a href="{% url 'degree_admission_view' student.id %}" target="_blank" class="btn btn-sm btn-outline-info me-1" title="Print">
+                  Print
                 </a>
+
+                {% comment %} <a href="{% url 'degree_admission_view' student.id %}" class="btn btn-icon btn-sm btn-outline-info me-1" title="View">
+                  <i class="ti ti-eye"></i>
+                </a> {% endcomment %}
 
 
 
@@ -128,7 +132,7 @@
               <td>{{ student.add_name }}</td>
               <td>{{ student.add_mobile }}</td>
               <td>{{ student.add_class_roll }}</td>
-              <td>{{ student.add_admission_group|title }}</td>
+              <td>{{ student.add_admission_group|upper }}</td>
               <td>{{ student.add_session.ses_name }}</td>
               <td>
                 {% comment %} {{ student.add_program.deg_name }} {% endcomment %}

@@ -6,20 +6,74 @@
 
 <div class="">
 
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
   <div class="card my-4">
     <!-- 🔍 Filter & Search -->
-    <form method="get" class="row g-2 p-4">
-      <div class="col-md-4">
-        <input type="text" name="search" value="{{ search }}" placeholder="Search student..." class="form-control">
-      </div>
+    <form method="get" class="row g-2 p-4 align-items-end">
+
+      <!-- Search -->
       <div class="col-md-3">
-        <input type="number" name="invoice" value="{{ invoice_id }}" placeholder="Invoice ID" class="form-control">
+        <label>Search</label>
+        <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Student name or phone">
       </div>
-      <div class="col-md-5 d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Search</button>
+
+      <!-- Purpose Filter -->
+      <div class="col-md-2">
+        <label>Purpose</label>
+        <select name="purpose" class="form-select">
+          <option value="">All</option>
+          {% for pur in purposes %}
+            <option value="{{ pur.id }}" {% if pur.id|stringformat:"s" == request.GET.purpose %}selected{% endif %}>{{ pur.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Group Filter -->
+      <div class="col-md-2">
+        <label>Group</label>
+        <select name="group" class="form-select">
+          <option value="">All</option>
+          {% for g in groups %}
+            <option value="{{ g }}" {% if g == request.GET.group %}selected{% endif %}>{{ g|title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Is Paid Filter -->
+      <div class="col-md-2">
+        <label>Paid Status</label>
+        <select name="is_paid" class="form-select">
+          <option value="">All</option>
+          <option value="true" {% if request.GET.is_paid == 'true' %}selected{% endif %}>Paid</option>
+          <option value="false" {% if request.GET.is_paid == 'false' %}selected{% endif %}>Unpaid</option>
+        </select>
+      </div>
+
+      <!-- Date Range -->
+      <div class="col-md-3">
+        <label>Assigned From</label>
+        <input type="date" name="assigned_from" value="{{ request.GET.assigned_from }}" class="form-control">
+      </div>
+      {% comment %} <div class="col-md-3">
+        <label>To</label>
+        <input type="date" name="assigned_to" value="{{ request.GET.assigned_to }}" class="form-control">
+      </div> {% endcomment %}
+
+      <!-- Buttons -->
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary">🔍 Search</button>
         <a href="{% url 'student-invoice-list' %}" class="btn btn-secondary">Reset</a>
       </div>
     </form>
+
   </div>
 
   <!-- 📄 Student Invoice Table -->
@@ -41,25 +95,40 @@
             <th>Amount</th>
             <th>Note</th>
             <th>Is Paid</th>
+            <th>Assigned At</th>
+
 
           </tr>
         </thead>
         <tbody>
           {% for entry in student_invoices %}
           <tr>
-            <td>{{ entry.invoice.id }}</td>
-            <td>
+            {% comment %} <td>{{ entry.invoice.id }}</td> {% endcomment %}
+            <td>{{ forloop.counter }}</td>
+            <td class="text-center d-flex gap-2 justify-content-center">
+              <!-- 🖨️ Print/Details Button -->
+              <a href="{% url 'student-invoice-detail' entry.id %}" class="btn btn-sm btn-outline-info" target="_blank" title="Details / Print">
+                <i class="fas fa-print"></i>
+              </a>
+
               <!-- ✏️ Edit Button (modal trigger) -->
-              <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ entry.id }}">
+              <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ entry.id }}" title="Edit">
                 <i class="fas fa-edit"></i>
               </button>
             </td>
+
             <td>{{ entry.student.add_name }}</td>
             <td>{{ entry.student.add_mobile }}</td>
             <td>{{ entry.student.add_class_roll }}</td>
             <td>{{ entry.student.get_add_admission_group_display }}</td>
             <td>{{ entry.invoice.invoice_purpose.name }}</td>
-            <td>{{ entry.invoice.amount|intcomma }}</td>
+            <td>
+              {% comment %} {{ entry.invoice.amount|intcomma }} ৳ {% endcomment %}
+              {{ entry.invoice.amount|intcomma }} ৳
+              <br>
+              <small>( Waiver: {{ entry.discount_amount|intcomma }} ৳ ) </small>
+
+            </td>
             <td>{{ entry.note|default:"-" }}</td>
             <td>
               {% if entry.is_paid %}
@@ -68,6 +137,7 @@
                 <span class="badge bg-warning text-dark">Unpaid</span>
               {% endif %}
             </td>
+            <td>{{ entry.assigned_at|date:"d M Y" }}</td>
 
           </tr>
 
@@ -82,14 +152,47 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
+
                     <div class="mb-3">
                       <label class="form-label">Amount</label>
-                      <input type="number" name="amount" class="form-control" value="{{ entry.invoice.amount }}" required>
+                      <input type="number" id="invoiceAmount{{ entry.id }}" class="form-control" value="{{ entry.invoice.amount }}" readonly>
                     </div>
+
+
                     <div class="mb-3">
                       <label class="form-label">Note</label>
                       <textarea name="note" class="form-control" rows="2">{{ entry.note }}</textarea>
                     </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">Payment Method</label>
+                      <select name="add_payment_method" class="form-select">
+                        <option value="">Select a method</option>
+                        <option value="office" {% if entry.add_payment_method == 'office' %}selected{% endif %}>Office Cash</option>
+                        <option value="bkash" {% if entry.add_payment_method == 'bkash' %}selected{% endif %}>Bkash</option>
+                        <option value="rocket" {% if entry.add_payment_method == 'rocket' %}selected{% endif %}>Rocket</option>
+                        <option value="nagad" {% if entry.add_payment_method == 'nagad' %}selected{% endif %}>Nagad</option>
+                        <option value="bank" {% if entry.add_payment_method == 'bank' %}selected{% endif %}>Bank</option>
+                        <option value="others" {% if entry.add_payment_method == 'others' %}selected{% endif %}>Others</option>
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">Waiver Amount</label>
+                      <input type="number" name="discount_amount" class="form-control" value="{{ entry.discount_amount }}">
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">Payable Amount (after discount)</label>
+                      <input type="text" id="payableAmount{{ entry.id }}" class="form-control" readonly>
+                    </div>
+
+
+                    <div class="mb-3">
+                      <label class="form-label">Discount Reason</label>
+                      <input type="text" name="discount_reason" class="form-control" value="{{ entry.discount_reason }}">
+                    </div>
+
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" name="is_paid" {% if entry.is_paid %}checked{% endif %}>
                       <label class="form-check-label">Mark as Paid</label>
@@ -101,7 +204,29 @@
                 </form>
               </div>
             </div>
+
+           <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                const modalId = "{{ entry.id }}";
+                const amountInput = document.querySelector(`#invoiceAmount${modalId}`);
+                const discountInput = document.querySelector(`#editModal${modalId} input[name="discount_amount"]`);
+                const payableField = document.querySelector(`#payableAmount${modalId}`);
+
+                function updatePayableAmount() {
+                  const amount = parseFloat(amountInput.value) || 0;
+                  const discount = parseFloat(discountInput.value) || 0;
+                  const payable = Math.max(0, amount - discount);
+                  payableField.value = payable.toLocaleString('en-US') + " ৳";
+                }
+
+                discountInput.addEventListener('input', updatePayableAmount);
+                updatePayableAmount();
+              });
+            </script>
+
+
           </div>
+
 
           {% empty %}
           <tr><td colspan="7" class="text-center">No student invoices found.</td></tr>
@@ -110,23 +235,42 @@
       </table>
 
       <!-- 🔢 Pagination -->
-      {% if is_paginated %}
-      <nav class="mt-3">
-        <ul class="pagination justify-content-center">
-          {% if page_obj.has_previous %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search }}&invoice={{ invoice_id }}">«</a>
-          </li>
-          {% endif %}
-          <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
-          {% if page_obj.has_next %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search }}&invoice={{ invoice_id }}">»</a>
-          </li>
-          {% endif %}
-        </ul>
-      </nav>
-      {% endif %}
+      <div class="card-footer d-flex justify-content-end">
+        {% if is_paginated %}
+          <nav>
+            <ul class="pagination pagination-sm">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.session %}session={{ request.GET.session }}&{% endif %}{% if request.GET.program %}program={{ request.GET.program }}&{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                    «
+                  </a>
+                </li>
+              {% endif %}
+
+              {% for i in paginator.page_range %}
+                {% if i <= 2 or i > paginator.num_pages|add:'-2' or i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
+                  <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                    <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.session %}session={{ request.GET.session }}&{% endif %}{% if request.GET.program %}program={{ request.GET.program }}&{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&{% endif %}page={{ i }}">{{ i }}</a>
+
+                  </li>
+                {% elif i == 3 or i == paginator.num_pages|add:'-3' %}
+                  <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
+              {% endfor %}
+
+
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.session %}session={{ request.GET.session }}&{% endif %}{% if request.GET.program %}program={{ request.GET.program }}&{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&{% endif %}page={{page_obj.next_page_number }}">
+                    »
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        {% endif %}
+      </div>
+
     </div>
   </div>
 </div>

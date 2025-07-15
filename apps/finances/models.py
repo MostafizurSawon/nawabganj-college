@@ -14,6 +14,7 @@ class Invoice(models.Model):
     invoice_group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='invoice_group', verbose_name="invoice Group", null=True, blank=True)
     invoice_purpose = models.ForeignKey(Purpose, on_delete=models.CASCADE, related_name='invoice_purpose', verbose_name="invoice Purpose", null=True, blank=True)
     amount = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
 
     def __str__(self):
         return self.invoice_group.group_name
@@ -31,13 +32,37 @@ class StudentInvoice(models.Model):
     invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE, related_name='student_invoices')
     is_paid = models.BooleanField(default=False)
     note = models.TextField(null=True, blank=True)
+
+    # ✅ Add these:
+    add_payment_method = models.CharField(
+        max_length=15,
+        choices=[
+            ('office', 'Office Cash'),
+            ('bkash', 'Bkash'),
+            ('rocket', 'Rocket'),
+            ('nagad', 'Nagad'),
+            ('bank', 'Bank'),
+            ('others', 'Others'),
+        ],
+        null=True,
+        blank=True
+    )
+
+    discount_amount = models.PositiveIntegerField(null=True, blank=True)
+    discount_reason = models.CharField(max_length=255, null=True, blank=True)
+
     assigned_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('content_type', 'object_id', 'invoice')
 
     def __str__(self):
+        if self.discount_amount:
+            final = max(0, self.invoice.amount - self.discount_amount)
+            return f"{self.student} | {self.invoice.invoice_purpose} | {final} Tk (after discount)"
         return f"{self.student} | {self.invoice.invoice_purpose} | {self.invoice.amount} Tk"
+
+
 
 
 

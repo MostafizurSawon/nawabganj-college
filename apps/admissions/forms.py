@@ -289,7 +289,7 @@ class DegreeAdmissionForm(forms.ModelForm):
             'add_hsc_passyear': 'e.g. 2022',
             'add_trxid': 'Transaction ID',
             'add_slip': 'Your Note',
-            'add_class_roll': 'HSC Class Roll',
+            'add_class_roll': 'Class Roll',
         }
 
         for field_name, text in placeholders.items():

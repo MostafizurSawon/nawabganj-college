@@ -16,6 +16,7 @@ urlpatterns = [
 
     # Students show as per invoice
     path('student-invoices/', views.StudentInvoiceListView.as_view(), name='student-invoice-list'),
+    path('student-invoice/<int:pk>/detail/', views.StudentInvoiceDetailView.as_view(), name='student-invoice-detail'),  # Print Purpose
     path('student-invoice/<int:pk>/update/', views.StudentInvoiceUpdateView.as_view(), name='student-invoice-update'),
 
 

@@ -49,7 +49,7 @@ def get_degree_admission_fee(request):
 
         fee = Fee.objects.get(
             fee_session_id=session_id,
-            fee_program__pro_name__iexact="Honours",
+            fee_program__pro_name__iexact="Degree",
             fee_group=group
         )
         return JsonResponse({'amount': fee.amount})

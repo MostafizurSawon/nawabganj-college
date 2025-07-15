@@ -45,9 +45,7 @@
             <option value="">All Groups</option>
             {% for g in groups %}
               <option value="{{ g.id }}" {% if g.id|stringformat:"s" == selected_group %}selected{% endif %}>
-                {% if g.group_name == "commerce" %}Business Studies
-                {% elif g.group_name == "arts" %}Humanities
-                {% else %}{{ g.group_name|upper }}{% endif %}
+                {{ g.get_group_name_display }}
               </option>
             {% endfor %}
           </select>
@@ -90,7 +88,9 @@
                 {{ fee.fee_program.pro_name }}
               {% endif %}
             </td>
-            <td>{{ fee.fee_group.group_name|upper }}</td>
+            <td>{{ fee.fee_group.get_group_name_display }}</td>
+
+
             <td>{{ fee.amount|intcomma }} ৳</td>
             <td>
             <!-- Edit Icon Button -->

@@ -6,6 +6,16 @@ from apps.admissions.models import Session, Programs
 
 from web_project import TemplateLayout, TemplateHelper
 
+GROUP_CHOICES_MAP = {
+    'science': 'Science',
+    'arts': 'Humanities',
+    'commerce': 'Business Studies',
+    'Ba': 'BA',
+    'Bss': 'BSS',
+    'Bbs': 'BBS',
+    'Bsc': 'BSC',
+}
+
 class AdmittedStudentListView(ListView):
     model = HscAdmissions
     template_name = 'students/admitted_students_list.html'
@@ -51,7 +61,7 @@ class AdmittedStudentListView(ListView):
 
         context['sessions'] = Session.objects.all()
         context['programs'] = Programs.objects.all()
-        context['groups'] = ['science', 'arts', 'commerce']
+        context['groups'] = GROUP_CHOICES_MAP.items()
         return context
 
 

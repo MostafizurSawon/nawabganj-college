@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 
-# Hsc
+# Hsc and Degree
 class Programs(models.Model):
     pro_name = models.CharField(max_length=20, null=True, blank=True)
     pro_status = models.CharField(max_length=15, choices=[
@@ -53,10 +53,10 @@ class Group(models.Model):
         ('science', 'Science'),
         ('arts', 'Humanities'),
         ('commerce', 'Business Studies'),
-        ('Ba', 'Ba'),
-        ('Bss', 'Bss'),
-        ('Bbs', 'Bbs'),
-        ('Bsc', 'Bsc'),
+        ('Ba', 'BA'),
+        ('Bss', 'BSS'),
+        ('Bbs', 'BBS'),
+        ('Bsc', 'BSC'),
     ], null=True, blank= True)
 
     def __str__(self):
@@ -445,7 +445,14 @@ class DegreeAdmission(models.Model):
     merit_position = models.CharField(max_length=10, null=True, blank=True)
 
     add_amount = models.DecimalField(max_digits=8, decimal_places=2, default=0)
-    add_payment_method = models.CharField(max_length=20, null=True, blank=True)
+    add_payment_method = models.CharField(max_length=15, choices=[
+        ('office', 'Office Cash'),
+        ('bkash', 'Bkash'),
+        ('rocket', 'Rocket'),
+        ('nagad', 'Nagad'),
+        ('bank', 'Bank'),
+        ('others', 'Others'),
+    ], null=True, blank=True)
     add_trxid = models.CharField(max_length=50, null=True, blank=True)
     add_slip = models.TextField(null=True, blank=True)
 
