@@ -107,9 +107,14 @@
             <td>{{ forloop.counter }}</td>
             <td class="text-center d-flex gap-2 justify-content-center">
               <!-- 🖨️ Print/Details Button -->
-              <a href="{% url 'student-invoice-detail' entry.id %}" class="btn btn-sm btn-outline-info" target="_blank" title="Details / Print">
+              <a href="{% if entry.is_paid %}{% url 'student-invoice-detail' entry.id %}{% else %}#{% endif %}"
+                class="btn btn-sm btn-outline-info {% if not entry.is_paid %}disabled{% endif %}"
+                target="_blank"
+                title="Details / Print">
                 <i class="fas fa-print"></i>
               </a>
+
+
 
               <!-- ✏️ Edit Button (modal trigger) -->
               <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ entry.id }}" title="Edit">

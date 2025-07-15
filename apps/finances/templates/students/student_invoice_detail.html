@@ -118,7 +118,8 @@
             <span class="badge bg-primary float_badge">COLLEGE COPY</span>
             <div class="text-center">
                 {% comment %} <img src="./assets/header_invoice.svg" class="img-fluid w-100" alt="College Banner"> {% endcomment %}
-                <img src={% static 'cus/logo.jpg' %} class="logo" alt="Logo">
+                <img src={% static 'cus/header_invoice.svg' %} class="img-fluid w-100" alt="College Banner">
+                {% comment %} <img src={% static 'cus/logo.jpg' %} class="logo" alt="Logo"> {% endcomment %}
 
             </div>
             <h6 class="text-center my-2">PAYMENT RECEIPT</h6>
@@ -138,15 +139,26 @@
               {% comment %} <div class="col text-end">
                 <strong>Date:</strong> {{ now|date:"j F, Y" }}
               </div> {% endcomment %}
+              <div class="col text-end">
+                <strong>Session:</strong> {{ invoice.student.add_session.ses_name|default:"N/A" }}
+              </div>
             </div>
+
+            {% comment %} <div class="row mb-1">
+                <div class="col"><strong>Transaction ID:</strong> 2505149006731404</div>
+                <div class="col text-end"><strong>Session:</strong> 2022-23</div>
+            </div> {% endcomment %}
 
             <div class="row mb-1">
               <div class="col">
                 <strong>Payment Date:</strong> {{ invoice.assigned_at|date:"j F, Y" }}
+
               </div>
               <div class="col text-end">
                 <strong>Payment Method:</strong>
                 {{ invoice.get_add_payment_method_display|default:"—" }}
+
+
               </div>
             </div>
 
@@ -169,7 +181,7 @@
                 <strong>Student Type:</strong> {{ invoice.student.add_program.pro_name|default:"N/A" }}
               </div>
               <div class="col text-end">
-                <strong>Session:</strong> {{ invoice.student.add_session.ses_name|default:"N/A" }}
+                <strong>Roll:</strong> {{ invoice.student.add_class_roll }}
               </div>
             </div>
 
@@ -216,52 +228,102 @@
 
         <!-- STUDENT COPY -->
         <div class="receipt-copy badge_relative">
-            <span class="badge bg-danger float_badge">STUDENT COPY</span>
+            <span class="badge bg-primary float_badge">COLLEGE COPY</span>
             <div class="text-center">
-                <img src="./assets/header_invoice.svg" class="img-fluid w-100" alt="College Banner">
+                {% comment %} <img src="./assets/header_invoice.svg" class="img-fluid w-100" alt="College Banner"> {% endcomment %}
+                <img src={% static 'cus/header_invoice.svg' %} class="img-fluid w-100" alt="College Banner">
+                {% comment %} <img src={% static 'cus/logo.jpg' %} class="logo" alt="Logo"> {% endcomment %}
 
             </div>
             <h6 class="text-center my-2">PAYMENT RECEIPT</h6>
-            <div class="text-center mb-2"><span class="badge bg-success">PAID</span></div>
+
+            <div class="text-center mb-2">
+              {% if invoice.is_paid %}
+                <span class="badge bg-success">PAID</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">UNPAID</span>
+              {% endif %}
+            </div>
 
             <div class="row mb-1">
-                <div class="col"><strong>Invoice Number:</strong> INV-XMWTBTXJ-1747203604</div>
-                <div class="col text-end"><strong>Date:</strong> 14 May, 2025</div>
+              <div class="col">
+                <strong>Invoice Number:</strong> {{ invoice.invoice.id }}
+              </div>
+              {% comment %} <div class="col text-end">
+                <strong>Date:</strong> {{ now|date:"j F, Y" }}
+              </div> {% endcomment %}
+              <div class="col text-end">
+                <strong>Session:</strong> {{ invoice.student.add_session.ses_name|default:"N/A" }}
+              </div>
             </div>
+
             <div class="row mb-1">
-                <div class="col"><strong>Payment Date:</strong> 22 June, 2025</div>
-                <div class="col text-end"><strong>Payment Method:</strong> Sonali Bank</div>
+              <div class="col">
+                <strong>Payment Date:</strong> {{ invoice.assigned_at|date:"j F, Y" }}
+
+              </div>
+              <div class="col text-end">
+                <strong>Payment Method:</strong>
+                {{ invoice.get_add_payment_method_display|default:"—" }}
+
+
+              </div>
             </div>
-            <div class="mb-1"><strong>Transaction ID:</strong> 2505149006731404</div>
+
+            {# Optional Transaction ID if needed later #}
+            {# <div class="mb-1"><strong>Transaction ID:</strong> {{ invoice.transaction_id }}</div> #}
+
             <hr class="my-2" />
+
             <div class="row mb-1">
-                <div class="col"><strong>Student Name:</strong> {{ invoice.student.add_name }}</div>
-                <div class="col text-end"><strong>Student Mobile:</strong> {{ invoice.student.add_mobile }}</div>
+              <div class="col">
+                <strong>Student Name:</strong> {{ invoice.student.add_name }}
+              </div>
+              <div class="col text-end">
+                <strong>Student Mobile:</strong> {{ invoice.student.add_mobile }}
+              </div>
             </div>
+
             <div class="row mb-1">
-                <div class="col"><strong>Student Type:</strong> HSC</div>
-                <div class="col text-end"><strong>Session:</strong> 2024-2025</div>
+              <div class="col">
+                <strong>Student Type:</strong> {{ invoice.student.add_program.pro_name|default:"N/A" }}
+              </div>
+              <div class="col text-end">
+                <strong>Roll:</strong> {{ invoice.student.add_class_roll }}
+              </div>
             </div>
+
             <table class="table table-bordered mt-2 mb-2">
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th class="text-end">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>জুলাই ২০২৫ পূর্ববর্তী বকেয়া</td>
-                        <td class="text-end">1,050.00 BDT</td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th class="text-end">Total Amount</th>
-                        <th class="text-end">1,050.00 BDT</th>
-                    </tr>
-                </tfoot>
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th class="text-end">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ invoice.invoice.invoice_purpose.name|default:"Invoice Item" }}</td>
+                  <td class="text-end">
+                    {{ invoice.invoice.amount|intcomma }} BDT
+                  </td>
+                </tr>
+
+                {% if invoice.discount_amount %}
+                <tr>
+                  <td>Discount {% if invoice.discount_reason %}({{ invoice.discount_reason }}){% endif %}</td>
+                  <td class="text-end text-danger">-{{ invoice.discount_amount|intcomma }} BDT</td>
+                </tr>
+                {% endif %}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th class="text-end">Total Amount</th>
+                  <th class="text-end">{{ final_amount|floatformat:2|intcomma }} BDT</th>
+                </tr>
+              </tfoot>
+
             </table>
+
             <div class="text-center small">
                 <p>This is a software generated copy. Powered by Peoples College. Design Developed by JBD IT.</p>
             </div>
@@ -274,7 +336,7 @@
     </div>
 
 
-    <div class="card-body">
+    {% comment %} <div class="card-body">
     <table class="table table-bordered">
       <tr>
         <th>Student Name</th>
@@ -325,7 +387,7 @@
     </table>
 
     <a href="{% url 'student-invoice-list' %}" class="btn btn-secondary mt-3">← Back to List</a>
-  </div>
+  </div> {% endcomment %}
 
     <script>
         function printReceipt() {
