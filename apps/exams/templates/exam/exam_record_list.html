@@ -1,0 +1,206 @@
+{% extends layout_path %}
+
+{% block title %}Exam Mark{% endblock %}
+{% load static %}
+
+{% block content %}
+<div class="card p-4">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="get" class="row g-3 mb-3">
+    <div class="col-md-3">
+      <input type="text" name="search" placeholder="Search by name or exam" value="{{ request.GET.search }}" class="form-control">
+    </div>
+    <div class="col-md-3">
+      <select name="class_filter" class="form-select">
+        <option value="">Select Class</option>
+        {% for cls in classes %}
+          <option value="{{ cls.id }}" {% if request.GET.class_filter == cls.id|stringformat:"s" %}selected{% endif %}>{{ cls.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="exam_filter" class="form-select">
+        <option value="">Select Exam</option>
+        {% for exam in exams %}
+          <option value="{{ exam.id }}" {% if request.GET.exam_filter == exam.id|stringformat:"s" %}selected{% endif %}>{{ exam.exam_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2"><input type="date" name="start_date" class="form-control" value="{{ request.GET.start_date }}"></div>
+    <div class="col-md-2"><input type="date" name="end_date" class="form-control" value="{{ request.GET.end_date }}"></div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+    <div class="col-auto">
+      <a class="btn btn-secondary" href="{% url 'exam_record_list' %}">Reset</a>
+    </div>
+  </form>
+
+  {# ---- Download buttons ---- #}
+  {% with query=request.GET.urlencode %}
+    {% comment %} <a
+      href="{% url 'all_marksheets' %}{% if query %}?{{ query }}{% endif %}"
+      class="btn btn-success my-4"
+      target="_blank" rel="noopener"
+    >
+      Download All Marksheets
+    </a> {% endcomment %}
+
+    {% if request.GET.exam_filter %}
+      <a
+        href="{% url 'all_marksheets_exam' request.GET.exam_filter %}"
+        class="btn btn-outline-success my-4 ms-2"
+        target="_blank" rel="noopener"
+      >
+        Download Marksheet
+      </a>
+    {% endif %}
+  {% endwith %}
+
+  <table class="table table-bordered mb-4 text-center">
+    <thead>
+      <tr>
+        <th>SID</th>
+        <th>Student</th>
+        <th>Class</th>
+        <th>Section</th>
+        <th>Exam</th>
+        <th>Total Marks</th>
+        <th>GPA</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in exam_records %}
+        <tr>
+          <td>{{ record.student.add_class_roll }}</td>
+          <td>{{ record.student.add_name }}</td>
+          <td>{{ record.exam.exam_class.name }} 
+            {% if record.exam.group %}
+            <br>
+              ({{ record.exam.group.get_group_name_display }})
+            {% endif %}
+
+          </td>
+          <td>{{ record.student.get_add_class_section_display }}</td>
+          <td>{{ record.exam.exam_name }}</td>
+          <td>{{ record.total_marks }}</td>
+
+          <td class="
+            {% if record.grade == 'F' %}text-danger fw-bold
+            {% elif record.grade == 'A+' %}text-success fw-bold
+            {% else %}text-info fw-bold{% endif %}
+          ">
+            {{ record.gpa|default:"0.0" }} ({{ record.grade }})
+          </td>
+
+          <td>
+            <a target="_blank" href="{% url 'marksheet' record.id %}"
+               class="btn btn-sm
+                 {% if record.grade == 'F' %}btn-outline-danger
+                 {% elif record.grade == 'A+' %}btn-outline-success
+                 {% else %}btn-outline-info{% endif %}">
+              Marksheet
+            </a>
+
+            <a target="_blank" href="{% url 'edit_marks' record.id %}" class="btn btn-sm btn-outline-primary ms-1">Edit</a>
+
+            {# Optional: per-row exam-wise download #}
+            <a href="{% url 'all_marksheets_exam' record.exam.id %}"
+               class="btn btn-sm btn-outline-secondary ms-1"
+               target="_blank" rel="noopener">
+               All in this exam
+            </a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8">No records found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if is_paginated %}
+  {# Pagination with filters preserved #}
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center custom-pagination">
+
+      {% with s=request.GET.search cf=request.GET.class_filter ef=request.GET.exam_filter sd=request.GET.start_date ed=request.GET.end_date %}
+
+        {# Previous #}
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link"
+               href="?page={{ page_obj.previous_page_number }}&search={{ s }}&class_filter={{ cf }}&exam_filter={{ ef }}&start_date={{ sd }}&end_date={{ ed }}">
+              &laquo;
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+        {% endif %}
+
+        {# Always show page 1 #}
+        {% if page_obj.number > 3 %}
+          <li class="page-item">
+            <a class="page-link"
+               href="?page=1&search={{ s }}&class_filter={{ cf }}&exam_filter={{ ef }}&start_date={{ sd }}&end_date={{ ed }}">1</a>
+          </li>
+          {% if page_obj.number > 4 %}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+          {% endif %}
+        {% endif %}
+
+        {# Dynamic middle pages #}
+        {% for num in page_obj.paginator.page_range %}
+          {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+            {% if page_obj.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+              <li class="page-item">
+                <a class="page-link"
+                   href="?page={{ num }}&search={{ s }}&class_filter={{ cf }}&exam_filter={{ ef }}&start_date={{ sd }}&end_date={{ ed }}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {# Always show last page #}
+        {% if page_obj.number < page_obj.paginator.num_pages|add:'-2' %}
+          {% if page_obj.number < page_obj.paginator.num_pages|add:'-3' %}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+          {% endif %}
+          <li class="page-item">
+            <a class="page-link"
+               href="?page={{ page_obj.paginator.num_pages }}&search={{ s }}&class_filter={{ cf }}&exam_filter={{ ef }}&start_date={{ sd }}&end_date={{ ed }}">
+              {{ page_obj.paginator.num_pages }}
+            </a>
+          </li>
+        {% endif %}
+
+        {# Next #}
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link"
+               href="?page={{ page_obj.next_page_number }}&search={{ s }}&class_filter={{ cf }}&exam_filter={{ ef }}&start_date={{ sd }}&end_date={{ ed }}">
+              &raquo;
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+        {% endif %}
+
+      {% endwith %}
+    </ul>
+  </nav>
+  {% endif %}
+
+</div>
+{% endblock %}

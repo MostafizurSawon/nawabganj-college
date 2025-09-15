@@ -1,0 +1,9 @@
+<h3>Add Mark for {{ exam_record.student.add_name }}</h3>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Add Mark</button>
+</form>
+
+<a href="{% url 'student_marks_view' exam_record.id %}" class="btn btn-secondary">Back</a>

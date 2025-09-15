@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admit Cards – Back</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- html2pdf -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Bengali webfonts (optional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bn-font: "Hind Siliguri","Noto Sans Bengali",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      --pageW: 210mm;
+      --pageH: 297mm;                /* A4 */
+      --pad:   10mm;                 /* চারপাশে সমান স্পেস (front-এর সাথে মিল রাখবেন) */
+      --mid:   20mm;                 /* মাঝের ডাবল-স্পেস (front-এর সাথে মিল রাখবেন) */
+      --eps:   0mm;                  /* pdf micro-shrink */
+      --hcard: calc((var(--pageH) - (var(--pad) * 2) - var(--mid)) / 2);
+    }
+    html,body{ font-family: var(--bn-font); background:#f3f4f6; }
+
+    /* Screen preview */
+    #backContainer{ max-width: 794px; margin:12px auto; }
+    .a4-sheet{
+      position: relative;            /* overlay cut line এর জন্য */
+      background:#fff; margin:12px auto;
+      padding: var(--pad); box-sizing:border-box; width:100%;
+    }
+    .sheet-inner{ display:flex; flex-direction:column; min-height:900px; }
+    .mid-slot{ height: var(--mid); } /* শুধু ফাঁকা স্পেস */
+
+    /* A4 মাঝখানের ড্যাশড কাট-লাইন (front/back একই পজিশন) */
+    .cutline{
+      position:absolute;
+      top: 50%;
+      left: var(--pad);
+      right: var(--pad);
+      transform: translateY(-0.5px);
+      border-top: 1px dashed #9CA3AF;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* কনটেন্ট কার্ড: কোনো বর্ডার/শ্যাডো নয়, শুধু প্যাডিং */
+    .back-card{
+      position: relative;
+      background:#fff; color:#000;
+      padding:14px; box-sizing:border-box; width:100%;
+      break-inside:avoid; page-break-inside:avoid;
+      display:flex; flex-direction:column; justify-content:flex-start;
+      font-size:12px; line-height:1.55;
+      z-index: 2;
+    }
+
+    /* Quill/HTML content স্টাইলিং */
+    .back-content{ width:100%; }
+    .back-content h1{ font-size:18px; font-weight:700; margin:0 0 8px; }
+    .back-content h2{ font-size:16px; font-weight:700; margin:10px 0 6px; }
+    .back-content h3{ font-size:14px; font-weight:700; margin:8px 0 6px; }
+    .back-content p{ margin:6px 0; }
+    .back-content ul{ margin:6px 0 6px 20px; list-style:disc; }
+    .back-content ol{ margin:6px 0 6px 22px; list-style:decimal; }
+    .back-content table{ border-collapse:collapse; width:100%; margin:8px 0; }
+    .back-content th,.back-content td{ border:1px solid #9ca3af; padding:6px; }
+    .back-content img{ max-width:100%; height:auto; }
+
+    /* Print */
+    @media print{
+      @page { size: A4 portrait; margin: 0; }
+      body{ -webkit-print-color-adjust: exact; background:#fff!important; }
+      .fixed{ display:none!important; }
+
+      #backContainer{ width: var(--pageW); margin:0 auto; }
+      .a4-sheet{
+        width: var(--pageW); height: var(--pageH);
+        padding: var(--pad); margin:0 auto;
+        page-break-after: always; box-sizing:border-box;
+      }
+      .a4-sheet:last-child{ page-break-after: auto; }
+
+      .sheet-inner{
+        height: calc(var(--pageH) - (var(--pad) * 2));
+        display:flex; flex-direction:column;
+      }
+      .mid-slot{ height: var(--mid); }
+      .back-card{ height: var(--hcard); }  /* শিটের অর্ধেক */
+      .cutline{ border-top-width:1px; }    /* প্রিন্টেও মাঝের লাইন */
+    }
+
+    /* PDF mode (html2pdf চলাকালীন) */
+    .html2pdf__page-break{ height:0!important; margin:0!important; border:0!important; }
+    body.pdf #backContainer{ width: var(--pageW); margin:0 auto; }
+    body.pdf .a4-sheet{
+      width: var(--pageW);
+      height: calc(var(--pageH) - var(--eps));
+      padding: var(--pad);
+      margin:0 auto; page-break-after: always; box-sizing:border-box;
+    }
+    body.pdf .a4-sheet:last-child{ page-break-after: auto; }
+    body.pdf .sheet-inner{
+      height: calc(var(--pageH) - var(--eps) - (var(--pad) * 2));
+      display:flex; flex-direction:column;
+    }
+    body.pdf .back-card{
+      height: calc((var(--pageH) - var(--eps) - (var(--pad) * 2) - var(--mid)) / 2);
+    }
+  </style>
+</head>
+
+<body class="pb-28">
+  <!-- Screen toolbar -->
+  <div class="fixed bottom-0 left-0 w-full bg-white z-50 flex justify-center gap-4 py-3 shadow-md print:hidden">
+    <button onclick="downloadPDF()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">⬇️ Download PDF</button>
+  </div>
+
+  <div id="backContainer">
+    <!-- একটাই শিট, ভিতরে ২ কপি -->
+    <div class="a4-sheet">
+      <div class="cutline" aria-hidden="true"></div>
+      <div class="sheet-inner">
+        <!-- TOP half -->
+        <div class="back-card">
+          <div class="back-content">
+            {{ admit.admit_card|default:""|safe }}
+          </div>
+        </div>
+
+        <div class="mid-slot" aria-hidden="true"></div>
+
+        <!-- BOTTOM half -->
+        <div class="back-card">
+          <div class="back-content">
+            {{ admit.admit_card|default:""|safe }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+    async function downloadPDF(){
+      const root = document.documentElement;
+      document.body.classList.add('pdf');
+      root.style.setProperty('--eps','1mm'); // tiny shrink → অতিরিক্ত পেজ রোধ
+
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+      await new Promise(r => requestAnimationFrame(()=>requestAnimationFrame(r)));
+      await sleep(20);
+
+      const el = document.getElementById('backContainer');
+      const opt = {
+        margin:[0,0,0,0],
+        filename:'admit_cards_back.pdf',
+        image:{ type:'jpeg', quality:0.98 },
+        html2canvas:{ scale:2, useCORS:true, backgroundColor:'#ffffff', scrollY:0 },
+        jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' },
+        pagebreak:{ mode:['css'] }
+      };
+
+      await html2pdf().from(el).set(opt).save();
+
+      document.body.classList.remove('pdf');
+      root.style.removeProperty('--eps');
+    }
+  </script>
+</body>
+</html>

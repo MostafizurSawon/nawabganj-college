@@ -1,0 +1,444 @@
+{% extends layout_path %}
+{% load static %}
+{% block title %}Degree Admission{% endblock %}
+
+{% block content %}
+
+<div class="flex-grow-1 container-p-y">
+  <h4 class="fw-bold py-3 mb-4">
+    <span class="text-muted fw-light">Admission /</span> {{ form.initial.add_admission_group|upper }}
+  </h4>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data">
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+    {% csrf_token %}
+
+    <!-- Personal Info -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Personal Information</h5></div>
+      <div class="card-body row g-3">
+
+        <div class="col-md-6">
+          <label for="id_add_name" class="form-label">Name (English)</label>
+          {{ form.add_name }}
+        </div>
+
+        <div class="col-md-6">
+          <label for="id_add_name_bangla" class="form-label">Name (Bangla)</label>
+          {{ form.add_name_bangla }}
+        </div>
+
+        <div class="col-md-3">
+          <label for="id_add_mobile" class="form-label">Mobile Number</label>
+          {{ form.add_mobile }}
+          {% if form.add_mobile.errors %}
+            <div class="text-danger small">{{ form.add_mobile.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-md-3">
+          <label for="id_add_birthdate" class="form-label">Date of Birth</label>
+          {{ form.add_birthdate }}
+        </div>
+
+        <div class="col-md-3">
+          <label for="id_add_gender" class="form-label">Gender</label>
+          {{ form.add_gender }}
+        </div>
+
+        <div class="col-md-3">
+          <label for="id_add_blood_group" class="form-label">Blood Group</label>
+          {{ form.add_blood_group }}
+        </div>
+
+        <div class="col-md-3">
+          <label for="id_add_nationality" class="form-label">Nationality</label>
+          {{ form.add_nationality }}
+        </div>
+
+        <div class="col-md-3">
+          <label for="id_add_religion" class="form-label">Religion</label>
+          {{ form.add_religion }}
+        </div>
+
+        <div class="col-md-3">
+          <label for="id_add_marital_status" class="form-label">Marital Status</label>
+          {{ form.add_marital_status }}
+        </div>
+
+        <div class="col-md-3">
+          <label for="id_add_birth_certificate_no" class="form-label">Birth Certificate No</label>
+          {{ form.add_birth_certificate_no }}
+        </div>
+
+        <div class="col-md-6">
+          <label for="id_add_photo" class="form-label">Upload Photo</label>
+          {{ form.add_photo }}
+          {% if form.add_photo.errors %}
+            <div class="text-danger small">{{ form.add_photo.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- Parents Info -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Parents & Guardian Information</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label>Father's Name</label>
+          {{ form.add_father }}
+        </div>
+        <div class="col-md-4">
+          <label>Father's Name (Bangla)</label>
+          {{ form.add_father_bangla }}
+        </div>
+        <div class="col-md-4">
+          <label>Father's Mobile</label>
+          {{ form.add_father_mobile }}
+          {% if form.add_father_mobile.errors %}
+            <div class="text-danger small">{{ form.add_father_mobile.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-4">
+          <label>Mother's Name</label>
+          {{ form.add_mother }}
+        </div>
+        <div class="col-md-4">
+          <label>Mother's Name (Bangla)</label>
+          {{ form.add_mother_bangla }}
+        </div>
+        <div class="col-md-4">
+          <label>Mother's Mobile</label>
+          {{ form.add_mother_mobile }}
+          {% if form.add_mother_mobile.errors %}
+            <div class="text-danger small">{{ form.add_mother_mobile.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_select" class="form-label">Select Guardian</label>
+          {{ form.add_parent_select }}
+        </div>
+
+        <div class="col-md-4">
+          <label>Guardian</label>
+          {{ form.add_parent }}
+        </div>
+
+        <div class="col-md-4">
+          <label>Guardian Mobile</label>
+          {{ form.add_parent_mobile }}
+          {% if form.add_parent_mobile.errors %}
+            <div class="text-danger small">{{ form.add_parent_mobile.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-4">
+          <label>Guardian Relation</label>
+          {{ form.add_parent_relation }}
+        </div>
+        <div class="col-md-4">
+          <label>Guardian Profession</label>
+          {{ form.add_parent_service }}
+        </div>
+        <div class="col-md-4">
+          <label>Guardian Income</label>
+          {{ form.add_parent_income }}
+        </div>
+        <div class="col-md-6">
+          <label>Land (Agricultural)</label>
+          {{ form.add_parent_land_agri }}
+        </div>
+        <div class="col-md-6">
+          <label>Land (Non-Agricultural)</label>
+          {{ form.add_parent_land_nonagri }}
+        </div>
+      </div>
+    </div>
+
+    <!-- SSC Info -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">SSC Information</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-3">
+        <label>Roll</label>
+        {{ form.add_ssc_roll }}
+      </div>
+      <div class="col-md-3">
+        <label>Reg</label>
+        {{ form.add_ssc_reg }}
+      </div>
+      <div class="col-md-3">
+        <label>Board</label>
+        {{ form.add_ssc_board }}
+      </div>
+      <div class="col-md-3">
+        <label>Group</label>
+        {{ form.add_ssc_group }}
+      </div>
+      <div class="col-md-3">
+        <label>Pass Year</label>
+        {{ form.add_ssc_passyear }}
+      </div>
+      <div class="col-md-3">
+        <label>GPA</label>
+        {{ form.add_ssc_gpa }}
+      </div>
+      <div class="col-md-3">
+        <label>SSC Session</label>
+        {{ form.add_ssc_session }}
+      </div>
+      </div>
+    </div>
+
+    <!-- HSC Info -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">HSC Information</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-3"><label>Roll</label> {{ form.add_hsc_roll }}</div>
+        <div class="col-md-3"><label>Reg</label> {{ form.add_hsc_reg }}</div>
+        <div class="col-md-3"><label>Session</label> {{ form.add_hsc_session }}</div>
+        <div class="col-md-3"><label>GPA</label> {{ form.add_hsc_gpa }}</div>
+        <div class="col-md-3"><label>Board</label> {{ form.add_hsc_board }}</div>
+        <div class="col-md-3"><label>Group</label> {{ form.add_hsc_group }}</div>
+        <div class="col-md-3"><label>Pass Year</label> {{ form.add_hsc_passyear }}</div>
+      </div>
+    </div>
+
+    <!-- Address Info -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Address</h5></div>
+      <div class="card-body row g-3">
+        <!-- Present Address -->
+        <div class="col-md-3">
+          <label>Village</label>
+          {{ form.add_village }}
+        </div>
+        <div class="col-md-3">
+          <label>Post</label>
+          {{ form.add_post }}
+        </div>
+        <div class="col-md-3">
+          <label>Upazila</label>
+          {{ form.add_upojella }}
+        </div>
+        <div class="col-md-3">
+          <label>District</label>
+          {{ form.add_distric }}
+        </div>
+
+        <!-- Checkbox: Same as Present -->
+        <div class="col-md-12 mt-2">
+          <label class="switch switch-success my-2">
+            <input type="checkbox"
+                  name="add_address_same"
+                  id="id_add_address_same"
+                  class="switch-input"
+                  {% if form.add_address_same.value %}checked{% endif %}>
+            <span class="switch-toggle-slider">
+              <span class="switch-on">
+                <i class="ti ti-check"></i>
+              </span>
+              <span class="switch-off">
+                <i class="ti ti-x"></i>
+              </span>
+            </span>
+            <span class="switch-label">Same as present address</span>
+          </label>
+        </div>
+
+
+
+        <!-- Permanent Address -->
+        <div class="col-md-3">
+          <label>Village (Permanent)</label>
+          {{ form.add_village_per }}
+        </div>
+        <div class="col-md-3">
+          <label>Post (Permanent)</label>
+          {{ form.add_post_per }}
+        </div>
+        <div class="col-md-3">
+          <label>Upazila (Permanent)</label>
+          {{ form.add_upojella_per }}
+        </div>
+        <div class="col-md-3">
+          <label>District (Permanent)</label>
+          {{ form.add_distric_per }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Subject Selection -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Subject Selection</h5></div>
+      <div class="card-body">
+        <div class="row">
+          {% for subject in subjects_all %}
+            <div class="col-md-3">
+              <div class="form-check">
+                <input class="form-check-input degree-subject-checkbox"
+                      type="checkbox"
+                      name="subjects"
+                      id="subject_{{ subject.id }}"
+                      value="{{ subject.id }}"
+                      {% if subject in form.instance.subjects.all %}checked{% endif %}>
+                <label class="form-check-label" for="subject_{{ subject.id }}">{{ subject.sub_name }}</label>
+              </div>
+            </div>
+          {% endfor %}
+
+        </div>
+        <div class="text-danger mt-2" id="subject-error" style="display:none">Please select exactly 3 subjects.</div>
+      </div>
+    </div>
+
+    <!-- College Info & Payment -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">College Info</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4"><label>Session</label> {{ form.add_session }}</div>
+        <div class="col-md-4"><label>Class Roll</label> {{ form.add_class_roll }}</div>
+        <div class="col-md-4"><label>Merit Position</label> {{ form.merit_position }}</div>
+        <div class="col-md-4"><label>Admission Fee</label> {{ form.add_amount }}</div>
+        <div class="col-md-4"><label>Payment Method</label> {{ form.add_payment_method }}</div>
+        <div class="col-md-4"><label>Transaction ID</label> {{ form.add_trxid }}</div>
+        <div class="col-md-4"><label>Note</label> {{ form.add_slip }}</div>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary" id="submit-btn">Submit Admission</button>
+    </div>
+  </form>
+</div>
+
+<script>
+
+  <!-- Guardian Section -->
+   document.addEventListener("DOMContentLoaded", function () {
+    const guardianSelect = document.getElementById("id_add_parent_select");
+
+    const fatherName = document.getElementById("id_add_father");
+    const fatherMobile = document.getElementById("id_add_father_mobile");
+    const motherName = document.getElementById("id_add_mother");
+    const motherMobile = document.getElementById("id_add_mother_mobile");
+
+    const guardianName = document.getElementById("id_add_parent");
+    const guardianMobile = document.getElementById("id_add_parent_mobile");
+    const guardianRelation = document.getElementById("id_add_parent_relation");
+
+    function autoFillGuardianFields() {
+      const selected = guardianSelect.value;
+
+      if (selected === "father") {
+        guardianName.value = fatherName?.value || "";
+        guardianMobile.value = fatherMobile?.value || "";
+        guardianRelation.value = "Father";
+      } else if (selected === "mother") {
+        guardianName.value = motherName?.value || "";
+        guardianMobile.value = motherMobile?.value || "";
+        guardianRelation.value = "Mother";
+      } else {
+        guardianName.value = "";
+        guardianMobile.value = "";
+        guardianRelation.value = "";
+      }
+    }
+
+    if (guardianSelect) {
+      guardianSelect.addEventListener("change", autoFillGuardianFields);
+      // ✅ Call once on page load also
+      autoFillGuardianFields();
+    }
+    fatherName.addEventListener("input", autoFillGuardianFields);
+    fatherMobile.addEventListener("input", autoFillGuardianFields);
+    motherName.addEventListener("input", autoFillGuardianFields);
+    motherMobile.addEventListener("input", autoFillGuardianFields);
+
+  });
+
+
+
+  <!-- Address Copy Section -->
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const checkbox = document.getElementById("id_add_address_same");
+    checkbox.addEventListener("change", function () {
+      if (this.checked) {
+        document.getElementById("id_add_village_per").value = document.getElementById("id_add_village").value;
+        document.getElementById("id_add_post_per").value = document.getElementById("id_add_post").value;
+        document.getElementById("id_add_upojella_per").value = document.getElementById("id_add_upojella").value;
+        document.getElementById("id_add_distric_per").value = document.getElementById("id_add_distric").value;
+      }
+    });
+  });
+
+
+  <!-- 🔷 Admission Fee Load Script -->
+
+  const selectedGroup = "{{ form.initial.add_admission_group|default:'Ba' }}";
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const sessionSelect = document.getElementById("id_add_session");
+    const feeField = document.getElementById("id_add_amount");
+
+    if (!sessionSelect || !feeField) return;
+
+    sessionSelect.addEventListener("change", function () {
+      const sessionId = this.value;
+
+      console.log("📦 Fetching fee for session:", sessionId);
+      console.log("🎯 Group selected:", selectedGroup);  // ✅ DEBUG
+
+      fetch(`/dashboard/api/fee/degree/?session=${sessionId}&group=${selectedGroup}`)
+        .then(res => res.json())
+        .then(data => {
+          console.log("💰 Fee response:", data);
+          feeField.value = data.amount;
+        })
+        .catch(err => console.error("❌ Fee fetch error:", err));
+    });
+  });
+
+
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const checkboxes = document.querySelectorAll('.degree-subject-checkbox');
+    const errorBox = document.getElementById("subject-error");
+    const submitBtn = document.getElementById("submit-btn");
+
+    function validateSubjects() {
+      const selected = Array.from(checkboxes).filter(cb => cb.checked);
+      if (selected.length !== 3) {
+        errorBox.style.display = "block";
+        submitBtn.disabled = true;
+      } else {
+        errorBox.style.display = "none";
+        submitBtn.disabled = false;
+      }
+    }
+
+    checkboxes.forEach(cb => cb.addEventListener("change", validateSubjects));
+    validateSubjects();
+  });
+</script>
+
+{% endblock %}

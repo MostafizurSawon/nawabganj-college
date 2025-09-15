@@ -1,0 +1,176 @@
+{% extends layout_path %}
+{% block title %}Student Details{% endblock %}
+
+{% block content %}
+<div class="flex-grow-1 container-p-y">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible mb-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center bg-label-primary text-white">
+      <h5 class="mb-0">
+        👤 Student Profile - {{ student.add_name }}
+        {% if student.add_admission_group %}
+          <span class="badge bg-label-light shadow-sm text-capitalize ms-2 text-primary p-2" style="font-size: 0.85rem;">
+            {% if student.add_admission_group == "science" %}
+              🧪 Science
+            {% elif student.add_admission_group == "commerce" %}
+              💼 Commerce
+            {% elif student.add_admission_group == "arts" %}
+              🎨 Arts
+            {% endif %}
+          </span>
+        {% endif %}
+      </h5>
+    </div>
+
+
+    <div class="card-body">
+      <div class="row my-3">
+        <div class="col-md-2 text-center">
+          {% if student.add_photo %}
+            <img src="{{ student.add_photo.url }}" class="img-thumbnail rounded" alt="Photo" style="max-height: 180px;">
+          {% endif %}
+        </div>
+        <div class="col-md-10">
+          <div class="row mb-2">
+            <div class="col-md-4"><strong>Name:</strong> {{ student.add_name }}</div>
+            <div class="col-md-4"><strong>Mobile:</strong> {{ student.add_mobile }}</div>
+            <div class="col-md-4"><strong>Roll:</strong> {{ student.add_class_roll }}</div>
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-md-4"><strong>Father:</strong> {{ student.add_father }}</div>
+            <div class="col-md-4"><strong>Mother:</strong> {{ student.add_mother }}</div>
+            <div class="col-md-4"><strong>Program:</strong> {{ student.add_program.pro_name }}</div>
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-md-4"><strong>Session:</strong> {{ student.add_session.ses_name }}</div>
+            <div class="col-md-4">
+              <strong>Group:</strong>
+              {% if student.add_admission_group == "ba" %}
+                🧪 Ba
+              {% elif student.add_admission_group == "bss" %}
+                💼 BSS
+              {% elif student.add_admission_group == "bsc" %}
+                💼 BSC
+              {% elif student.add_admission_group == "bbs" %}
+                💼 BBS
+              {% else %}
+                <span class="text-muted">Unknown</span>
+              {% endif %}
+            </div>
+            <div class="col-md-4"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <hr class="my-4" />
+      <h6 class="text-primary">🎓 Academic Information</h6>
+      <div class="row mb-2">
+        <div class="col-md-3"><strong>SSC Roll:</strong> {{ student.add_ssc_roll }}</div>
+        <div class="col-md-3"><strong>SSC Reg:</strong> {{ student.add_ssc_reg }}</div>
+        <div class="col-md-3"><strong>SSC GPA:</strong> {{ student.add_ssc_gpa }}</div>
+        <div class="col-md-3"><strong>Board:</strong> {{ student.add_ssc_board }}</div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-3"><strong>Year:</strong> {{ student.add_ssc_passyear }}</div>
+        <div class="col-md-3"><strong>Session:</strong> {{ student.add_ssc_session }}</div>
+        <div class="col-md-3"><strong>HSC Year:</strong> {{ student.add_hsc_year }}</div>
+        <div class="col-md-3"><strong>Class Roll:</strong> {{ student.add_class_roll }}</div>
+      </div>
+
+
+      <div class="row mt-3">
+        <div class="col-md-6">
+          <strong>📚 All Subjects:</strong><br/>
+          <div class="d-flex flex-wrap gap-1 mt-1">
+            {% for sub in student.subjects.all %}
+              <span class="badge bg-label-info" data-bs-toggle="tooltip" data-bs-placement="top" title="Group: {{ sub.group|title }} | Code: {{ sub.code }}">
+                {{ sub.sub_name }}
+              </span>
+            {% empty %}
+              <span class="text-muted">No subjects selected.</span>
+            {% endfor %}
+          </div>
+        </div>
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+      <hr class="my-4" />
+      <h6 class="text-primary">🏠 Address Information</h6>
+      <div class="row mb-2">
+        <div class="col-md-6"><strong>Present:</strong> {{ student.add_village }}, {{ student.add_post }}, {{ student.add_upojella }}, {{ student.add_distric }}</div>
+        <div class="col-md-6"><strong>Permanent:</strong> {{ student.add_village_per }}, {{ student.add_post_per }}, {{ student.add_upojella_per }}, {{ student.add_distric_per }}</div>
+      </div>
+
+      <hr class="my-4" />
+      <h6 class="text-primary">📜 Personal Details</h6>
+      <div class="row mb-2">
+        <div class="col-md-3"><strong>Date of Birth:</strong> {{ student.add_birthdate }}</div>
+        <div class="col-md-3"><strong>Blood Group:</strong> {{ student.add_blood_group }}</div>
+        <div class="col-md-3"><strong>Gender:</strong> {{ student.add_gender }}</div>
+        <div class="col-md-3"><strong>Religion:</strong> {{ student.add_religion }}</div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-3"><strong>Nationality:</strong> {{ student.add_nationality }}</div>
+        <div class="col-md-5"><strong>Birth Certificate No:</strong> {{ student.add_birth_certificate_no }}</div>
+        <div class="col-md-4"><strong>Marital Status:</strong> {{ student.add_marital_status }}</div>
+      </div>
+
+      <hr class="my-4" />
+      <h6 class="text-primary">💳 Payment Info</h6>
+      <div class="row mb-2">
+        <div class="col-md-3"><strong>Payment Method:</strong> {{ student.add_payment_method }}</div>
+        <div class="col-md-3"><strong>Amount:</strong> {{ student.add_amount }}</div>
+        <div class="col-md-3"><strong>Transaction ID:</strong> {{ student.add_trxid }}</div>
+        <div class="col-md-3"><strong>Slip Ref:</strong> {{ student.add_slip }}</div>
+      </div>
+
+      <hr class="my-4" />
+      <h6 class="text-primary">👨‍👩‍👧‍👦 Guardian Details</h6>
+      <div class="row mb-2">
+        <div class="col-md-3"><strong>Primary Guardian:</strong> {{ student.add_parent }}</div>
+        <div class="col-md-3"><strong>Relation:</strong> {{ student.add_parent_relation }}</div>
+        <div class="col-md-3"><strong>Mobile:</strong> {{ student.add_parent_mobile }}</div>
+        <div class="col-md-3"><strong>Profession:</strong> {{ student.add_parent_service }}</div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-3"><strong>Income:</strong> {{ student.add_parent_income }}</div>
+        <div class="col-md-3"><strong>Agricultural Land:</strong> {{ student.add_parent_land_agri }}</div>
+        <div class="col-md-3"><strong>Non-Agri Land:</strong> {{ student.add_parent_land_nonagri }}</div>
+      </div>
+
+      <div class="mt-4">
+        <a href="{% url 'admitted_students_list' %}" class="btn btn-outline-primary">← Back to List</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  });
+</script>
+
+{% endblock %}

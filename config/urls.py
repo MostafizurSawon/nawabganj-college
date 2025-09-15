@@ -20,11 +20,15 @@ from django.urls import include, path
 from web_project.views import SystemView
 from django.conf import settings
 from django.conf.urls.static import static
+from . import views
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path('', views.home, name='home'),
+    path("jbdit-94/", admin.site.urls),
     # starter urls
     path("", include("apps.sample.urls")),
+    path("", include("apps.pages.urls")),
+    path("", include("apps.accounts.urls")),
     path("dashboard/", include("apps.admissions.urls")),
     path("dashboard/", include("apps.students.urls")),
     path("finances/", include("apps.finances.urls")),

@@ -1,0 +1,233 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All Student Marksheets</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+    }
+
+    .a4-container {
+      width: 21cm;
+      min-height: 29.7cm;
+      padding: 1.5cm;
+      margin: 0 auto;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header img {
+      width: 80px;
+      vertical-align: middle;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin: 0;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 15px;
+    }
+
+    .header p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .header h2 {
+      font-size: 20px;
+      margin-top: 10px;
+      border: 1px solid black;
+      padding: 5px;
+      display: inline-block;
+    }
+
+    .student-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .student-info-left, .student-info-right {
+      border: 1px solid black;
+      padding: 5px;
+      width: 48%;
+    }
+
+    .student-info-left table, .student-info-right table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    .student-info-left td, .student-info-right td {
+      padding: 2px 5px;
+      border: 1px solid black;
+    }
+
+    .grade-table-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .marks-table {
+      width: 80%;
+      border-collapse: collapse;
+    }
+
+    .marks-table th, .marks-table td {
+      border: 1px solid black;
+      padding: 6px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .marks-table th {
+      background-color: #f2f2f2;
+    }
+
+    .grade-legend {
+      width: 18%;
+      border-collapse: collapse;
+    }
+
+    .grade-legend th, .grade-legend td {
+      border: 1px solid black;
+      padding: 4px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .grade-legend th {
+      background-color: #f2f2f2;
+    }
+
+    .nb-footer {
+      font-size: 12px;
+      margin-top: 5px;
+      font-weight: bold;
+    }
+
+    .attendance-report {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .attendance-report table {
+      width: 40%;
+      border-collapse: collapse;
+    }
+
+    .attendance-report th, .attendance-report td {
+      border: 1px solid black;
+      padding: 5px;
+      text-align: left;
+    }
+
+    .attendance-report th {
+      background-color: #f2f2f2;
+      text-align: center;
+    }
+
+    .signatures {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .signature-line {
+      border-top: 1px solid black;
+      width: 180px;
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .signature-block {
+      text-align: center;
+    }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 12px;
+    }
+
+    .buttons {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .buttons button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 0 10px;
+    }
+
+    @media print {
+      body {
+        background-color: white;
+      }
+      .a4-container {
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+      }
+      .buttons {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+    <div class="buttons" style="text-align:center; margin-bottom: 20px;">
+        <button onclick="downloadAllPDF()">Download All Marksheets (PDF)</button>
+        <a href="{% url 'exam_record_list' %}"><button>Back</button></a>
+      </div>
+
+  <div id="pdfContainer">
+    {% for data in all_data %}
+      {% include "marks/marksheet_block.html" with record=data.record subject_marks=data.subject_marks gpa=data.gpa %}
+    {% endfor %}
+  </div>
+
+  
+
+  <script>
+    async function downloadAllPDF() {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const elements = document.querySelectorAll('.a4-container');
+
+      for (let i = 0; i < elements.length; i++) {
+        const canvas = await html2canvas(elements[i], { scale: 2 });
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = 210;
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        if (i !== 0) pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      }
+
+      pdf.save("All_Student_Marksheets.pdf");
+    }
+  </script>
+</body>
+</html>

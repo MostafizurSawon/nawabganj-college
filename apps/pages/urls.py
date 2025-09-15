@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import MiscPagesView
-
+from . import views
 
 
 urlpatterns = [
@@ -24,4 +24,8 @@ urlpatterns = [
         MiscPagesView.as_view(template_name="pages_misc_not_authorized.html"),
         name="pages-misc-not-authorized",
     ),
+
+    path('admitted-students/hsc/sms/', views.HscStudentSMSSelectView.as_view(), name='hsc_sms_select'),
+    path('admitted-students/hsc/sms/compose/', views.HscStudentSMSComposeView.as_view(), name='hsc_sms_compose'),
+
 ]

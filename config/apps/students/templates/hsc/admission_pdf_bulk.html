@@ -1,0 +1,582 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>ভর্তি আবেদন ফর্ম (HSC)</title>
+  <link rel="stylesheet" href="{% static 'css/siyam_rupali.css' %}">
+  <style>
+        * {
+            font-family: 'Siyam Rupali', sans-serif;
+            margin: o;
+            padding: 0;
+            box-sizing: border-box;
+
+        }
+
+        .admission-pdf-form-container {
+            max-width: 794px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid black;
+            background: white;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+        }
+
+        .header-logo-part {
+            display: flex;
+            align-items: start;
+            align-items: center;
+            gap: 0;
+        }
+
+        .header-text {
+            text-align: left;
+        }
+
+        .header-text h1 {
+            font-size: 30px;
+            margin: 0;
+        }
+
+        .header-text h3 {
+            font-size: 25px;
+            font-weight: normal;
+            margin: 0 !important;
+        }
+
+        .header-text p {
+            font-size: 20px;
+            font-weight: normal;
+            color: #535353;
+            margin: 0 !important;
+        }
+
+        .logo {
+            width: 144px;
+            padding-right: 10px;
+        }
+
+        .photo {
+            width: 150px;
+            height: 150px;
+
+        }
+
+        .photo img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+
+
+        }
+
+
+
+
+        .multi-line {
+            width: 100%;
+            height: 20px;
+            border-bottom: 1px solid black;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            text-align: center;
+            padding: 5px;
+        }
+
+        ul {
+            margin: 5px 0 5px 20px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+        }
+
+        /* section one */
+        .form-section-one {
+            margin-top: 20px;
+            border: 1px solid black;
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .form-section-one>.input-group:nth-child(1) {
+            grid-row: span 2;
+        }
+
+        .form-section-one>.input-group:nth-child(2) {
+            grid-column: span 5;
+            text-align: left;
+            padding: 5px 10px;
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+
+        }
+
+        .form-section-one>.input-group:nth-child(4) {
+            grid-column: span 5;
+            text-align: left;
+            padding: 5px 10px;
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+
+
+        }
+
+        .form-section-one>.input-group:nth-child(3) {
+            grid-column: span 3;
+            grid-row: span 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-section-one>.input-group:nth-child(3) .optional {
+            color: gray;
+            font-size: 14px;
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        .class-roll {
+            margin: 8px 0;
+        }
+
+        /* form section two */
+        .form-section-two {
+            margin-top: 20px;
+            border: 1px solid black;
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .form-section-two .input-group {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        .form-section-two .input-group .section-two-title {
+            grid-column: span 2;
+            text-align: left;
+            padding: 5px 10px;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+
+        .form-section-two>.input-group:last-child .section-two-title,
+        .form-section-two>.input-group:last-child .section-two-write {
+            border-bottom: none;
+        }
+
+        .form-section-two .input-group .section-two-write {
+            grid-column: span 3;
+            padding: 5px 10px;
+            border-bottom: 1px solid black;
+        }
+
+        .section-two-write-last {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            justify-content: start;
+            align-items: center;
+            grid-column: span 3;
+            border-bottom: none;
+        }
+
+        .section-two-write-last div {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            justify-content: start;
+            align-items: center;
+
+        }
+
+        .section-two-write-last>div:nth-child(1) {
+            border-right: 1px solid black;
+            padding: 5px 10px;
+
+        }
+
+        .section-two-write-last>div:nth-child(2) {
+            padding: 5px 10px;
+        }
+
+        /*form section three */
+        .form-section-three {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            border: 1px solid black;
+            margin-top: 20px;
+        }
+
+        .form-section-three>.input-group:nth-child(1) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(2) {
+            grid-column: span 2;
+        }
+
+
+        .form-section-three>.input-group:nth-child(3) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(4) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(5) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(6) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(6) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(7) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(8) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(9) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(10) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(11) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(12) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(13) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(14) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(15) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(16) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(17) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(18) {
+            grid-column: span 2;
+        }
+
+        .form-section-three>.input-group:nth-child(19) {
+            grid-column: span 2;
+
+
+        }
+
+        .form-section-three>.input-group:nth-child(20) {
+            grid-column: span 2;
+
+
+        }
+
+        .form-section-three>.input-group:nth-child(21) {
+            grid-column: span 2;
+        }
+
+
+        .form-section-three .input-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .form-section-three .input-group span {
+            padding: 5px 10px;
+        }
+
+        .text_nowrap {
+            white-space: nowrap;
+        }
+
+        .border_right_bottom {
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+
+        .border_left_bottom {
+            border-left: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+
+        .border_bottom {
+            border-bottom: 1px solid black;
+        }
+
+        .border_left {
+            border-left: 1px solid black;
+
+        }
+
+        .border_right {
+            border-right: 1px solid black;
+
+        }
+
+        .grid_4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr) !important;
+            align-items: center;
+            justify-content: start;
+        }
+
+        .check_box {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            border: 2px solid #333;
+            border-radius: 4px;
+            background: linear-gradient(180deg, #fff 70%, #f0f0f0 100%);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            margin-left: 6px;
+            transition: border-color 0.2s;
+            margin: 0;
+            padding: 0;
+        }
+
+        .grid_column_span_3 {
+            grid-column: span 3 !important;
+        }
+
+        .grid_column_span_1 {
+            grid-column: span 1 !important;
+        }
+
+        .grid_column_span_4 {
+            grid-column: span 4;
+        }
+
+        .grid_column_span_2 {
+            grid-column: span 2;
+        }
+
+        .subject_table {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .subject_table li::before {
+            content: "";
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            background: linear-gradient(180deg, #fff 70%, #f0f0f0 100%);
+            vertical-align: middle;
+            box-sizing: border-box;
+        }
+
+        .subject-table li {
+            margin: 5px 0;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+  <div class="d-flex justify-content-end mb-3 no-print">
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+  </div>
+
+  {% for student in students %}
+  <div class="admission-pdf-form-container page-break">
+
+    <!-- Header Section -->
+    <div class="header">
+      <div class="header-logo-part">
+        <img src="{% static 'cus/logo.jpg' %}" class="logo" alt="Logo">
+        <div class="header-text">
+          <h1>পিপলস কলেজ, মহুরাপুর</h1>
+          <h3>স্থাপিত ১৯৭০ খ্রি:</h3>
+          <h3>ভর্তি আবেদন ফর্ম</h3>
+          <p>(আবেদনকারীর হাত দিয়ে ফর্ম পূরণ করতে হবে)</p>
+        </div>
+      </div>
+      <div class="photo">
+        {% if student.add_photo %}
+        <img src="{{ student.add_photo.url }}" alt="">
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Section One -->
+    <div class="form-section-one">
+      <div class="input-group">
+        <span class="label">মোবাইল নং</span>
+        <span></span>
+      </div>
+
+      <div class="input-group">
+        <span class="label">শিক্ষার্থীর:</span>
+        <span>{{ student.add_mobile }}</span>
+      </div>
+
+      <div class="input-group">
+        <span class="optional">(অফিস কর্তৃক পূরণীয়)</span>
+        <span class="class-roll">শ্রেণী রোল: {{ student.add_class_roll }}</span>
+      </div>
+
+      <div class="input-group">
+        <span class="label">অভিভাবকের:</span>
+        <span>{{ student.add_parent }}</span>
+      </div>
+    </div>
+
+    <!-- Letter -->
+    <p>বরাবর,<br>
+      অধ্যক্ষ<br>
+      পিপলস কলেজ<br>
+      মহুরাপুর, দৌলতপুর, কুষ্টিয়া।
+    </p>
+
+    <p>জনাব,<br>
+      আমি আপনার কলেজে {{ student.add_session.ses_name }} শিক্ষাবর্ষে ডিগ্রি শ্রেণিতে ভর্তি হতে ইচ্ছুক। নিচে আমার বিবরণ প্রদান করিলাম:
+    </p>
+
+    <!-- Section Two -->
+    <div class="form-section-two">
+      <div class="input-group">
+        <span class="section-two-title">১. আবেদনকারীর নাম (বাংলায়):</span>
+        <span class="section-two-write">{{ student.add_name_bangla }}</span>
+      </div>
+      <div class="input-group">
+        <span class="section-two-title">২. পিতার নাম (বাংলায়):</span>
+        <span class="section-two-write">{{ student.add_father_bangla }}</span>
+      </div>
+      <div class="input-group">
+        <span class="section-two-title">৩. মাতার নাম (বাংলায়):</span>
+        <span class="section-two-write">{{ student.add_mother_bangla }}</span>
+      </div>
+      <div class="input-group">
+        <span class="section-two-title">৪. অভিভাবকের নাম:</span>
+        <span class="section-two-write">{{ student.add_parent }}</span>
+      </div>
+      <div class="input-group">
+        <span class="section-two-title"></span>
+        <span class="section-two-write-last">
+          <div><span>মোবাইল নং:</span><span>{{ student.add_parent_mobile }}</span></div>
+          <div><span>সম্পর্ক:</span><span>{{ student.add_parent_relation }}</span></div>
+        </span>
+      </div>
+    </div>
+
+    <!-- Section Three -->
+    <div class="form-section-three">
+      <div class="input-group"><span>৫. অভিভাবকের পেশা:</span><span>{{ student.add_parent_service }}</span></div>
+      <div class="input-group"><span>বার্ষিক আয়:</span><span>{{ student.add_parent_income }}</span></div>
+      <div class="input-group"><span>জমি: কৃষি</span><span>{{ student.add_parent_land_agri }}</span></div>
+      <div class="input-group"><span>অকৃষি:</span><span>{{ student.add_parent_land_nonagri }}</span></div>
+      <div class="input-group"><span>ঠিকানা:</span><span>{{ student.add_village }}, {{ student.add_post }}, {{ student.add_upojella }}, {{ student.add_distric }}</span></div>
+      <div class="input-group"><span>স্থায়ী ঠিকানা:</span><span>{{ student.add_village_per }}, {{ student.add_post_per }}, {{ student.add_upojella_per }}, {{ student.add_distric_per }}</span></div>
+      <div class="input-group"><span>জন্ম তারিখ:</span><span>{{ student.add_birthdate }}</span></div>
+      <div class="input-group"><span>বৈবাহিক অবস্থা:</span><span>{{ student.add_marital_status }}</span></div>
+    </div>
+
+    <!-- SSC Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>পরীক্ষার নাম</th>
+          <th>রোল</th>
+          <th>রেজি</th>
+          <th>শিক্ষাবর্ষ</th>
+          <th>GPA</th>
+          <th>পাশের সাল</th>
+          <th>বোর্ড</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SSC</td>
+          <td>{{ student.add_ssc_roll }}</td>
+          <td>{{ student.add_ssc_reg }}</td>
+          <td>{{ student.add_ssc_session }}</td>
+          <td>{{ student.add_ssc_gpa }}</td>
+          <td>{{ student.add_ssc_passyear }}</td>
+          <td>{{ student.add_ssc_board }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Subjects -->
+    <div class="form-section">
+      <label>পছন্দকৃত বিষয়সমূহ:</label>
+      <ul class="subject_table">
+        {% for sub in student.subjects.all %}
+          <li>{{ sub.sub_name }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <p style="margin-top: 20px;">আমি অঙ্গীকার করছি উপরের সকল তথ্য সত্য এবং কোনো ভুল থাকলে কলেজ কর্তৃপক্ষ প্রয়োজনীয় ব্যবস্থা নিতে পারবে।</p>
+
+    <!-- Signature -->
+    <div class="signatures">
+      <div>
+        <p>অভিভাবকের স্বাক্ষর</p>
+        <p>তারিখ: ......................</p>
+      </div>
+      <div>
+        <p>আবেদনকারীর স্বাক্ষর</p>
+        <p>তারিখ: ......................</p>
+      </div>
+    </div>
+
+  </div>
+  {% endfor %}
+</body>
+</html>

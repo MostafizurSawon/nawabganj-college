@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ record.exam.exam_name }}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f0f0f0; }
+    .marks-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .marks-table th, .marks-table td { border: 1px solid black; padding: 8px 10px; text-align: center; }
+    .marks-table th { background-color: #f2f2f2; font-size: 15px; }
+
+    .a4-container { width: 21cm; min-height: 29.7cm; padding: 1.5cm; margin: auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); box-sizing: border-box; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header img { width: 80px; vertical-align: middle; }
+    .header h1 { font-size: 28px; margin: 0; display: inline-block; vertical-align: middle; margin-left: 15px; }
+    .header h2 { font-size: 20px; margin-top: 10px; border: 1px solid black; padding: 5px; display: inline-block; }
+    .header p { margin: 5px 0; font-size: 14px; }
+
+    .student-info { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; }
+    .student-info > div { border: 1px solid black; padding: 5px; width: 48%; }
+    .student-info table { width: 100%; border-collapse: collapse; }
+    .student-info td { padding: 2px 5px; border: 1px solid black; }
+
+    .grade-table-container { display: flex; justify-content: space-between; align-items: flex-start; }
+    .grade-legend { width: 200px; border-collapse: collapse; }
+    .grade-legend th, .grade-legend td { border: 1px solid black; padding: 4px; text-align: center; font-size: 12px; }
+    .grade-legend th { background-color: #f2f2f2; }
+
+    .attendance-report { margin-top: 20px; font-size: 14px; }
+    .attendance-report table { width: 40%; border-collapse: collapse; }
+    .attendance-report th, .attendance-report td { border: 1px solid black; padding: 5px; text-align: left; }
+    .attendance-report th { background-color: #f2f2f2; text-align: center; }
+
+    .signatures { margin-top: 20px; display: flex; justify-content: space-between; font-size: 14px; }
+    .signature-block { text-align: center; }
+    .signature-line { border-top: 1px solid black; width: 180px; margin-top: 40px; text-align: center; }
+
+    .footer-text { text-align: center; margin-top: 30px; font-size: 12px; }
+    .buttons { text-align: center; margin-top: 20px; }
+    .buttons button { padding: 10px 20px; font-size: 16px; margin: 0 10px; cursor: pointer; }
+    @media print {
+      body { background: white; }
+      .a4-container { box-shadow: none; margin: 0; padding: 0; }
+      .buttons { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="a4-container" id="reportCard">
+  <!-- Header -->
+  <div class="header">
+    <img src="{{ site_settings.logo.url }}" alt="School Logo">
+    <h1>{{ site_settings.name }}</h1>
+    <p>{{ site_settings.post }}, {{ site_settings.upozilla }}, {{ site_settings.district }}</p>
+    <h2>{{ record.exam.exam_name }}</h2>
+  </div>
+
+  <!-- Student Information -->
+  <div class="student-info">
+    <div>
+      <table>
+        <tr><td><strong>Student's Name:</strong></td><td>{{ record.student.add_name }}</td></tr>
+        <tr><td><strong>Class:</strong></td><td>{{ record.exam.exam_class.name }}</td></tr>
+        <tr><td><strong>Group:</strong></td><td>{{ record.exam.group.group_name }}</td></tr>
+      </table>
+    </div>
+    <div>
+      <table>
+        <tr><td><strong>SID:</strong></td><td>{{ record.student.add_class_roll }}</td></tr>
+        <tr><td><strong>Section:</strong></td><td>{{ record.student.get_add_class_section_display }}</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Marks Table -->
+  <div class="grade-table-container">
+    <table class="marks-table">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Full</th>
+          <th>CQ&nbsp;(A)</th>
+          <th>MCQ&nbsp;(B)</th>
+          <th>Practical&nbsp;(C)</th>
+          <th>Total&nbsp;A+B+C</th>
+          <th>Total&nbsp;80%</th>
+          <th>Total&nbsp;CT+EX</th>
+          <th>GP</th>
+          <th>Total&nbsp;Mark</th>
+          <th>GPA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {# ----- Combined (Bangla & English) Subjects ----- #}
+        {% for subject in combined_results %}
+          {% if subject.name == "Bangla" %}
+            {% for paper in bangla_papers %}
+              <tr>
+                <td>{{ paper.subject.name }}</td>
+                <td>{{ paper.full_marks }}</td>
+                <td>{{ paper.cq_mark|default:"-" }}</td>
+                <td>{{ paper.mcq_mark|default:"-" }}</td>
+                <td>{{ paper.practical_mark|default:"-" }}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            {% endfor %}
+          {% elif subject.name == "English" %}
+            {% for paper in english_papers %}
+              <tr>
+                <td>{{ paper.subject.name }}</td>
+                <td>{{ paper.full_marks }}</td>
+                <td>{{ paper.cq_mark|default:"-" }}</td>
+                <td>{{ paper.mcq_mark|default:"-" }}</td>
+                <td>{{ paper.practical_mark|default:"-" }}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            {% endfor %}
+          {% endif %}
+
+          <tr style="background:#e6ffe6; font-weight:bold;">
+            <td>Total&nbsp;{{ subject.name }}</td>
+            <td>{{ subject.full_marks }}</td>
+            <td>{{ subject.cq }}</td>
+            <td>{{ subject.mcq }}</td>
+            <td>{{ subject.practical }}</td>
+            <td>{{ subject.total }}</td>
+            <td>{{ subject.total_80 }}</td>
+            <td>{{ subject.total_ct_ex }}</td>
+            <td>{{ subject.gp }}</td>
+            <td>{{ subject.total_ct_ex }}</td>
+            <td>{{ subject.gpa }} ({{ subject.grade }})</td>
+          </tr>
+        {% endfor %}
+
+        {# ----- Regular Subjects ----- #}
+        {% for mark in regular_subject_marks %}
+          <tr>
+            <td>{{ mark.subject.name }}</td>
+            <td>{{ mark.full_marks|default:"-" }}</td>
+            <td>{{ mark.cq_mark|default:"-" }}</td>
+            <td>{{ mark.mcq_mark|default:"-" }}</td>
+            <td>{{ mark.practical_mark|default:"-" }}</td>
+            <td>{{ mark.total_mark|default:"-" }}</td>
+            <td>{{ mark.total_80|default:"-" }}</td>
+            <td>{{ mark.total_ct_ex|default:"-" }}</td>
+            <td>{{ mark.gp|default:"-" }}</td>
+            <td>{{ mark.total_ct_ex|default:"-" }}</td>
+            <td>{{ mark.gpa|default:"0" }} ({{ mark.grade|default:"-" }})</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; margin-top:20px;">
+    <!-- Attendance Report -->
+    <div class="attendance-report">
+      <table>
+        <thead><tr><th colspan="2">Attendance Report</th></tr></thead>
+        <tbody>
+          <tr><td>Name of the Examination</td><td>{{ record.exam.exam_name }}</td></tr>
+          <tr><td>Attendance</td><td>-</td></tr>
+          <tr><td>Working Days</td><td>-</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <table class="grade-legend">
+        <thead>
+          <tr><th>Letter</th><th>%</th><th>GP</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>A+</td><td>80–100</td><td>5.0</td></tr>
+          <tr><td>A</td><td>70–79</td><td>4.0</td></tr>
+          <tr><td>A-</td><td>60–69</td><td>3.5</td></tr>
+          <tr><td>B</td><td>50–59</td><td>3.0</td></tr>
+          <tr><td>C</td><td>40–49</td><td>2.0</td></tr>
+          <tr><td>D</td><td>33–39</td><td>1.0</td></tr>
+          <tr><td>F</td><td>0–32</td><td>0.0</td></tr>
+        </tbody>
+      </table>
+
+      <table class="grade-legend" style="margin-top:10px;">
+        <tr><td><strong>Total</strong></td><td><strong>GPA</strong></td><td><strong>Grade</strong></td></tr>
+        <tr>
+          <td>{{ record.total_marks }}</td>
+          <td>{{ gpa|default:"-" }}</td>
+          <td>{{ record.grade|default:"-" }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Comments -->
+  <div style="margin-top:15px; font-size:14px;">
+    <strong>Class Teacher's Comment:</strong>
+    <div style="border:1px solid black; height:40px; margin-top:5px;"></div>
+  </div>
+
+  <!-- Signatures -->
+  <div class="signatures">
+    <div class="signature-block"><p class="signature-line"></p><p>Class Teacher's Signature</p></div>
+    <div class="signature-block"><p class="signature-line"></p><p>Guardian's Signature</p></div>
+    <div class="signature-block"><p class="signature-line"></p><p>Head Teacher's Signature</p></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-text">
+    © 2025 - {{ site_settings.name }}, {{ site_settings.post }}, {{ site_settings.upozilla }}, {{ site }}. All Rights Reserved.
+  </div>
+</div>
+
+<div class="buttons">
+  <button onclick="downloadPDF()">Download PDF</button>
+  <button onclick="window.print()">Print</button>
+  <a href="{% url 'exam_record_list' %}">Back</a>
+</div>
+
+<!-- jsPDF + html2canvas scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  async function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const reportCard = document.getElementById('reportCard');
+    const canvas = await html2canvas(reportCard, {
+      scale: 2,
+      useCORS: true,
+      scrollY: -window.scrollY
+    });
+    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = 210;
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pageWidth;
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save('Report-Card-{{ record.student.add_name|slugify }}.pdf');
+  }
+</script>
+</body>
+</html>

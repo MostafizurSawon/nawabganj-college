@@ -1,0 +1,332 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<title>Admission Form – {{ student.add_name|default:"" }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  @page { size: A4; margin: 6mm; }
+  :root{ --ink:#111; --light-ink:#555; --brand:#c21a1a; --line:#444; --f:11px; --f-print:10px; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:#f5f6f8; color:var(--ink); font-family: Arial, Helvetica, sans-serif; }
+
+  .page{ width:210mm; margin:12px auto; background:#fff; padding:12mm; overflow:visible; transform-origin: top left; }
+
+  .toolbar{ display:flex; gap:8px; justify-content:space-between; align-items:center; width:210mm; margin:12px auto 0; }
+  .btn{ background:#1a93c2; color:#fff; border:0; padding:6px 12px; font-size:12px; border-radius:4px; cursor:pointer; }
+  .btn.back{ background:#555; }
+  .btn a{ color:#fff; text-decoration:none; }
+  @media print{ .toolbar{ display:none !important; } }
+
+  .header{ display:grid; grid-template-columns:60px 1fr 105px; align-items:center; gap:10px; border-bottom:1.5px solid var(--line); padding-bottom:8px; margin-bottom:8px; }
+  .logo{ width:85px; height:85px; object-fit:contain; }
+  .inst{ text-align:center; }
+  .inst h1{ margin:0; font-size:28px; color:var(--brand); letter-spacing:.2px; }
+  .inst .meta{ margin-top:2px; font-size:14px; color:var(--light-ink); }
+  .photo-wrap{ justify-self:end; width:105px; height:125px; border:1px solid var(--line); padding:3px; }
+  .photo{ width:100%; height:100%; object-fit:cover; }
+
+  .titlebar{
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; /* left | center | right */
+    align-items: center;
+    padding: 4px 6px;
+    background:#fafafa;
+    border:1px solid var(--line);
+    margin:8px 0 6px;
+    font-size:10px;
+  }
+  .titlebar .left{ justify-self: start; font-weight:700; }
+  .titlebar .center{ justify-self: center; font-weight:700; font-size:11px; }
+  .titlebar .right{ justify-self: end; color: var(--light-ink); }
+
+  table.kv{ width:100%; border-collapse:collapse; }
+  .kv th, .kv td{ border:1px solid var(--line); padding:4px 6px; vertical-align:top; font-size:11px; }
+  .kv th{ background:#f7f7f7; text-align:left; font-weight:700; }
+  .kv .label{ width:22%; color:#222; background:#fcfcfc; }
+  .kv .value{ width:28%; }
+
+  .section{ margin:8px 0 12px; }
+  .section h3{ margin:0 0 4px; font-size:12px; letter-spacing:.15px; }
+
+  .sign-row{ display:flex; justify-content:space-between; margin-top:16px; }
+  .sign{ width:36%; text-align:center; }
+  .sign .line{ border-top:1px solid var(--line); margin-top:28px; padding-top:4px; font-size:11px; }
+
+  .footer-note{ margin-top:50px; text-align:center; font-size:11px; color:#555; }
+
+  @media print{
+    body{ background:#fff; }
+    .page{ page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+    .kv th,.kv td{ padding:3.5px 5px; font-size: var(--f-print); }
+    .inst h1{ font-size:27px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SCREEN-ONLY TOOLBAR -->
+<div class="toolbar">
+  {% if request.user.role == 'student' %}
+    <button class="btn back"><a href="{% url 'index' %}">← Back</a></button>
+  {% else %}
+    <button class="btn back"><a href="{% url 'admitted_students_list' %}">← Back</a></button>
+  {% endif %}
+  <div style="display:flex; gap:8px;">
+    <button class="btn" id="pdfBtn">⬇ Download PDF</button>
+    {% comment %} <button class="btn" id="printBtn">🖨️ Print</button> {% endcomment %}
+  </div>
+</div>
+
+<div class="page" id="a4-page">
+  <!-- HEADER -->
+  <div class="header">
+    <img src="{% static 'cus/logo.png' %}" class="logo" alt="Logo">
+    <div class="inst">
+      <h1>{{ institute_name|default:"নবাবগঞ্জ সিটি কলেজ, চাপাইনবাবগঞ্জ" }}</h1>
+      {% comment %} <h1>{{ institute_name|default:"নবাবগঞ্জ সিটি কলেজ, চাপাইনবাবগঞ্জ" }}</h1> {% endcomment %}
+      <div class="meta">EIIN: {{ eiin|default:"124596" }} &nbsp;|&nbsp; কোড: {{ college_code|default:"1756" }} &nbsp;|&nbsp; ফোন: {{ phone|default:"01742-898390" }}</div>
+    </div>
+    <div class="photo-wrap">
+      {% if student.add_photo %}
+        <img class="photo" src="{{ student.add_photo.url }}" alt="Photo">
+      {% else %}
+        <div class="photo" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:#777;">Photo</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- TITLE -->
+  <div class="titlebar">
+    <div class="left">College Code: {{ college_code|default:"1756" }}</div>
+    <div class="center">GROUP OF {{ student.get_add_admission_group_display|default:""|upper }}</div>
+    <div class="right">Application Date: {{ student.created_at|date:"d / M / Y"|default:"" }}</div>
+  </div>
+  
+
+  <!-- APPLICANT -->
+  <div class="section">
+    <h3>Applicant Information</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Student's Name (English)</td><td class="value">{{ student.add_name|default:"" }}</td>
+        <td class="label">Class Roll</td><td class="value">{{ student.add_class_roll|default:"" }}</td>
+      </tr>
+      {% comment %} <tr>
+        <td class="label">Student's Name (Bangla)</td><td class="value">{{ student.add_name_bangla|default:"" }}</td>
+        <td class="label">Merit Position</td><td class="value">{{ student.merit_position|default:"" }}</td>
+      </tr> {% endcomment %}
+      <tr>
+        <td class="label">Mobile</td><td class="value">{{ student.add_mobile|default:"" }}</td>
+        <td class="label">Blood Group</td><td class="value">{{ student.add_blood_group|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Birth Certificate / NID</td><td class="value">{{ student.add_birth_certificate_no|default:"" }}</td>
+        <td class="label">Date of Birth</td><td class="value">{{ student.add_birthdate|date:"d M Y"|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Marital Status</td><td class="value">{{ student.add_marital_status|default:"" }}</td>
+        <td class="label">Age</td><td class="value">{{ student.add_age|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Gender</td><td class="value">{{ student.add_gender|default:"" }}</td>
+        <td class="label">Religion</td><td class="value">{{ student.add_religion|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Email</td><td class="value">{{ student.add_email|default:"" }}</td>
+        <td class="label">Nationality</td><td class="value">{{ student.add_nationality|default:"" }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- PARENT -->
+  <div class="section">
+    <h3>Parent/Guardian Information</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Father's Name</td><td class="value">{{ student.add_father|default:"" }}</td>
+        <td class="label">Father's Mobile</td><td class="value">{{ student.add_father_mobile|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Father's NID</td><td class="value">{{ student.add_father_nid|default:"" }}</td>
+        <td class="label">Father's Date of Birth</td><td class="value">{{ student.add_father_birthdate|date:"d M Y"|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Mother's Name</td><td class="value">{{ student.add_mother|default:"" }}</td>
+        <td class="label">Mother's Mobile</td><td class="value">{{ student.add_mother_mobile|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Mother's NID</td><td class="value">{{ student.add_mother_nid|default:"" }}</td>
+        <td class="label">Mother's Date of Birth</td><td class="value">{{ student.add_mother_birthdate|date:"d M Y"|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Guardian (If different)</td><td class="value">{{ student.add_parent|default:"" }}</td>
+        <td class="label">Guardian Mobile</td><td class="value">{{ student.add_parent_mobile|default:"" }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ADDRESS -->
+  <div class="section">
+    <h3>Present Address</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Village/Area</td><td class="value">{{ student.add_village|default:"" }}</td>
+        <td class="label">Post</td><td class="value">{{ student.add_post|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Police Station</td><td class="value">{{ student.add_police|default:"" }}</td>
+        <td class="label">District & Postal</td><td class="value">{{ student.add_distric|default:"" }} – {{ student.add_postal|default:"" }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>Permanent Address</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Village/Area</td><td class="value">{{ student.add_village_per|default:"" }}</td>
+        <td class="label">Post</td><td class="value">{{ student.add_post_per|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Police Station</td><td class="value">{{ student.add_police_per|default:"" }}</td>
+        <td class="label">District & Postal</td><td class="value">{{ student.add_distric_per|default:"" }} – {{ student.add_postal_per|default:"" }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- QUOTA / COMMUNITY (NEW) -->
+  <div class="section">
+    <h3>Special Quota / Community</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Special Quota</td>
+        <td class="value">{% if student.qouta %}Yes{% else %}No{% endif %} {% if student.qouta %},{{ student.qouta_name|default:"" }}{% endif %}</td>
+
+        <td class="label">Community</td>
+        <td class="value">{% if student.community %}Yes{% else %}No{% endif %} {% if student.community %},{{ student.community_name|default:"" }}{% endif %}</td>
+      </tr>
+      {% comment %} <tr>
+        
+      </tr> {% endcomment %}
+    </table>
+  </div>
+
+  <!-- SSC -->
+  <div class="section">
+    <h3>Academic Information (SSC)</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Board</td><td class="value">{{ student.add_ssc_board|default:"" }}</td>
+        <td class="label">Passing Year</td><td class="value">{{ student.add_ssc_passyear|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">SSC Roll</td><td class="value">{{ student.add_ssc_roll|default:"" }}</td>
+        <td class="label">Registration</td><td class="value">{{ student.add_ssc_reg|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Institute</td><td class="value">{{ student.add_ssc_institute|default:"" }}</td>
+        <td class="label">GPA</td><td class="value">{{ student.add_ssc_gpa|default:"" }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- SUBJECTS -->
+  <div class="section">
+    <h3>Subject Choice Information</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Subject</td>
+        <td class="value">Bangla, English, ICT</td>
+        <td class="label">4th Subject</td>
+        <td class="value">{% if student.fourth_subject %}{{ student.fourth_subject.sub_name|default:"" }}{% else %}—{% endif %}</td>
+      </tr>
+      <tr>
+        <td class="label">Elective Subjects</td>
+        <td class="value" colspan="3">
+          {% for s in student.subjects.all %}
+            {% if s.sub_name.lower not in 'bangla,english,ict' %}
+              {{ s.sub_name|default:"" }}{% if not forloop.last %}, {% endif %}
+            {% endif %}
+          {% empty %}
+
+          
+          {% endfor %} {% if student.main_subject %} {{student.main_subject.sub_name}}{% endif %} 
+          {% if student.optional_subject or student.optional_subject %} , {{student.optional_subject.sub_name}} , {{student.optional_subject_2.sub_name}}
+          {% endif %}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- PAYMENT -->
+  <div class="section">
+    <h3>Payment Information <span class="student_id">(Student ID: {{ student.id }})</span></h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Payment Method</td>
+        <td class="value">{{ student.add_payment_method|default:""|title }}</td>
+        <td class="label">Payment From</td>
+        <td class="value">{{ student.add_slip|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">TrxID</td><td class="value">{{ student.add_trxid|default:"" }}</td>
+        <td class="label">Amount</td><td class="value">{{ student.add_amount|default:"" }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- SIGNATURES -->
+  <div class="sign-row">
+    <div class="sign"><div class="line">Applicant's Signature</div></div>
+    <div class="sign"><div class="line">Principal's Signature</div></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-note">
+    &copy; {% now "Y" %} Nawabganj city college. All rights reserved. Design &amp; Development by JBD IT.
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  const PX_PER_MM = 96 / 25.4;
+  const A4_W_PT = 595.28, A4_H_PT = 841.89;
+
+  function fitForPrint() {
+    const page = document.getElementById('a4-page');
+    if (!page) return;
+    const targetHpx = 297 * PX_PER_MM;
+    const scale = Math.min(1, targetHpx / page.scrollHeight);
+    page.style.transform = `scale(${scale})`;
+  }
+  function resetAfterPrint() {
+    const page = document.getElementById('a4-page');
+    if (page) page.style.transform = '';
+  }
+  window.onbeforeprint = fitForPrint;
+  window.onafterprint  = resetAfterPrint;
+  window.matchMedia('print').addEventListener('change', e => { if (e.matches) fitForPrint(); else resetAfterPrint(); });
+
+  document.getElementById('pdfBtn')?.addEventListener('click', async () => {
+    const node = document.getElementById('a4-page');
+    if (!node) return;
+    const { jsPDF } = window.jspdf;
+    const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor:'#ffffff', windowWidth: node.scrollWidth });
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({ orientation:'p', unit:'pt', format:'a4' });
+    const imgProps = pdf.getImageProperties(imgData);
+    const imgW = imgProps.width, imgH = imgProps.height;
+    const scale = Math.min(A4_W_PT / imgW, A4_H_PT / imgH);
+    const renderW = imgW * scale, renderH = imgH * scale;
+    const offsetX = (A4_W_PT - renderW) / 2, offsetY = (A4_H_PT - renderH) / 2;
+    pdf.addImage(imgData, 'PNG', offsetX, offsetY, renderW, renderH);
+    pdf.save('ভর্তি_ফর্ম.pdf');
+  });
+
+  document.getElementById('printBtn')?.addEventListener('click', () => window.print());
+</script>
+</body>
+</html>

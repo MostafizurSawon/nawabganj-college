@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Attendance Preview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu; margin:16px; }
+  header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  table { width:100%; border-collapse: collapse; }
+  th, td { border:1px solid #e5e7eb; padding:6px 8px; text-align:center; }
+  th { background:#f9fafb; }
+  .btn { display:inline-block; padding:8px 12px; border:1px solid #0ea5e9; border-radius:8px; text-decoration:none; background:#fff; cursor:pointer; }
+  .name{
+    text-align: left;
+  }
+  /* print CSS keeps it neat if they use Ctrl+P */
+  @media print {
+    .no-print { display:none; }
+    body { margin:0; }
+  }
+</style>
+</head>
+<body>
+  <header class="no-print">
+    {% comment %} <div>
+      <h2 style="margin:0">Attendance Preview</h2>
+      <div>
+        {% if subject %}<strong>Subject:</strong> {{ subject.sub_name }}{% if subject.code %} ({{ subject.code }}){% endif %}{% endif %}
+        {% if active_session %} | <strong>Session:</strong> {{ active_session.ses_name }}{% endif %}
+      </div>
+    </div> {% endcomment %}
+    <div>
+      <button class="btn" id="btnPrint">Print</button>
+      <button class="btn" id="btnPdf">Download PDF</button>
+    </div>
+  </header>
+
+  <!-- Everything inside #printArea will be rendered to canvas/PDF -->
+  <div id="printArea">
+    <h3 style="margin:0 0 6px;">Attendance</h3>
+    <div style="margin:0 0 10px; font-size: 13px;">
+      {% if subject %}<strong>Subject:</strong> {{ subject.sub_name }}{% if subject.code %} ({{ subject.code }}){% endif %}{% endif %}
+      {% if active_session %} | <strong>Session:</strong> {{ active_session.ses_name }}{% endif %}
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:130px;">Date</th>
+          <th style="width:80px;">Roll</th>
+          <th class="name">Name</th>
+          <th style="width:90px;">Group</th>
+          <th style="width:90px;">Class&nbsp;ID</th>
+          <th style="width:220px;">Signature</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td>{% now "d-m-Y" %}</td>
+          <td>{{ s.add_class_roll|default:"" }}</td>
+          <td class="name">{{ s.add_name }}</td>
+          <td>{{ s.get_add_admission_group_display }}</td>
+          <td>{{ s.add_class_id|default:"" }}</td>
+          <td></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No students selected.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CDN scripts (client-side only; no server PDF libs) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script>
+    // Simple print
+    document.getElementById('btnPrint').addEventListener('click', () => window.print());
+
+    // Canvas -> PDF (A4 portrait, multi-page if content is tall)
+    document.getElementById('btnPdf').addEventListener('click', async () => {
+      const { jsPDF } = window.jspdf;
+      const el = document.getElementById('printArea');
+
+      // Render DOM to canvas
+      const canvas = await html2canvas(el, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/png');
+
+      // A4 in jsPDF (pt): 595.28 x 841.89 ; we’ll keep 20pt margin
+      const pdf = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'p' });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+
+      // Fit image width to page width minus margin
+      const imgW = pageW - margin * 2;
+      const imgH = canvas.height * imgW / canvas.width;
+
+      let y = margin;
+      let remaining = imgH;
+      const img = imgData;
+
+      // If one page fits, easy:
+      if (imgH <= (pageH - margin * 2)) {
+        pdf.addImage(img, 'PNG', margin, y, imgW, imgH);
+      } else {
+        // Multi-page slice: draw portions vertically
+        let position = 0;
+        const pageHeightPt = pageH - margin * 2;
+
+        while (remaining > 0) {
+          const canvasPage = document.createElement('canvas');
+          canvasPage.width = canvas.width;
+          // portion height in source pixels
+          const portionPx = Math.floor(pageHeightPt * canvas.width / imgW);
+          canvasPage.height = Math.min(portionPx, canvas.height - position);
+
+          const ctx = canvasPage.getContext('2d');
+          ctx.drawImage(
+            canvas,
+            0, position, canvas.width, canvasPage.height,  // src
+            0, 0, canvasPage.width, canvasPage.height      // dst
+          );
+          const imgPage = canvasPage.toDataURL('image/png');
+          const imgPageH = canvasPage.height * imgW / canvasPage.width;
+
+          if (position > 0) pdf.addPage();
+          pdf.addImage(imgPage, 'PNG', margin, margin, imgW, imgPageH);
+
+          position += canvasPage.height;
+          remaining -= imgPageH;
+        }
+      }
+
+      const filename = "{{ subject.code|default:subject.sub_name|default:'students' }}".replace(/\s+/g,'_');
+      pdf.save(`Attendance_${filename}.pdf`);
+    });
+  </script>
+</body>
+</html>

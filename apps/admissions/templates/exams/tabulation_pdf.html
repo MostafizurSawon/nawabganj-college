@@ -1,0 +1,162 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Tabulation Sheet – Landscape{% endblock %}
+
+{% block content %}
+<style>
+  /* Print page setup */
+  @page { size: A4 landscape; margin: 8mm; }
+  @media print {
+    .no-print { display:none !important; }
+    .page-a4-landscape { box-shadow: none !important; border: none !important; }
+  }
+
+  /* Pages */
+  .pages.stack { display: grid; gap: 12px; }
+  .page-a4-landscape {
+    position: relative;                 /* needed for absolute footer */
+    width: 297mm; height: 210mm;        /* fixed A4 landscape */
+    background: #fff;
+    margin: 0 auto;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 6px rgba(0,0,0,.05);
+    display: flex; flex-direction: column;
+  }
+
+  .sheet-header { padding: 8px 10px 6px; flex: 0 0 auto; }
+  .table-wrap  { padding: 0 8px 28px;   /* leave room above footer */ flex: 1 1 auto; overflow: hidden; }
+
+  /* Table */
+  .tabulation { table-layout: fixed; width: 100%; border-collapse: collapse; }
+  .tabulation th, .tabulation td {
+    border: 1px solid #dee2e6;
+    padding: .3rem .4rem;
+    font-size: 11px;
+    line-height: 1.2;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .tabulation thead th {
+    font-weight: 600;
+    white-space: normal; word-wrap: break-word; overflow-wrap: break-word;
+  }
+  /* Column widths */
+  .tabulation th:first-child, .tabulation td:first-child { width: 50px; }     /* Roll */
+  .tabulation th:nth-child(2), .tabulation td:nth-child(2) {                  /* Name */
+    width: 200px; text-align: left;
+  }
+
+  /* Watermark footer */
+  .page-footer {
+    position: absolute;
+    left: 0; right: 0; bottom: 6mm;      /* sit just above bottom margin */
+    font-size: 10px;
+    color: rgba(120,120,120,.6);
+    text-align: center;
+    font-style: italic;
+    pointer-events: none;
+  }
+</style>
+
+<div class="container-fluid py-3">
+
+  <!-- Controls (screen only) -->
+  <div class="d-flex justify-content-end mb-2 no-print">
+    <button class="btn btn-sm btn-outline-secondary me-2" id="btnPrint">Print</button>
+    <button class="btn btn-sm btn-primary" id="btnPdf">Download PDF</button>
+  </div>
+
+  <div id="printArea" class="pages stack">
+    {% for r in rows %}
+      {% if forloop.first or forloop.counter0|divisibleby:ROWS_PER_PAGE %}
+        <section class="page-a4-landscape">
+          <!-- Header (repeats every page) -->
+          <div class="sheet-header text-center">
+            <h5 class="mb-0">{{ institute_name }}</h5>
+            <div class="small">EIIN: {{ eiin }}</div>
+            <div class="fw-semibold mt-1">{{ exam_name }}</div>
+            <div class="small mt-1">
+              Class: {{ class_name }} • Group: {{ group_name }} • Session: {{ session_name }}
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="tabulation">
+              <thead>
+                <tr>
+                  <th>Roll</th>
+                  <th style="text-align:left;">Name</th>
+                  {% for sub in subjects %}<th>{{ sub }}</th>{% endfor %}
+                  <th>GPA Without 4th</th>
+                  <th>GPA</th>
+                  <th>Letter Grade</th>
+                </tr>
+              </thead>
+              <tbody>
+      {% endif %}
+
+                <tr>
+                  <td>{{ r.roll }}</td>
+                  <td style="text-align:left;">{{ r.name }}</td>
+                  {% for m in r.marks %}<td>{{ m }}</td>{% endfor %}
+                  <td>{{ r.gpa_wo4 }}</td>
+                  <td>{{ r.gpa }}</td>
+                  <td>{{ r.grade }}</td>
+                </tr>
+
+      {% if forloop.counter|divisibleby:ROWS_PER_PAGE or forloop.last %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Watermark footer (repeats every page) -->
+          <div class="page-footer">
+            &copy; {% now "Y" %} — Design &amp; Developed by JBD IT
+          </div>
+        </section>
+      {% endif %}
+    {% empty %}
+      <section class="page-a4-landscape">
+        <div class="sheet-header text-center">
+          <h5 class="mb-0">{{ institute_name }}</h5>
+          <div class="small">EIIN: {{ eiin }}</div>
+          <div class="fw-semibold mt-1">{{ exam_name }}</div>
+          <div class="small mt-1">
+            Class: {{ class_name }} • Group: {{ group_name }} • Session: {{ session_name }}
+          </div>
+        </div>
+        <div class="p-4 text-center">No data available</div>
+        <div class="page-footer">
+          &copy; {% now "Y" %} — Design &amp; Developed by JBD IT
+        </div>
+      </section>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- html2canvas + jsPDF -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script>
+  // Print
+  document.getElementById('btnPrint')?.addEventListener('click', () => window.print());
+
+  // Download as PDF (multi-page)
+  document.getElementById('btnPdf')?.addEventListener('click', async () => {
+    const { jsPDF } = window.jspdf;
+    const pages = Array.from(document.querySelectorAll('.page-a4-landscape'));
+    const pdf = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'landscape' });
+    const pageW = pdf.internal.pageSize.getWidth();
+
+    for (let i = 0; i < pages.length; i++) {
+      const canvas = await html2canvas(pages[i], { scale: 2 });
+      const img = canvas.toDataURL('image/png');
+      const imgH = canvas.height * pageW / canvas.width;
+      if (i > 0) pdf.addPage();
+      pdf.addImage(img, 'PNG', 0, 0, pageW, imgH);
+    }
+    pdf.save('tabulation_landscape.pdf');
+  });
+</script>
+{% endblock content %}

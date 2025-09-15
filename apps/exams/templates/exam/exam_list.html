@@ -1,0 +1,194 @@
+{% extends layout_path %}
+
+{% block title %}College Exam{% endblock %}
+{% load static %}
+
+{% block content %}
+<div class="card p-4">
+  <h2>College Exam</h2>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="get" class="row gy-2 gx-3 align-items-center mb-4">
+    <div class="col-md-3">
+      <input type="text" name="search" class="form-control" placeholder="Search exam or program"
+             value="{{ request.GET.search }}">
+    </div>
+
+    <div class="col-md-2">
+      <select name="class_filter" class="form-select">
+        <option value=""> Select Program </option>
+        {% for cls in classes %}
+          <option value="{{ cls.id }}" {% if request.GET.class_filter == cls.id|stringformat:"s" %}selected{% endif %}>
+            {{ cls.pro_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-3">
+      <select name="exam_filter" class="form-select">
+        <option value=""> Select Exam </option>
+        {% for exam in all_exams %}
+          <option value="{{ exam.id }}" {% if request.GET.exam_filter == exam.id|stringformat:"s" %}selected{% endif %}>
+            {{ exam.exam_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-2">
+      <input type="date" name="start_date" class="form-control" placeholder="Start Date"
+             value="{{ request.GET.start_date }}">
+    </div>
+
+    <div class="col-md-2">
+      <input type="date" name="end_date" class="form-control" placeholder="End Date"
+             value="{{ request.GET.end_date }}">
+    </div>
+
+    <div class="col-md-12 d-flex justify-content-between mt-3">
+      <div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+
+        {% if mode == 'marks' %}
+          <a href="{% url 'exam_list_marks' %}" class="btn btn-secondary ms-2">Reset</a>
+        {% elif mode == 'tabulation' %}
+          <a href="{% url 'tabulation_list' %}" class="btn btn-secondary ms-2">Reset</a>
+        {% elif mode == 'sadmit_front' %}
+          <a href="{% url 'admit_front' %}" class="btn btn-secondary ms-2">Reset</a>
+        {% elif mode == 'sadmit_back' %}
+          <a href="{% url 'admit_back' %}" class="btn btn-secondary ms-2">Reset</a>
+        {% elif mode == 'seatplan' %}
+          <a href="{% url 'seatplan' %}" class="btn btn-secondary ms-2">Reset</a>
+        {% else %}
+          <a href="{% url 'exam_list' %}" class="btn btn-secondary ms-2">Reset</a>
+        {% endif %}
+      </div>
+
+      {% if mode == 'sadmit_back' %}
+        <div>
+          <a href="{% url 'admit_back_page' %}" class="btn btn-primary ms-2">Edit Admit Card Text</a>
+        </div>
+      {% endif %}
+    </div>
+  </form>
+
+  <table class="table table-bordered table-striped table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>#</th>
+        <th>Exam Name</th>
+        <th>Program</th>
+        <th>Session</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>
+          {% if mode == 'marks' %}Give Marks{% else %}Actions{% endif %}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for exam in exams %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ exam.exam_name }}</td>
+        <td>{{ exam.exam_class.pro_name }}</td>
+        <td>{{ exam.exam_session.ses_name }}</td>
+        <td>{{ exam.exam_start_date }}</td>
+        <td>{{ exam.exam_end_date }}</td>
+        <td>
+          {% if mode == 'marks' %}
+            {% for subject in exam.subjects.all %}
+              <a href="{% url 'marks_entry' exam.id subject.id %}" target="_blank" class="btn btn-sm btn-primary mb-1">
+                {{ subject.name }}
+              </a><br>
+            {% endfor %}
+          {% elif mode == 'tabulation' %}
+            <a href="{% url 'exam_tabulation' exam.id %}" target="_blank" class="btn btn-sm btn-success">
+              <i class="bi bi-table"></i> View Tabulation
+            </a><br>
+          {% elif mode == 'sadmit_front' %}
+            <a href="{% url 'admit_card_front' exam.id %}" target="_blank" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-card-text"></i> Admit Card (Front)
+            </a><br>
+          {% elif mode == 'sadmit_back' %}
+            <a href="{% url 'admit_card_back' exam.id %}" target="_blank" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-card-heading"></i> Admit Card (Back)
+            </a><br>
+          {% elif mode == 'seatplan' %}
+            <a href="{% url 'exam_seat_plan' exam.id %}" target="_blank" class="btn btn-sm btn-outline-dark">
+              <i class="bi bi-layout-text-window-reverse"></i> See Seat Plan
+            </a><br>
+          {% else %}
+            <a href="{% url 'exam_subject_full_marks' exam.id %}" target="_blank" class="btn btn-sm btn-info mb-1">
+              <i class="bi bi-pencil-square"></i> Set Full Marks
+            </a>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="text-center">No exams found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if is_paginated %}
+  <nav>
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}
+          {% if request.GET.class_filter %}class_filter={{ request.GET.class_filter }}&{% endif %}
+          {% if request.GET.exam_filter %}exam_filter={{ request.GET.exam_filter }}&{% endif %}
+          {% if request.GET.start_date %}start_date={{ request.GET.start_date }}&{% endif %}
+          {% if request.GET.end_date %}end_date={{ request.GET.end_date }}&{% endif %}
+          page={{ page_obj.previous_page_number }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+      {% endif %}
+
+      {% for num in paginator.page_range %}
+        {% if num == page_obj.number %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% else %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}
+            {% if request.GET.class_filter %}class_filter={{ request.GET.class_filter }}&{% endif %}
+            {% if request.GET.exam_filter %}exam_filter={{ request.GET.exam_filter }}&{% endif %}
+            {% if request.GET.start_date %}start_date={{ request.GET.start_date }}&{% endif %}
+            {% if request.GET.end_date %}end_date={{ request.GET.end_date }}&{% endif %}
+            page={{ num }}">{{ num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}
+          {% if request.GET.class_filter %}class_filter={{ request.GET.class_filter }}&{% endif %}
+          {% if request.GET.exam_filter %}exam_filter={{ request.GET.exam_filter }}&{% endif %}
+          {% if request.GET.start_date %}start_date={{ request.GET.start_date }}&{% endif %}
+          {% if request.GET.end_date %}end_date={{ request.GET.end_date }}&{% endif %}
+          page={{ page_obj.next_page_number }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Seat Plan Cards | {{ exam.exam_name }}</title>
+
+  <!-- html2canvas + jsPDF -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin:0; padding:0; }
+
+    body{
+      font-family: Arial, sans-serif;
+      background:#e9e9e9;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      display:flex; flex-direction:column; align-items:center;
+    }
+
+    /* A4 physical page; equal outer space 5mm */
+    @page { size: A4; margin: 0; }
+
+    .page{
+      width:210mm; height:297mm; background:#fff;
+      padding:5mm;                    /* চার পাশে সমান */
+      margin:5px auto;                /* screen gap only */
+      box-shadow:0 0 6px rgba(0,0,0,.12);
+      page-break-after:always;
+      display:flex;
+      position:relative;
+    }
+    .page:last-child{ page-break-after:auto; }
+
+    /* 2 × 6 grid; center gaps are 10mm so each side gets 5mm after cut */
+    .card-grid{
+      width:100%; height:100%;
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      grid-template-rows:repeat(6, 1fr);
+      gap:10mm;                       /* মাঝের gap = 10mm */
+    }
+
+    /* Card */
+    .card{
+      position:relative;
+      border:0.25mm solid #000;
+      border-radius:2mm;
+      padding:3mm 3mm 5mm;            /* নিচে সামান্য বেশি padding */
+      background:#fcfcfc;
+      display:flex; flex-direction:column; justify-content:space-between;
+      overflow:hidden;
+    }
+
+    .card-header{
+      font-size:9px; font-weight:bold; text-align:center; color:#2c2c2c;
+    }
+
+    .card-body{ font-size:8px; line-height:1.35; }
+    .card-body p{ margin: 2.2mm 0; }
+    .student-name{ font-weight:bold; font-size:16px !important; text-align:center; }
+
+    /* ===== Key–Value rows (flex; centered) ===== */
+    .kv{
+      display:flex;
+      justify-content:center;         /* মাঝখানে */
+      align-items:baseline;
+      gap:6px;                        /* label–value ফাঁক */
+      margin: 2mm 0;                  /* সারির ওপর-নীচে স্পেস (আগের মতই) */
+      text-align:center;
+      font-size: 12px;
+    }
+    .kv .k{ font-weight:700; }        /* label (Session:, Exam:) */
+
+    .kv .v{
+      display:inline-block;
+      line-height:1.2;
+    }
+
+    /* ✅ শুধু PDF রেন্ডারিংয়ের সময় value সামান্য উপরে তুলতে */
+    .pdf-mode .kv .v.shift-up{
+      position: relative;
+      top: -.6mm;                      /* প্রয়োজন হলে -0.6mm / -1.2mm টিউন করুন */
+    }
+
+    .roll-number-display{ text-align:center; margin-top:auto; }
+    .roll-number-display span{ font-size:15px; font-weight:bold; color:#d90429; }
+
+    .card-footer{ text-align:center; font-size:7px; color:#555; margin-top:2mm; }
+
+    /* Buttons (hidden in print) */
+    .button-container{
+      position:fixed; bottom:0; left:0; width:100%;
+      padding:14px; background:#fff;
+      box-shadow:0 -2px 8px rgba(0,0,0,.15);
+      text-align:center; z-index:1000;
+    }
+    .button-container button{
+      background:#28a745; color:#fff; border:none;
+      border-radius:6px; padding:12px 22px; font-size:15px; font-weight:600; cursor:pointer;
+    }
+
+    @media print{
+      body{ background:#fff; }
+      .button-container{ display:none !important; }
+      .page{ margin:0; box-shadow:none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="pages">
+    {% for page in pages %}
+      <section class="page">
+        <div class="card-grid">
+          {% for record in page %}
+            <div class="card">
+              <div class="card-header">{{ site_settings.name }}</div>
+
+              <div class="card-body">
+                <p class="student-name">{{ record.student.add_name }}</p>
+
+                <!-- Session row (flex) -->
+                <div class="kv">
+                  <div class="k">Session:</div>
+                  <div class="v shift-up">{{ record.student.add_session.ses_name }}</div>
+                </div>
+
+                <!-- Exam row (flex) -->
+                <div class="kv">
+                  <div class="k">Exam:</div>
+                  <div class="v shift-up">{{ exam.exam_name }}</div>
+                </div>
+              </div>
+
+              <div class="roll-number-display">
+                <span>Class ID: {{ record.student.add_class_roll }}</span>
+              </div>
+
+              <div class="card-footer">Powered by JBD IT</div>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  </div>
+
+  <div class="button-container" data-html2canvas-ignore="true">
+    <!-- <button type="button" onclick="window.print()">🖨️ Print Cards</button> -->
+    <button type="button" onclick="downloadPDF()">⬇️ Download as PDF</button>
+  </div>
+
+  <script>
+    async function downloadPDF() {
+      const sections = Array.from(document.querySelectorAll('.page'));
+      if (!sections.length) return;
+
+      // ✅ PDF-only styles ON
+      document.body.classList.add('pdf-mode');
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+
+      for (let i = 0; i < sections.length; i++) {
+        const node = sections[i];
+        const canvas = await html2canvas(node, {
+          scale: 3,
+          useCORS: true,
+          scrollY: 0,
+          backgroundColor: '#ffffff'
+        });
+
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const pdfW = 210, pdfH = 297;
+        if (i > 0) pdf.addPage('a4', 'portrait');
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
+      }
+
+      pdf.save('seat-plan-cards.pdf');
+
+      // ✅ PDF-only styles OFF
+      document.body.classList.remove('pdf-mode');
+    }
+  </script>
+</body>
+</html>

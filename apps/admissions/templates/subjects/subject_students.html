@@ -1,0 +1,436 @@
+{% extends layout_path %}
+{% load static %}
+{% load custom_filters %}
+{% block title %}Subject Wise Student List{% endblock %}
+
+{% block content %}
+
+<!-- Bootstrap Icons (once is enough if already in base) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<style>
+  /* ----- Layout & Typography ----- */
+  :root{ --muted:#6b7280; --ring:#e5e7eb; }
+  .page-header h2{ font-weight:700; letter-spacing:.2px; }
+  .chip{
+    display:inline-flex; align-items:center; gap:.5rem;
+    padding:.4rem .75rem; border-radius:999px;
+    background:#f3f4f6; border:1px solid var(--ring); font-size:.85rem;
+  }
+  .chip strong{ font-weight:600 }
+  .divider{ height:1px; background:var(--ring); margin:1rem 0 }
+  .muted{ color:var(--muted) }
+
+  /* ----- Card polish ----- */
+  .card{ border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,.06); border:1px solid #eef1f4 }
+  .card-header{ border-bottom:1px solid #eef1f4 }
+
+  /* ----- Table polish ----- */
+  .table thead th{ background:#f8fafc; font-weight:700; border-bottom:1px solid var(--ring); }
+  .table td, .table th{ vertical-align:middle }
+  .table-hover tbody tr:hover{ background:#f9fafb }
+
+  /* ----- Pills / Badges ----- */
+  .pill{
+    display:inline-block; padding:.25rem .65rem; border-radius:999px;
+    background:#e0e7ff; color:#4338ca; font-size:.75rem; font-weight:600;
+  }
+
+  /* ----- Accordion in "All Subjects" ----- */
+  .subj-accordion .accordion-button{ border-radius:10px; font-weight:600; }
+  .subj-accordion .accordion-button:not(.collapsed){ background:#eef2ff; color:#3730a3; }
+  .list-group-item small{ color:var(--muted) }
+
+  /* Hide Vuexy notification dots that overlap */
+  .app-sidebar .badge-dot, .nav-item .badge-notifications{ display:none!important }
+
+  /* Subject icon badge */
+  .subject-icon{
+    display:inline-grid; place-items:center;
+    width:28px; height:28px; margin-right:.5rem;
+    border-radius:8px; background:#eef2ff; color:#3730a3; font-size:16px;
+  }
+</style>
+
+
+
+<div class="flex-grow-1 container-fluid px-0 px-md-2">
+
+   <!-- Messages -->
+  {% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+  <!-- Header -->
+  <div class="page-header d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+    <div>
+      <h2 class="mb-1">Subject-wise Students</h2>
+      <p class="muted mb-0">Pick a subject to see all enrolled students, with counts by group.</p>
+    </div>
+    {% if total_count %}
+      <div class="badge bg-info">Total Students: <strong>{{ total_count }}</strong></div>
+    {% endif %}
+  </div>
+
+  <!-- Filter -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3 align-items-end">
+        <div class="col-12 col-md-6 col-lg-5">
+          <label for="subject" class="form-label mb-1">Subject</label>
+          {{ form.subject|add_class:"form-select" }}
+        </div>
+        <div class="col-12 col-md-auto d-flex gap-2">
+          <button class="btn btn-primary" type="submit">Filter</button>
+          <a class="btn btn-outline-secondary" href="{% url 'subject_wise_students' %}">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if selected_subject %}
+    <!-- Selected Subject Meta -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <div class="h5 mb-2 mb-md-1">Subject: <strong>{{ selected_subject.sub_name }}</strong></div>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="chip">Code: <strong>{{ selected_subject.code|default:"" }}</strong></span>
+              {% if selected_subject.group %}
+                <span class="chip">Group: <strong>{{ selected_subject.get_group_display|default:"" }}</strong></span>
+              {% else %}
+                <span class="chip">Group: <strong>All</strong></span>
+              {% endif %}
+              {% if selected_subject.used_count %}
+                <span class="chip">Admitted: <strong>{{ selected_subject.used_count|default:"0" }}</strong></span>
+              {% endif %}
+              {% if selected_subject.limit %}
+                <span class="chip">Seat Limit: <strong>{{ selected_subject.limit|default:"" }}</strong></span>
+              {% endif %}
+              {% if active_session_name %}
+                <span class="chip">Session: <strong>{{ active_session_name }}</strong></span>
+              {% endif %}
+            </div>
+          </div>
+          {% comment %} {% if group_counts %}
+            <div class="d-flex flex-wrap gap-2">
+              {% for group in group_counts %}
+                <span class="pill">{{ group.add_admission_group|title }}: {{ group.count }}</span>
+              {% endfor %}
+            </div>
+          {% endif %} {% endcomment %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Students Table -->
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+          <h5 class="mb-0">Students</h5>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="pill">Showing {{ students|length }} of {{ total_count }}</span>
+            {% if total_count > 0 %}
+            <!-- NEW: open printable PDF page in new tab -->
+            <a class="btn btn-success"
+              href="{% url 'subject_students_pdf' %}?subject={{ form.subject.value }}"
+              target="_blank" rel="noopener">
+              Download PDF
+            </a>
+              <a class="btn btn-primary" href="?subject={{ form.subject.value }}&download_csv=1">Download CSV</a>
+
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Quick search (client-side) -->
+        <div class="row g-2 mb-2">
+          <div class="col-12 col-sm-6 col-lg-6">
+            <input id="tableFilter" type="search" class="form-control" placeholder="Quick search by name, roll, group, class ID, session…">
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle" id="studentsTable">
+            <thead>
+              <tr>
+                <th style="width:80px">Roll</th>
+                <th>Student</th>
+                <th>Mobile</th>
+                <th style="width:140px">Group</th>
+                <th style="width:140px">Class ID</th>
+                <th style="width:140px">Session</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in students %}
+                <tr>
+                  <td><span class="badge bg-primary-subtle text-primary fw-semibold border border-primary-subtle">{{ s.add_class_roll|default:"" }}</span></td>
+                  <td class="fw-semibold">{{ s.add_name }}</td>
+                  <td class="fw-semibold">{{ s.add_mobile }}</td>
+                  <td>{{ s.get_add_admission_group_display|title }}</td>
+                  <td>{{ s.add_class_id|default:"" }}</td>
+                  <td>{{ s.add_session|default:"" }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center muted py-4">No students found.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {% if students.has_other_pages %}
+          <nav aria-label="Students page navigation" class="mt-3">
+            <ul class="pagination justify-content-center">
+              {% if students.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?subject={{ form.subject.value }}&page={{ students.previous_page_number }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+              {% endif %}
+
+              {% for num in students.paginator.page_range %}
+                {% if students.number == num %}
+                  <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > students.number|add:-3 and num < students.number|add:3 %}
+                  <li class="page-item"><a class="page-link" href="?subject={{ form.subject.value }}&page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+              {% endfor %}
+
+              {% if students.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?subject={{ form.subject.value }}&page={{ students.next_page_number }}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+              {% endif %}
+            </ul>
+          </nav>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- All Subjects Grid -->
+    <section class="mt-5">
+      <div class="d-flex align-items-baseline justify-content-between flex-wrap gap-2 mb-2">
+        <h5 class="mb-0">All Subjects & Enrolled Students</h5>
+        <span class="muted small">Tap “View Students” to expand a subject</span>
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-md-2 g-3">
+        {% for item in all_subjects_students %}
+          <div class="col">
+            <div class="card h-100">
+              <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                <div class="fw-semibold d-flex align-items-center">
+                  <span class="subject-icon">
+                    <!-- data-subject used by JS to choose icon -->
+                    <i class="bi" data-subject="{{ item.subject.sub_name }}"></i>
+                  </span>
+                  {{ item.subject.sub_name }}
+                  <span class="muted ms-1">({{ item.subject.code|default:"All" }})</span>
+                  {% if item.subject.group == "science" %}
+                  <span class="ms-2 badge bg-info rounded-pill">{{ item.subject.get_group_display|default:"All" }}</span>
+                  {% elif item.subject.group == "arts" %}
+                  <span class="ms-2 badge bg-success rounded-pill">{{ item.subject.get_group_display|default:"All" }}</span>
+                  {% elif item.subject.group == "commerce" %}
+                  <span class="ms-2 badge bg-primary rounded-pill">{{ item.subject.get_group_display|default:"All" }}</span>
+                  {% else %}
+                  <span class="ms-2 badge bg-success rounded-pill">{{ item.subject.get_group_display|default:"All" }}</span>
+                  {% endif %}
+                </div>
+                <span class="badge bg-primary">{{ item.students|length }} Students</span>
+              </div>
+              <div class="card-body">
+                <div class="accordion subj-accordion" id="acc-{{ item.subject.id }}">
+                  <div class="accordion-item border-0">
+                    <h2 class="accordion-header" id="h-{{ item.subject.id }}">
+                      <button class="accordion-button collapsed mt-5" type="button"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#c-{{ item.subject.id }}"
+                              aria-expanded="false"
+                              aria-controls="c-{{ item.subject.id }}">
+                        View Students
+                      </button>
+                    </h2>
+                    <div id="c-{{ item.subject.id }}" class="accordion-collapse collapse"
+                        aria-labelledby="h-{{ item.subject.id }}" data-bs-parent="#acc-{{ item.subject.id }}">
+                    <div class="accordion-body p-0 pt-2">
+                        {% if item.students %}
+                        <ul class="list-group list-group-flush">
+                            {% for student in item.students %}
+                            <li class="list-group-item d-flex align-items-center">
+                                <!-- Roll column -->
+                                <div style="min-width:80px;">
+                                <span class="badge bg-success w-100 text-center">
+                                    Roll: {{ student.add_class_roll|default:"" }}
+                                </span>
+                                </div>
+
+                                <!-- Name column -->
+                                <div class="ms-3 flex-grow-1">
+                                <div class="fw-semibold">
+                                  {{ student.add_name }}
+                                  <br>
+                                  Mobile: {{ student.add_mobile }}
+                                </div>
+                                </div>
+
+                                <!-- ID column -->
+                                <div>
+                                <span class="badge bg-info">ID: {{ student.add_class_id|default:"" }}</span>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="muted fst-italic m-0 py-2">No students enrolled in this subject.</p>
+                        {% endif %}
+                    </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div><!--/card-body-->
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+  {% else %}
+    <!-- Empty state -->
+    <div class="card">
+      <div class="card-body">
+        <p class="muted mb-2">Select a subject, then hit <strong>Filter</strong> to view students.</p>
+        <div class="divider"></div>
+      </div>
+    </div>
+
+    <!-- All Subjects Grid (no selection) -->
+    <section class="mt-4">
+      <div class="d-flex align-items-baseline justify-content-between flex-wrap gap-2 mb-2">
+        <h5 class="mb-0">All Subjects & Enrolled Students</h5>
+        <span class="muted small">Tap “View Students” to expand a subject</span>
+      </div>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-md-2 g-3">
+        {% for item in all_subjects_students %}
+          <div class="col">
+            <div class="card h-100">
+              <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                <div class="fw-semibold d-flex align-items-center">
+                  <span class="subject-icon">
+                    <i class="bi" data-subject="{{ item.subject.sub_name }}"></i>
+                  </span>
+                  {{ item.subject.sub_name }}
+                  <span class="muted ms-1">({{ item.subject.code|default:"All" }})</span>
+                </div>
+                <span class="badge bg-primary">{{ item.students|length }} Students</span>
+              </div>
+              <div class="card-body">
+                <div class="accordion subj-accordion" id="acc-no-{{ item.subject.id }}">
+                  <div class="accordion-item border-0">
+                    <h2 class="accordion-header" id="h-no-{{ item.subject.id }}">
+                      <button class="accordion-button collapsed mt-5" type="button"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#c-no-{{ item.subject.id }}"
+                              aria-expanded="false"
+                              aria-controls="c-no-{{ item.subject.id }}">
+                        View Students
+                      </button>
+                    </h2>
+                    <div id="c-no-{{ item.subject.id }}" class="accordion-collapse collapse"
+                         aria-labelledby="h-no-{{ item.subject.id }}" data-bs-parent="#acc-no-{{ item.subject.id }}">
+                      <div class="accordion-body p-0 pt-2">
+                        {% if item.students %}
+                          <ul class="list-group list-group-flush">
+                            {% for student in item.students %}
+                              <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="fw-semibold">{{ student.add_name }}</div>
+                                <span class="badge bg-secondary">Roll: {{ student.add_class_roll|default:"" }}</span>
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          <p class="muted fst-italic m-0 py-2">No students enrolled in this subject.</p>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div><!--/card-body-->
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+</div>
+
+<!-- Tiny scripts -->
+<script>
+  // 1) Client-side table filter
+  (function(){
+    const input = document.getElementById('tableFilter');
+    const table = document.getElementById('studentsTable');
+    if(!input || !table) return;
+    input.addEventListener('input', function(){
+      const q = this.value.toLowerCase().trim();
+      const rows = table.tBodies[0]?.rows || [];
+      for(const r of rows){
+        const text = r.innerText.toLowerCase();
+        r.style.display = text.includes(q) ? '' : 'none';
+      }
+    }, {passive:true});
+  })();
+
+  // 2) Subject → Icon mapping (Bootstrap Icons)
+  (function(){
+    const ICON_RULES = [
+      { re: /bangla|bengali/i,                       icon: 'bi-journal-text' },
+      { re: /english/i,                              icon: 'bi-translate' },
+      { re: /ict|computer|information\s*tech/i,      icon: 'bi-pc-display' },
+      { re: /agriculture/i,                          icon: 'bi-flower1' },
+      { re: /arabic/i,                               icon: 'bi-translate' },
+      { re: /civics|governance/i,                    icon: 'bi-people' },
+      { re: /economics/i,                            icon: 'bi-graph-up' },
+      { re: /geography|environment/i,                icon: 'bi-globe2' },
+      { re: /history/i,                              icon: 'bi-hourglass-split' },
+      { re: /home\s*science/i,                       icon: 'bi-house-door' },
+      { re: /islam(ic)?\s*(history|studies)?/i,      icon: 'bi-moon-stars' },
+      { re: /logic/i,                                icon: 'bi-braces' },
+      { re: /psychology/i,                           icon: 'bi-emoji-smile' },
+      { re: /social\s*work|sociology/i,              icon: 'bi-people' },
+      { re: /accounting/i,                           icon: 'bi-journal-check' },
+      { re: /business\s*organization|management|marketing/i, icon: 'bi-briefcase' },
+      { re: /finance|banking|insurance/i,            icon: 'bi-cash-coin' },
+      { re: /statistics/i,                           icon: 'bi-bar-chart-line' },
+      { re: /biology/i,                              icon: 'bi-bug' },
+      { re: /chemistry/i,                            icon: 'bi-droplet' },
+
+      { re: /higher\s*math|mathematics|math/i,       icon: 'bi-calculator' },
+      { re: /physics/i,                              icon: 'bi-magnet' }
+    ];
+    const DEFAULT_ICON = 'bi-book';
+
+    document.querySelectorAll('.subject-icon i.bi[data-subject]').forEach(el=>{
+      const name = (el.dataset.subject || '').trim();
+      let chosen = DEFAULT_ICON;
+      for(const rule of ICON_RULES){
+        if(rule.re.test(name)){ chosen = rule.icon; break; }
+      }
+      el.classList.add(chosen);
+    });
+  })();
+</script>
+
+{% endblock content %}

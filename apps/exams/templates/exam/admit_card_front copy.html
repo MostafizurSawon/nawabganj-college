@@ -1,0 +1,386 @@
+{% load dict_filters %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admit Cards | {{ site_settings.name }}</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Bengali webfonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bn-font: "Hind Siliguri","Noto Sans Bengali",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      --pageW: 210mm;
+      --pageH: 297mm;     /* full A4 */
+      --pad:   10mm;      /* outer equal space */
+      --mid:   20mm;      /* middle double space */
+      --eps:   0mm;       /* used only in PDF to avoid overflow/blank */
+      --hcard: calc((var(--pageH) - (var(--pad) * 2) - var(--mid)) / 2); /* one card height */
+    }
+    html,body{ font-family: var(--bn-font); }
+  
+    /* SCREEN (preview) ----------------------------------------------------- */
+    #admitContainer{ max-width: 794px; margin:12px auto; }
+    .a4-sheet{
+      background:#fff; margin:12px auto; padding: var(--pad);
+      box-sizing:border-box; width:100%;
+      border:1px solid #e5e7eb;
+    }
+    /* flex column -> top card | mid | bottom card */
+    .sheet-inner{ display:flex; flex-direction:column; min-height: 900px; }
+    .mid-slot{ display:flex; align-items:center; height: var(--mid); }
+    .dash-svg{ display:block; width:100%; height:1px; }
+  
+    /* PRINT ONLY ----------------------------------------------------------- */
+    @media print{
+      @page { size: A4 portrait; margin: 0; }
+      body{ -webkit-print-color-adjust: exact; background:#fff !important; }
+      .fixed{ display:none !important; }
+  
+      #admitContainer{ width: var(--pageW); margin:0 auto; }
+      .a4-sheet{
+        width: var(--pageW);
+        height: var(--pageH);
+        padding: var(--pad);
+        margin:0 auto;
+        page-break-after: always;
+        box-sizing:border-box; border:0;
+      }
+      .a4-sheet:last-child{ page-break-after: auto; }
+  
+      .sheet-inner{
+        height: calc(var(--pageH) - (var(--pad) * 2));
+        display:flex; flex-direction:column;
+      }
+      .mid-slot{ height: var(--mid); }
+  
+      .admit-card{
+        height: var(--hcard);                 /* ✅ exact half */
+        border:1px solid #c5c5c5; box-shadow:none;
+      }
+    }
+  
+    /* PDF MODE (during html2pdf) ------------------------------------------ */
+    body.pdf #admitContainer{ width: var(--pageW); margin:0 auto; }
+    body.pdf .a4-sheet{
+      width: var(--pageW);
+      height: calc(var(--pageH) - var(--eps));   /* tiny shrink stops blank page */
+      padding: var(--pad);
+      margin:0 auto; border:0;
+    }
+    body.pdf .sheet-inner{
+      height: calc(var(--pageH) - var(--eps) - (var(--pad) * 2));
+      display:flex; flex-direction:column;
+    }
+    body.pdf .mid-slot{ height: var(--mid); }
+    body.pdf .admit-card{
+      height: calc((var(--pageH) - var(--eps) - (var(--pad) * 2) - var(--mid)) / 2); /* ✅ exact in pdf too */
+    }
+  
+    /* html2pdf helper should not add any visible gap */
+    .html2pdf__page-break{ height:0 !important; margin:0 !important; border:0 !important; }
+  
+    /* Card ----------------------------------------------------------------- */
+    .admit-card{
+      background:#fff; color:#000;
+      border:1px solid #d1d5db; border-radius:6px;
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      padding:12px; box-sizing:border-box; width:100%;
+      break-inside:avoid; page-break-inside:avoid;
+      font-size:11px;
+  
+      /* content up, signature bottom */
+      display:flex; flex-direction:column;
+    }
+  
+    /* Header (✅ fixed) ---------------------------------------------------- */
+    /* 3-column grid: [logo | center | photo] */
+    .header-bar{
+      display:grid;
+      grid-template-columns: auto 1fr auto;
+      align-items:center;
+      gap:10px;
+      width:100%;
+      border:2px solid #1e40af;
+      padding:8px;
+      border-radius:6px;
+      background:linear-gradient(#eaf2ff,#ffffff);
+    }
+  
+    /* center wrapper (works with your existing HTML) */
+    .header-bar > :nth-child(2){
+      min-width:0;            /* allow shrink */
+      text-align:center;
+      padding:0 4px;
+    }
+  
+    .brand-band{
+      color:#1e40af; width:100%; padding:2px 8px; font-weight:700;
+      display:flex; align-items:center; justify-content:center;
+    }
+  
+    /* School name: wrap to max 2 lines, never push photo out */
+    .header-title{
+      font-weight:800;
+      line-height:1.12;
+      /* responsive size but bounded; overrides Tailwind's text-[20px]/[22px] because this block comes later */
+      font-size: clamp(16px, 2.2vw, 22px);
+      /* allow wrapping */
+      white-space: normal !important;
+      word-break: break-word;
+      hyphens: auto;
+      /* limit to 2 lines */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  
+    /* keep the clamp in print/pdf */
+    @media print{
+      .header-title{
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    }
+    body.pdf .header-title{
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  
+    /* ADMIT CARD pill — text-only stronger nudge upward */
+    .badge-red{
+      --pillH: 26px;      /* pill height */
+      --nudge: 1.4px;     /* ↑ টেক্সট কতটা উপরে যাবে (3.0–4.0px টিউন করতে পারেন) */
+      display:inline-block;
+      height:var(--pillH);
+      line-height:calc(var(--pillH) - var(--nudge)); /* কেবল টেক্সট ওপরে */
+      padding:0 14px;
+      background:#ef4444;
+      color:#fff;
+      font-weight:700;
+      font-size:11px;
+      border-radius:9999px;
+      letter-spacing:.2px;
+    }
+    /* Print/PDF — সামান্য বাড়তি নাজ, পিল নড়বে না */
+    @media print{
+      .badge-red{
+        --nudge: 3.8px;
+        position: static !important;
+        top: auto !important;
+      }
+    }
+    body.pdf .badge-red{
+      --nudge: 3.8px;
+      position: static !important;
+      top: auto !important;
+    }
+  
+    /* Info grid ------------------------------------------------------------ */
+    .info-block{ padding-right: 18px; }
+    @media print{ .info-block{ padding-right: 10mm !important; } }
+  
+    .info-grid{
+      display:grid;
+      grid-template-columns:max-content 22px 1fr;
+      align-items:baseline;
+      row-gap:2px;
+    }
+    .info-grid > *:nth-child(3n){ padding-left:6px; }
+    .info-grid > *:nth-child(3n-1){ text-align:right; }
+  
+    /* Subjects (5 + 5) ----------------------------------------------------- */
+    .subjects-wrap{
+      display:grid; grid-template-columns:1fr 1fr; gap:0;
+      border:1px solid #9ca3af; border-radius:4px; overflow:hidden;
+    }
+    .sub-table{ width:100%; border-collapse:collapse; }
+    .sub-table th, .sub-table td{
+      border:1px solid #9ca3af; padding:4px 6px; font-size:11px; line-height:1.2; text-align:left;
+    }
+    .sub-table th{ background:#e5f0ff; text-align:center; font-weight:600; }
+  
+    /* Signatures ----------------------------------------------------------- */
+    .sig-line{
+      border-top:1px solid #6b7280; width:120px; text-align:center;
+      padding-top:3px; font-size:11px;
+    }
+    .sig-row{
+      display:flex; justify-content:space-between; align-items:flex-end;
+      margin-top:auto;        /* signature pushes to bottom of card */
+      padding-top:8px;
+    }
+  
+    /* table note under subjects ------------------------------------------- */
+    .table-note{
+      font-size:10px;
+      text-align:center;
+      margin-top:6px;
+    }
+  </style>
+  
+  
+</head>
+
+<body class="bg-gray-100 pb-28">
+  <!-- Bottom toolbar (screen only) -->
+  <div class="fixed bottom-0 left-0 w-full bg-white z-50 flex justify-center gap-4 py-3 shadow-md print:hidden">
+    {% comment %} <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">🖨️ Print</button> {% endcomment %}
+    <button onclick="downloadPDF()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">⬇️ Download PDF</button>
+  </div>
+
+  <div id="admitContainer">
+    {% for record in students %}
+      {% if forloop.counter0|divisibleby:2 %}
+      <!-- ১ শিট = ১ পেজ -->
+      <div class="a4-sheet">
+        <!-- grid: [top slot | 20mm mid | bottom slot] → সবসময় সমান top/bottom -->
+        <div class="sheet-inner">
+      {% endif %}
+
+          <!-- TOP/BOTTOM SLOT CARD -->
+          <div class="admit-card">
+            <!-- Header -->
+            <div class="header-bar">
+              <!-- left: logo -->
+              <img src="{{ site_settings.logo.url }}" alt="Logo"
+                   class="header-logo w-16 h-16 object-cover rounded-full border" />
+            
+              <!-- center: name + meta + badge -->
+              <div class="brand-wrap">
+                <div class="brand-band">
+                  <div class="header-title">
+                    {{ site_settings.name }}
+                  </div>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-0.5 mt-1 text-[11px]">
+                  <div><span class="font-semibold">Established:</span> {{ site_settings.established|default:"" }}</div>
+                  <div><span class="font-semibold">EIIN No:</span> {{ site_settings.eiin|default:"" }}</div>
+                  <div><span class="font-semibold">Mobile:</span> {{ site_settings.phone|default:"" }}</div>
+                </div>
+                <span class="badge-red inline-block mt-1">ADMIT CARD</span>
+              </div>
+            
+              <!-- right: student photo (fixed size, no shrink) -->
+              {% if record.student.add_photo %}
+                <img src="{{ record.student.add_photo.url }}" alt="Photo"
+                     class="header-photo object-cover rounded border"
+                     style="width:72px;height:86px;">
+              {% endif %}
+            </div>
+            
+
+            <!-- Examinee info -->
+            <div class="grid grid-cols-12 gap-2 mt-2 info-block">
+              <div class="col-span-9">
+                <div class="info-grid">
+                  <div class="font-semibold whitespace-nowrap">Exam Name</div><div>:</div><div>{{ record.exam.exam_name }}</div>
+                  <div class="font-semibold whitespace-nowrap">Examinee Name</div><div>:</div><div>{{ record.student.add_name }}</div>
+                  <div class="font-semibold whitespace-nowrap">Father's Name</div><div>:</div><div>{{ record.student.add_father|default:"" }}</div>
+                  <div class="font-semibold whitespace-nowrap">Mother's Name</div><div>:</div><div>{{ record.student.add_mother|default:"" }}</div>
+                </div>
+              </div>
+              <div class="col-span-3">
+                <div class="info-grid">
+                  <div class="font-semibold whitespace-nowrap">ID No</div><div>:</div><div>{{ record.student.add_class_roll|default:"" }}</div>
+                  <div class="font-semibold whitespace-nowrap">Session</div><div>:</div><div>{{ record.exam.exam_year.name }}</div>
+                  {% if record.student.group %}
+                  <div class="font-semibold whitespace-nowrap">Group</div><div>:</div><div>{{ record.student.get_group_display|default:"" }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Subjects (exact 5 + 5) -->
+            <div class="subjects-wrap mt-2">
+              <table class="sub-table">
+                <thead><tr><th style="width:56px">Code</th><th>Subject Name</th></tr></thead>
+                <tbody>
+                  {% for subject in record.exam.subjects.all|slice:":5" %}
+                    <tr><td class="!text-center">{{ subject.code|default:"" }}</td><td>{{ subject.name }}</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              <table class="sub-table">
+                <thead><tr><th style="width:56px">Code</th><th>Subject Name</th></tr></thead>
+                <tbody>
+                  {% for subject in record.exam.subjects.all|slice:"5:10" %}
+                    <tr><td class="!text-center">{{ subject.code|default:"" }}</td><td>{{ subject.name }}</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-note">N.B: Mobile phone is not allowed in the exam room.</div>
+
+            <!-- Signatures -->
+            <div class="sig-row">
+              <div class="sig-line text-center">Student Signature</div>
+              <div class="sig-line text-center">Head Teacher Signature</div>
+            </div>
+          </div>
+          <small class="block text-center relative top-[5px] print:top-[5px] text-[10px] opacity-80">
+            This is software generated copy. Design & Develop by JBD IT
+          </small>
+          
+
+          {% if not forloop.last and not forloop.counter0|add:1|divisibleby:2 %}
+            <!-- mid dashed – exactly in middle -->
+            <div class="mid-slot" aria-hidden="true">
+              <svg class="dash-svg" viewBox="0 0 100 1" preserveAspectRatio="none">
+                <line x1="0" y1="0.5" x2="100" y2="0.5" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="8 8"/>
+              </svg>
+            </div>
+          {% endif %}
+          
+
+      {% if forloop.counter0|add:1|divisibleby:2 or forloop.last %}
+        </div></div>
+        {% if not forloop.last %}<div class="html2pdf__page-break"></div>{% endif %}
+      {% endif %}
+      
+    {% endfor %}
+    
+  </div>
+
+  <script>
+    const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+    async function downloadPDF(){
+      const root = document.documentElement;
+      // PDF মোড অন + সামান্য shrink to avoid overflow/blank
+      document.body.classList.add('pdf');
+      root.style.setProperty('--eps', '1mm');
+
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+      await new Promise(r => requestAnimationFrame(()=>requestAnimationFrame(r)));
+      await sleep(25);
+
+      const el = document.getElementById('admitContainer');
+      const opt = {
+        margin:[0,0,0,0],
+        filename:'admit_cards_class6-8.pdf',
+        image:{ type:'jpeg', quality:0.98 },
+        html2canvas:{ scale:2, useCORS:true, backgroundColor:'#ffffff', scrollY:0 },
+        jsPDF:{ unit:'mm', format:'a4', orientation:'portrait' },
+        pagebreak:{ mode:['css'] } // আমরা sheet-এর পরে .html2pdf__page-break দিয়েছি
+      };
+      await html2pdf().from(el).set(opt).save();
+
+      document.body.classList.remove('pdf');
+      root.style.removeProperty('--eps');
+    }
+  </script>
+</body>
+</html>

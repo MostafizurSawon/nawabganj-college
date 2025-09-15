@@ -4,6 +4,63 @@
 {% block title %}Admitted Students{% endblock %}
 
 {% block content %}
+<style>
+  /* ---------- Table layout & widths ---------- */
+  .table th, .table td { vertical-align: middle; }
+
+  .name-column   { width: 30%; }
+  .mobile-column { width: 15%; white-space: nowrap; font-family: monospace; }
+  .roll-column, .group-column, .trxid-column { width: 5%; }
+
+  /* ✅ Actions column: small, single line, no wrap */
+  .actions-column {
+    width: 80px;
+    min-width: 80px;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  /* Square, compact icon buttons */
+  .btn-icon {
+    --btn-size: 28px;
+    width: var(--btn-size);
+    height: var(--btn-size);
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .btn-icon i { font-size: 16px; }
+  .actions-column .btn-group { gap: .25rem; }
+
+  /* Status column compact */
+  .status-column { width: 8%; min-width: 120px; }
+  .status-column .d-flex { flex-wrap: wrap; gap: .25rem; }
+  .status-column .btn, .status-column .badge { font-size: .75rem; padding: .25rem .5rem; }
+
+  /* Remove any accidental shadows on action buttons (theme safe) */
+  .actions-column, .actions-column a.btn {
+    box-shadow: none !important;
+    background-color: transparent !important;
+  }
+
+  {% comment %} .trxid-column { white-space: nowrap; } {% endcomment %}
+
+  /* ছোট আইকন বাটন */
+  .btn-icon-xs {
+    --btn-size: 24px;
+    width: var(--btn-size);
+    height: var(--btn-size);
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .btn-icon-xs i { font-size: 14px; }
+</style>
+
 <div class="flex-grow-1 container-p-y">
 
   {% if messages %}
@@ -15,43 +72,18 @@
     {% endfor %}
   {% endif %}
 
-  <div class="card mb-4">
-    <h3 class="m-4 text-center">Admitted Students </h3>
-    <div class="card-header d-flex justify-content-between align-items-center">
+  <div class="card mb-4 p-2">
+    <h3 class="m-4">Admitted Students</h3>
 
+    {% comment %} <a href="{% url 'subject_wise_students' %}" target="_blank" rel="noopener noreferrer">Subject student</a> {% endcomment %}
 
-      <form method="get" class="w-100">
-        <div class="row g-2 align-items-end">
-
-          <div class="col-md-3">
+    <div class="px-2">
+      <form method="get" class="col-md-12">
+        <div class="row g-2 d-flex justify-content-end align-items-end">
+          <div class="col-md-5">
             <label class="form-label">Search</label>
-            <input type="text" name="search" class="form-control" placeholder="Search name/roll..." value="{{ request.GET.search }}">
+            <input type="text" name="search" class="form-control" placeholder="Search by Payment Student ID, name, mobile, roll..." value="{{ request.GET.search }}">
           </div>
-
-          {% comment %} <div class="col-md-3">
-            <label class="form-label">Session</label>
-            <select name="session" class="form-select">
-              <option value="">All Sessions</option>
-              {% for ses in sessions %}
-                <option value="{{ ses.id }}" {% if request.GET.session == ses.id|stringformat:"s" %}selected{% endif %}>
-                  {{ ses.ses_name }}
-                </option>
-              {% endfor %}
-            </select>
-          </div> {% endcomment %}
-
-          {% comment %} <div class="col-md-2">
-            <label class="form-label">Program</label>
-            <select name="program" class="form-select">
-              <option value="">All Programs</option>
-              {% for prog in programs %}
-                <option value="{{ prog.id }}" {% if request.GET.program == prog.id|stringformat:"s" %}selected{% endif %}>
-                  {{ prog.pro_name }}
-                </option>
-              {% endfor %}
-            </select>
-          </div> {% endcomment %}
-
           <div class="col-md-3">
             <label class="form-label">Group</label>
             <select name="group" class="form-select">
@@ -61,109 +93,231 @@
               {% endfor %}
             </select>
           </div>
-
-
-          {% comment %} <div class="col-md-3">
-            <label class="form-label">Group</label>
-            <select name="group" class="form-select">
-              <option value="">All Groups</option>
-              {% for g in groups %}
-                {% if g == 'science' %}
-                  <option value="Science" {% if request.GET.group == 'Science' %}selected{% endif %}>Science</option>
-
-                {% elif g == 'arts' %}
-                  <option value="Arts" {% if request.GET.group == 'Arts' %}selected{% endif %}>Humanities</option>
-                {% elif g == 'commerce' %}
-                  <option value="Commerce" {% if request.GET.group == 'Commerce' %}selected{% endif %}>Business Studies</option>
-                {% else %}
-                  <option value="{{ g }}" {% if request.GET.group == g %}selected{% endif %}>{{ g }}</option>
-                {% endif %}
-              {% endfor %}
-            </select>
-          </div> {% endcomment %}
-
-
-          <div class="col-md-3 d-flex gap-2">
+          <div class="col-md-2 d-flex gap-2">
             <button type="submit" class="btn btn-primary w-100">Filter</button>
             <a href="{% url 'admitted_students_list' %}" class="btn btn-outline-secondary w-100">Reset</a>
           </div>
 
+          <!-- এই ব্লকের পরে আরেকটা ছোট ব্লক -->
+          <div class="col-md-2 d-flex justify-content-end mt-2">
+            <a class="btn btn-sm btn-success" href="?{% if request.GET.search %}search={{ request.GET.search }}&amp;{% endif %}{% if request.GET.session %}session={{ request.GET.session }}&amp;{% endif %}{% if request.GET.program %}program={{ request.GET.program }}&amp;{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&amp;{% endif %}{% if request.GET.order %}order={{ request.GET.order }}&amp;{% endif %}export=csv">
+              Download CSV
+            </a>
+          </div>
         </div>
       </form>
-
-
     </div>
 
-    <div class="table-responsive p-4">
-      <p class="ms-4 text-muted">Total students: {{ page_obj.paginator.count }}</p>
-      {% comment %} <a href="{% url 'generate_admission_pdfs' %}?{{ request.GET.urlencode }}" class="btn btn-sm btn-primary mb-3">
-        📄 Download PDF
-      </a> {% endcomment %}
+    <!-- Ascending/Descending buttons -->
+    <div class="col-md-3 d-flex gap-2 p-2 justify-content-center mt-3">
+      {% if request.GET.order == 'desc' %}
+        <a href="?{% if request.GET.search %}search={{ request.GET.search }}&amp;{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&amp;{% endif %}order=asc" class="btn btn-secondary w-50">Asc</a>
+        <a href="?{% if request.GET.search %}search={{ request.GET.search }}&amp;{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&amp;{% endif %}order=desc" class="btn btn-primary w-50">Desc</a>
+      {% else %}
+        <a href="?{% if request.GET.search %}search={{ request.GET.search }}&amp;{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&amp;{% endif %}order=asc" class="btn btn-primary w-50">Asc</a>
+        <a href="?{% if request.GET.search %}search={{ request.GET.search }}&amp;{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&amp;{% endif %}order=desc" class="btn btn-secondary w-50">Desc</a>
+      {% endif %}
+    </div>
 
+    <div class="table-responsive p-2">
+      <p class="ms-0 text-muted">Total students: {{ page_obj.paginator.count }}</p>
 
       <table class="table table-hover table-bordered">
         <thead class="table-light">
           <tr>
-            <th>#</th>
-            <th style="width: 100px;">Actions</th>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Roll</th>
-            <th>Group</th>
-            <th>Session</th>
-            <th>Program</th>
-
+            <th class="roll-column">Roll</th>
+            <th class="roll-column">Class ID</th>
+            <th class="actions-column">Actions</th>
+            <th class="name-column">Name</th>
+            <th class="mobile-column">Mobile</th>
+            <th class="group-column">Group</th>
+            <th class="trxid-column">TrxID</th>
+            <th class="status-column">Status</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="text-center">
           {% for student in students %}
             <tr>
-              <td>{{ forloop.counter }}</td>
-              <td class="d-flex justify-content-between">
-                <a href="{% url 'hsc_admission_view' student.id %}" target="_blank" class="btn btn-sm btn-outline-info me-1" title="View">
-                  {% comment %} <i class="ti ti-eye"></i> {% endcomment %} Print
-                </a>
+              <td class="roll-column">{{ student.add_class_roll|default:"" }}</td>
+              <td class="roll-column">{{ student.add_class_id|default:"" }}</td>
 
-
-
-                {% if student.add_admission_group == 'arts' %}
-                  <a href="{% url 'hsc_admission_update_arts' student.id %}" class="btn btn-icon btn-sm btn-outline-warning me-1" title="Edit">
-                    <i class="ti ti-pencil"></i>
+              <!-- ✅ Compact actions cell -->
+              <td class="actions-column text-center">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Actions">
+                  <!-- Print / View -->
+                  <a href="{% url 'hsc_admission_view' student.id %}"
+                     target="_blank"
+                     class="btn btn-outline-info btn-icon"
+                     title="Print / View">
+                    <i class="ti ti-printer"></i>
                   </a>
-                {% else %}
-                  <a href="{% url 'hsc_admission_update' student.id %}" class="btn btn-icon btn-sm btn-outline-warning me-1" title="Edit">
-                    <i class="ti ti-pencil"></i>
+
+                  <!-- Edit (group wise) -->
+                  {% if student.add_admission_group == 'arts' %}
+                    <a href="{% url 'hsc_admission_update_arts' student.id %}"
+                       class="btn btn-outline-warning btn-icon"
+                       title="Edit">
+                      <i class="ti ti-pencil"></i>
+                    </a>
+                  {% elif student.add_admission_group == 'commerce' %}
+                    <a href="{% url 'hsc_admission_update_business' student.id %}"
+                       class="btn btn-outline-warning btn-icon"
+                       title="Edit">
+                      <i class="ti ti-pencil"></i>
+                    </a>
+                  {% else %}
+                    <a href="{% url 'hsc_admission_update' student.id %}"
+                       class="btn btn-outline-warning btn-icon"
+                       title="Edit">
+                      <i class="ti ti-pencil"></i>
+                    </a>
+                  {% endif %}
+
+                  <!-- Delete -->
+                  <a href="{% url 'hsc_admission_delete' student.id %}"
+                     class="btn btn-outline-danger btn-icon"
+                     title="Delete"
+                     onclick="return confirm('Are you sure you want to delete this admission? This action cannot be undone!')">
+                    <i class="ti ti-trash"></i>
                   </a>
-                {% endif %}
-
-
-
-                <a href="{% url 'hsc_admission_delete' student.id %}"
-                  class="btn btn-icon btn-sm btn-outline-danger"
-                  title="Delete"
-                  onclick="return confirm('Are you sure you want to delete this admission? This action cannot be undone!')">
-                  <i class="ti ti-trash"></i>
-                </a>
-
+                </div>
               </td>
-              <td>{{ student.add_name }}</td>
-              <td>{{ student.add_mobile }}</td>
-              <td>{{ student.add_class_roll }}</td>
-              {% comment %} <td>{{ student.add_admission_group|title }}</td> {% endcomment %}
-              <td>{{ student.get_add_admission_group_display }}</td>
 
-              <td>{{ student.add_session.ses_name }}</td>
-              <td>{{ student.add_program.pro_name }}</td>
+              <td class="name-column">
+                {{ student.add_name }}
+                <br>
+                <span class="badge bg-primary rounded-pill mt-2">Payment Student ID: {{ student.created_by.id|default:"" }}</span>
+              </td>
+              <td class="mobile-column">{{ student.add_mobile }}</td>
+              <td class="group-column">{{ student.get_add_admission_group_display }}</td>
+
+              <td class="trxid-column">
+                {% if student.add_trxid %}
+                  <div class="d-inline-flex align-items-center gap-1">
+                    <span id="trx-{{ student.id }}" class="fw-semibold small">{{ student.add_trxid }}</span>
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-icon-xs copy-trxid"
+                            data-target="#trx-{{ student.id }}"
+                            title="Copy TrxID">
+                      <i class="ti ti-copy"></i>
+                    </button>
+                  </div>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
 
 
+              <td class="status-column text-nowrap">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge d-inline-flex align-items-center px-2 py-1
+                    {% if student.add_payment_status == 'paid' %} bg-success
+                    {% elif student.add_payment_status == 'pending' %} bg-warning text-dark
+                    {% elif student.add_payment_status == 'unpaid' %} bg-danger
+                    {% else %} bg-secondary
+                    {% endif %}">
+                    <i class="ti
+                      {% if student.add_payment_status == 'paid' %} ti-circle-check
+                      {% elif student.add_payment_status == 'pending' %} ti-clock
+                      {% elif student.add_payment_status == 'unpaid' %} ti-circle-x
+                      {% else %} ti-dots
+                      {% endif %} me-1"></i>
+                    {{ student.get_add_payment_status_display|default:"N/A" }}
+                  </span>
+
+                  <a href="#"
+                     class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center"
+                     title="Update payment"
+                     data-bs-toggle="modal"
+                     data-bs-target="#payModal-{{ student.id }}">
+                    <i class="ti ti-credit-card me-1"></i> Pay
+                  </a>
+
+                  {% if student.add_payment_status == 'paid' %}
+                    <a href="{% url 'hsc_admission_invoice' student.id %}"
+                       class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
+                       title="View/Download invoice">
+                      <i class="ti ti-file-invoice me-1"></i> Invoice
+                    </a>
+                  {% else %}
+                    <a href="#"
+                       class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center disabled"
+                       title="Invoice available after payment"
+                       tabindex="-1" aria-disabled="true" onclick="return false;">
+                      <i class="ti ti-file-invoice me-1"></i> Invoice
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="8" class="text-center">No students found.</td>
+              <td colspan="7" class="text-center">No students found.</td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
+
+      <!-- Payment modal per student -->
+      {% for student in students %}
+        <div class="modal fade" id="payModal-{{ student.id }}" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+              <form method="post" action="{% url 'hsc_payment_update' student.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                <div class="modal-header">
+                  <h5 class="modal-title">
+                    Payment Review — {{ student.add_name }}
+                    <span class="badge bg-primary rounded-pill">Payment Student ID: {{ student.created_by.id|default:"N/A" }}</span>
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                  {% if student.payment_form.non_field_errors %}
+                    <div class="alert alert-danger mb-3">{{ student.payment_form.non_field_errors }}</div>
+                  {% endif %}
+
+                  <div class="row g-3">
+                    <div class="col-md-4">
+                      <label class="form-label">Payment Method</label>
+                      {{ student.payment_form.add_payment_method }}
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Amount</label>
+                      {{ student.payment_form.add_amount }}
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Transaction ID</label>
+                      {{ student.payment_form.add_trxid }}
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Payment From</label>
+                      {{ student.payment_form.add_slip }}
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Payment Status</label>
+                      {{ student.payment_form.add_payment_status }}
+                    </div>
+                    <div class="col-md-12">
+                      <label class="form-label">Teacher Note</label>
+                      {{ student.payment_form.add_payment_note }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary">Save</button>
+                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+
     </div>
 
     <div class="alert alert-info mx-4">
@@ -173,52 +327,45 @@
       Total pages: {{ page_obj.paginator.num_pages }}
     </div>
 
-
-    <div class="card-footer d-flex justify-content-end">
-    {% if is_paginated %}
-      <nav>
-        <ul class="pagination pagination-sm">
-          {% if page_obj.has_previous %}
-            <li class="page-item">
-              <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.session %}session={{ request.GET.session }}&{% endif %}{% if request.GET.program %}program={{ request.GET.program }}&{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&{% endif %}page={{ page_obj.previous_page_number }}">
-                «
-              </a>
-            </li>
-          {% endif %}
-
-          {% for i in paginator.page_range %}
-            {% if i <= 2 or i > paginator.num_pages|add:'-2' or i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
-              <li class="page-item {% if page_obj.number == i %}active{% endif %}">
-                <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.session %}session={{ request.GET.session }}&{% endif %}{% if request.GET.program %}program={{ request.GET.program }}&{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&{% endif %}page={{ i }}">{{ i }}</a>
-
+    <div class="card-footer d-flex justify-content-center">
+      {% if is_paginated %}
+        <nav>
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.session %}session={{ request.GET.session }}&{% endif %}{% if request.GET.program %}program={{ request.GET.program }}&{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&{% endif %}page={{ page_obj.previous_page_number }}">«</a>
               </li>
-            {% elif i == 3 or i == paginator.num_pages|add:'-3' %}
-              <li class="page-item disabled"><span class="page-link">…</span></li>
             {% endif %}
-          {% endfor %}
 
+            {% for i in paginator.page_range %}
+              {% if i <= 2 or i > paginator.num_pages|add:'-2' or i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
+                <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                  <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.session %}session={{ request.GET.session }}&{% endif %}{% if request.GET.program %}program={{ request.GET.program }}&{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&{% endif %}page={{ i }}">{{ i }}</a>
+                </li>
+              {% elif i == 3 or i == paginator.num_pages|add:'-3' %}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+              {% endif %}
+            {% endfor %}
 
-          {% if page_obj.has_next %}
-            <li class="page-item">
-              <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.session %}session={{ request.GET.session }}&{% endif %}{% if request.GET.program %}program={{ request.GET.program }}&{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&{% endif %}page={{page_obj.next_page_number }}">
-                »
-              </a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-    {% endif %}
-  </div>
-
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.session %}session={{ request.GET.session }}&{% endif %}{% if request.GET.program %}program={{ request.GET.program }}&{% endif %}{% if request.GET.group %}group={{ request.GET.group }}&{% endif %}page={{ page_obj.next_page_number }}">»</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+    </div>
   </div>
 </div>
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const paginationLinks = document.querySelectorAll(".pagination .page-link");
 
     paginationLinks.forEach(link => {
       link.addEventListener("click", function (e) {
-        e.preventDefault(); // ❗ Stop default navigation
+        e.preventDefault();
         const targetUrl = this.href;
 
         window.scrollTo({
@@ -226,14 +373,74 @@
           behavior: "smooth"
         });
 
-        // Wait for scroll to finish before navigating
-        setTimeout(() => {
-          window.location.href = targetUrl;
-        }, 300); // Adjust delay if needed
+        setTimeout(() => { window.location.href = targetUrl; }, 300);
       });
     });
   });
+
+
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.copy-trxid');
+    if (!btn) return;
+
+    // 1) If points to a target element (span/input)
+    let val = '';
+    const targetSel = btn.getAttribute('data-target');
+    if (targetSel) {
+      const el = document.querySelector(targetSel);
+      if (el) val = (el.value ?? el.innerText ?? el.textContent ?? '').trim();
+    }
+
+    // 2) If explicit text provided
+    if (!val && btn.dataset.clipboardText) {
+      val = (btn.dataset.clipboardText || '').trim();
+    }
+
+    // 3) Fallback: search input/textarea inside same input-group
+    if (!val) {
+      const input = btn.closest('.input-group')?.querySelector('input, textarea');
+      val = (input?.value || '').trim();
+    }
+
+    const flash = (html, ok=true) => {
+      const old = btn.innerHTML;
+      const oldClasses = btn.className;
+      btn.innerHTML = html;
+      btn.classList.remove('btn-outline-secondary');
+      btn.classList.add(ok ? 'btn-success' : 'btn-danger');
+      setTimeout(() => {
+        btn.innerHTML = old;
+        btn.className = oldClasses;
+      }, 1200);
+    };
+
+    if (!val) {
+      flash('<i class="ti ti-alert-circle"></i>', false);
+      return;
+    }
+
+    // Copy to clipboard
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(val)
+        .then(() => flash('<i class="ti ti-check"></i>', true))
+        .catch(() => flash('<i class="ti ti-x"></i>', false));
+    } else {
+      // Fallback for non-secure context
+      const ta = document.createElement('textarea');
+      ta.value = val;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        flash('<i class="ti ti-check"></i>', true);
+      } catch (_) {
+        flash('<i class="ti ti-x"></i>', false);
+      } finally {
+        document.body.removeChild(ta);
+      }
+    }
+  });
 </script>
-
-
 {% endblock %}

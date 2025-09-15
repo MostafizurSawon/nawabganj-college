@@ -1,0 +1,271 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<title>Subject Students – {{ selected_subject.sub_name|default:"" }}</title>
+<link rel="shortcut icon" type="image/x-icon" href="{% static 'cus/logo.png' %}" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* --- Page setup --- */
+  @page { size: A4; margin: 6mm; }
+  :root{ --ink:#111; --light-ink:#555; --brand:#c21a1a; --line:#444; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:#f5f6f8; color:var(--ink); font-family: Arial, Helvetica, sans-serif; }
+
+  /* Canvas page container (screen view) */
+  .page{ width:210mm; margin:12px auto; background:#fff; padding:12mm; overflow:visible; transform-origin: top left; }
+
+  /* Toolbar (screen only) */
+  .toolbar{ display:flex; gap:8px; justify-content:space-between; align-items:center; width:210mm; margin:12px auto 0; }
+  .btn{ background:#1a93c2; color:#fff; border:0; padding:6px 12px; font-size:12px; border-radius:4px; cursor:pointer; }
+  .btn.back{ background:#555; }
+  .btn a{ color:#fff; text-decoration:none; }
+  @media print{ .toolbar{ display:none !important; } }
+
+  /* Header */
+  .header{ display:grid; grid-template-columns:60px 1fr 105px; align-items:center; gap:10px; border-bottom:1.5px solid var(--line); padding-bottom:8px; margin-bottom:8px; }
+  .logo{ width:90px; height:85px; object-fit:contain; }
+  .inst{ text-align:center; }
+  .inst h1{ margin:0; font-size:28px; color:var(--brand); letter-spacing:.2px; }
+  .inst .meta{ margin-top:2px; font-size:14px; color:var(--light-ink); }
+
+  /* Title bar */
+  .titlebar{
+    display:grid; grid-template-columns:1fr auto 1fr;
+    align-items:center; padding:4px 6px; background:#fafafa;
+    border:1px solid var(--line); margin:8px 0 10px; font-size:11px;
+  }
+  .titlebar .left{ justify-self:start; font-weight:700; }
+  .titlebar .center{ justify-self:center; font-weight:700; font-size:12px; }
+  .titlebar .right{ justify-self:end; color:var(--light-ink); }
+
+  /* Table */
+  .table-wrap{ margin-top:6px; }
+  table.list{ width:100%; border-collapse:collapse; }
+  .list th, .list td{ border:1px solid var(--line); padding:4px 6px; font-size:11px; }
+  .list th{ background:#f7f7f7; text-align:left; font-weight:700; }
+  .muted{ color:#666; }
+
+  /* Footer (screen spacing only; PDF is bottom-anchored via JS) */
+  .footer-note{ margin-top:30px; text-align:center; font-size:11px; color:#555; }
+
+  /* Print tweaks */
+  @media print{
+    body{ background:#fff; }
+    .page{ page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+    .list th,.list td{ padding:3.5px 5px; font-size:10px; }
+    .inst h1{ font-size:26px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SCREEN-ONLY TOOLBAR -->
+<div class="toolbar">
+  <button class="btn back" onclick="window.close()">← Close</button>
+  <div style="display:flex; gap:8px;">
+    <button class="btn" id="pdfBtn">⬇ Download PDF</button>
+    {% comment %} <button class="btn" id="printBtn">🖨️ Print</button> {% endcomment %}
+  </div>
+</div>
+
+<!-- A4 CONTENT -->
+<div class="page" id="a4-page">
+
+  <!-- FIXED HEADER (repeats on each PDF page) -->
+  <div id="pdf-header">
+    <div class="header">
+      <img src="{% static 'cus/logo.png' %}" class="logo" alt="Logo">
+      <div class="inst">
+        <h1>{{ institute_name|default:"নবাবগঞ্জ সিটি কলেজ" }}</h1>
+        <div class="meta">EIIN: {{ eiin|default:"124596" }} &nbsp;|&nbsp; কোড: 2626 &nbsp;|&nbsp; ফোন: {{ phone|default:"01309124596" }}</div>
+      </div>
+      {% comment %} <div class="photo-wrap">PDF</div> {% endcomment %}
+    </div>
+
+    <div class="titlebar">
+      <div class="left">Total Students: {{ total_count }}</div>
+      <div class="center">
+        {% if selected_subject %}
+          SUBJECT: {{ selected_subject.sub_name }}{% if selected_subject.code %} ({{ selected_subject.code }}){% endif %}
+        {% else %}
+          SUBJECT: —
+        {% endif %}
+      </div>
+      <div class="right">Session: {{ active_session_name|default:"All" }}</div>
+    </div>
+  </div>
+
+  <!-- FLOW CONTENT (will be sliced across pages) -->
+  <div id="pdf-body" class="table-wrap">
+    {% if students %}
+      <table class="list" id="main-table">
+        <thead>
+          <tr>
+            <th style="width:40px;">Roll</th>
+            <th>Student</th>
+            <th style="width:90px;">Mobile</th>
+            <th style="width:90px;"></th>
+            <th style="width:90px;"></th>
+            <th style="width:90px;"></th>
+            <th style="width:90px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+            <tr>
+              <td>{{ s.add_class_roll|default:"" }}</td>
+              <td>{{ s.add_name|default:"" }}</td>
+              <td>{{ s.add_mobile|default:"" }}</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="muted">No students found for this subject.</div>
+    {% endif %}
+  </div>
+
+  <!-- FIXED FOOTER (repeats on each PDF page) -->
+  <div id="pdf-footer" class="footer-note">
+    &copy; {% now "Y" %} Design & Develope by JBD IT
+  </div>
+</div>
+
+<!-- libs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" referrerpolicy="no-referrer"></script>
+
+<script>
+(function() {
+  const A4_W_PT = 595.28, A4_H_PT = 841.89;     // jsPDF A4 (pt)
+  const MARGIN_PT = 17.01;                      // ~6mm
+  const INNER_W_PT = A4_W_PT - MARGIN_PT * 2;
+  const INNER_H_PT = A4_H_PT - MARGIN_PT * 2;
+
+  const H2C_OPTS = { scale: 2, useCORS: true, backgroundColor: '#ffffff' };
+
+  function ptFromCanvas(imgWpx, imgHpx, targetWpt) {
+    const ratio = targetWpt / imgWpx;
+    return { w: targetWpt, h: imgHpx * ratio, scale: ratio };
+  }
+
+  async function toCanvas(node) {
+    if (!node) return null;
+    H2C_OPTS.windowWidth = node.scrollWidth || node.clientWidth || 794; // ~A4@96dpi
+    return await html2canvas(node, H2C_OPTS);
+  }
+
+  // Row boundary cut positions in canvas pixels (avoid cutting rows)
+  function getRowCutPositionsCanvas(bodyNode, bodyCanvas) {
+    const tbody = bodyNode.querySelector('tbody');
+    if (!tbody) return [0, bodyCanvas.height];
+
+    const bodyRectTop = bodyNode.getBoundingClientRect().top + window.scrollY;
+    const domTotalH = bodyNode.scrollHeight || bodyNode.offsetHeight;
+    const canvasPerDom = bodyCanvas.height / Math.max(1, domTotalH);
+
+    const rows = Array.from(tbody.rows);
+    const cuts = [0];
+    for (const tr of rows) {
+      const rBottomDom = tr.getBoundingClientRect().bottom + window.scrollY - bodyRectTop;
+      cuts.push(Math.round(rBottomDom * canvasPerDom));
+    }
+    cuts[cuts.length - 1] = bodyCanvas.height; // ensure full content
+    return cuts;
+  }
+
+  async function exportToPDF(filename) {
+    const headerNode = document.getElementById('pdf-header');
+    const bodyNode   = document.getElementById('pdf-body');
+    const footerNode = document.getElementById('pdf-footer');
+    if (!bodyNode) return;
+
+    const [headerCV, bodyCV, footerCV] = await Promise.all([
+      toCanvas(headerNode),
+      toCanvas(bodyNode),
+      toCanvas(footerNode)
+    ]);
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
+
+    // scale header & footer
+    const headPT = headerCV ? ptFromCanvas(headerCV.width, headerCV.height, INNER_W_PT) : { w:0, h:0, scale:1 };
+    const footPT = footerCV ? ptFromCanvas(footerCV.width, footerCV.height, INNER_W_PT) : { w:0, h:0, scale:1 };
+
+    // Add a little gap above footer
+    const EXTRA_GAP_PT = 14;
+    const availBodyPT = Math.max(10, INNER_H_PT - headPT.h - footPT.h - EXTRA_GAP_PT);
+    const bodyScalePTperPX = INNER_W_PT / bodyCV.width;           // PT per canvas PX (width scale)
+    const maxSliceCanvasH  = Math.floor(availBodyPT / bodyScalePTperPX);
+
+    // Cut on row edges
+    const rowCuts = getRowCutPositionsCanvas(bodyNode, bodyCV);
+
+    // helper canvas
+    const pageCanvas = document.createElement('canvas');
+    pageCanvas.width = bodyCV.width;
+    const pageCtx = pageCanvas.getContext('2d');
+
+    let start = 0;
+    let first = true;
+
+    while (start < bodyCV.height) {
+      // choose largest cut <= page capacity
+      let end = start;
+      for (let i = 0; i < rowCuts.length; i++) {
+        const c = rowCuts[i];
+        if (c <= start) continue;
+        if (c - start <= maxSliceCanvasH) end = c; else break;
+      }
+      if (end === start) end = Math.min(start + maxSliceCanvasH, bodyCV.height); // long single row fallback
+
+      const hpx = Math.max(1, end - start);
+      pageCanvas.height = hpx;
+      pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+      pageCtx.drawImage(bodyCV, 0, start, bodyCV.width, hpx, 0, 0, bodyCV.width, hpx);
+
+      if (!first) pdf.addPage();
+      first = false;
+
+      // Header (top)
+      if (headerCV) {
+        pdf.addImage(headerCV.toDataURL('image/png'), 'PNG', MARGIN_PT, MARGIN_PT, headPT.w, headPT.h);
+      }
+
+      // Body slice (fills space between header and footer)
+      const bodyHpt = hpx * bodyScalePTperPX;
+      pdf.addImage(pageCanvas.toDataURL('image/png'), 'PNG',
+        MARGIN_PT, MARGIN_PT + headPT.h, INNER_W_PT, bodyHpt);
+
+      // Footer (bottom anchored)
+      if (footerCV) {
+        const footerY = A4_H_PT - MARGIN_PT - footPT.h; // stick to bottom
+        pdf.addImage(footerCV.toDataURL('image/png'), 'PNG',
+          MARGIN_PT, footerY, footPT.w, footPT.h);
+      }
+
+      start = end;
+    }
+
+    const subject = "{{ selected_subject.sub_name|default:'Subject' }}";
+    const safe = (subject || 'Subject').replace(/[^A-Za-z0-9_()-]+/g, '_');
+    pdf.save(`${safe}_Students.pdf`);
+  }
+
+  document.getElementById('pdfBtn')?.addEventListener('click', () => {
+    exportToPDF();
+  });
+
+  document.getElementById('printBtn')?.addEventListener('click', () => window.print());
+})();
+</script>
+
+</body>
+</html>

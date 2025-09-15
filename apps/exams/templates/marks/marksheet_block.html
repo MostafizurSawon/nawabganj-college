@@ -1,0 +1,104 @@
+<div class="a4-container" style="margin-bottom: 50px;">
+    <div class="header">
+      <img src="{{ site_settings.logo.url }}" alt="School Logo" style="width: 80px;">
+      <h1>{{ site_settings.name }}</h1>
+      <p>{{ site_settings.post }}, {{ site_settings.upozilla }}, {{ site_settings.district }}</p>
+      <h2>{{ record.exam.exam_name }}</h2>
+    </div>
+  
+    <div class="student-info">
+      <div class="student-info-left">
+        <table>
+          <tr><td><strong>Student's Name:</strong></td><td>{{ record.student.add_name }}</td></tr>
+          <tr><td><strong>Class:</strong></td><td>{{ record.exam.exam_class.name }}</td></tr>
+        </table>
+      </div>
+      <div class="student-info-right">
+        <table>
+          <tr><td><strong>SID:</strong></td><td>{{ record.student.add_class_roll }}</td></tr>
+          <tr><td><strong>Class ID:</strong></td><td>{{ record.student.add_class_roll }}</td></tr>
+        </table>
+      </div>
+    </div>
+  
+    <div class="grade-table-container">
+      <table class="marks-table">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>CQ</th>
+            <th>MCQ</th>
+            {% if record.exam.exam_class.name not in "6 7 8" %}
+            <th>Practical</th>
+            {% endif %}
+            <th>CT</th>
+            <th>Total</th>
+            <th>Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mark in subject_marks %}
+          <tr>
+            <td>{{ mark.subject.name }}</td>
+            <td>{{ mark.cq_mark|default:"-" }}</td>
+            <td>{{ mark.mcq_mark|default:"-" }}</td>
+            {% if record.exam.exam_class.name not in "6 7 8" %}
+            <td>{{ mark.practical_mark|default:"-" }}</td>
+            {% endif %}
+            <td>{{ mark.ct_mark|default:"-" }}</td>
+            <td>{{ mark.total_mark }}</td>
+            <td>{{ mark.grade|default:"-" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+  
+      <div style="width: 18%;">
+        <table class="grade-legend">
+          <thead>
+            <tr><th>Letter</th><th>Range</th><th>GP</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>A+</td><td>80–100</td><td>5</td></tr>
+            <tr><td>A</td><td>70–79</td><td>4</td></tr>
+            <tr><td>A-</td><td>60–69</td><td>3.5</td></tr>
+            <tr><td>B</td><td>50–59</td><td>3</td></tr>
+            <tr><td>C</td><td>40–49</td><td>2</td></tr>
+            <tr><td>D</td><td>33–39</td><td>1</td></tr>
+            <tr><td>F</td><td>0–32</td><td>0</td></tr>
+          </tbody>
+        </table>
+        <table class="grade-legend" style="margin-top: 10px;">
+          <tr><td><strong>Total</strong></td><td><strong>GPA</strong></td><td><strong>Grade</strong></td></tr>
+          <tr>
+            <td>{{ record.total_marks }}</td>
+            <td>{{ gpa|default:"N/A" }}</td>
+            <td>{{ record.grade }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  
+    <div class="attendance-report" style="margin-top: 15px;">
+      <table>
+        <thead><tr><th colspan="2">Attendance Report</th></tr></thead>
+        <tbody>
+          <tr><td>Name of the Examination</td><td>{{ record.exam.exam_name }}</td></tr>
+          <tr><td>Attendance</td><td> - </td></tr>
+          <tr><td>Working Days</td><td> - </td></tr>
+        </tbody>
+      </table>
+    </div>
+  
+    <div style="margin-top: 15px; font-size: 14px;">
+      <strong>Class Teacher's Comment:</strong>
+      <div style="border: 1px solid black; height: 40px; margin-top: 5px;">{{ record.remarks }}</div>
+    </div>
+  
+    <div class="signatures">
+      <div class="signature-block"><p class="signature-line"></p><p>Class Teacher</p></div>
+      <div class="signature-block"><p class="signature-line"></p><p>Guardian</p></div>
+      <div class="signature-block"><p class="signature-line"></p><p>Head Teacher</p></div>
+    </div>
+  </div>
+  

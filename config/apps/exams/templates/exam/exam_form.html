@@ -1,0 +1,262 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}New Exam{% endblock %}
+
+{% block content %}
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+<div class="card flex-grow-1 p-4">
+  <h4 class="fw-bold py-3 mb-4">
+    <span class="text-muted fw-light">Exam /</span> {{ form.instance.pk|yesno:"Edit,Create" }}
+  </h4>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Exam Form -->
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label" for="{{ form.exam_name.id_for_label }}">Exam Name</label>
+        {{ form.exam_name }}
+        {{ form.exam_name.errors }}
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label" for="{{ form.exam_session.id_for_label }}">Session</label>
+        {{ form.exam_session }}
+        {{ form.exam_session.errors }}
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label" for="{{ form.exam_class.id_for_label }}">Program</label>
+        {{ form.exam_class }}
+        {{ form.exam_class.errors }}
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label" for="{{ form.group_name.id_for_label }}">Group</label>
+        {{ form.group_name }}
+        {{ form.group_name.errors }}
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label" for="{{ form.exam_start_date.id_for_label }}">Start Date</label>
+        {{ form.exam_start_date }}
+        {{ form.exam_start_date.errors }}
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label" for="{{ form.exam_end_date.id_for_label }}">End Date</label>
+        {{ form.exam_end_date }}
+        {{ form.exam_end_date.errors }}
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <button type="button" class="btn btn-outline-primary" id="show-subjects-btn">
+        Show Subjects
+      </button>
+    </div>
+
+    <!-- Subject container -->
+    <div id="subject-container" class="row" style="display: none;">
+      <label class="form-label mb-2">Subjects</label>
+      <div id="subject-list" class="row"></div>
+    </div>
+
+    <div class="mt-3">
+      <button type="submit" class="btn btn-primary">Save Exam</button>
+      {% if form.instance.pk %}
+        <a href="{% url 'exam_create' %}" class="btn btn-secondary ms-2">Cancel</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<hr class="my-4" />
+
+<div class="card p-4">
+
+  <div class="alert alert-light border border-danger rounded-3 mb-3 animate__animated animate__shakeX" role="alert" style="border-width:2px;">
+    <div class="fw-semibold text-danger mb-1 d-flex align-items-center">
+      <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+      নোট: পরীক্ষা ডিলিট করলে ওই পরীক্ষার সব অ্যাডমিট কার্ড, ফলাফল, ট্যাবুলেশন শিটসহ সব ডেটা ডিলিট হয়ে যাবে।
+    </div>
+  </div>
+
+  <h5>Existing Exams</h5>
+
+  <!-- Filters -->
+  <form method="get" class="row g-3 mb-3">
+    <div class="col-md-4">
+      <input type="text" name="search" value="{{ search_query|default:'' }}" placeholder="Search exams..." class="form-control" />
+    </div>
+
+    <div class="col-md-4">
+      <select name="class_filter" class="form-select">
+        <option value="">Filter by Program</option>
+        {% for class in classes %}
+          <option value="{{ class.id }}" {% if class_filter == class.id|stringformat:"s" %}selected{% endif %}>
+            {{ class.pro_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <select name="session_filter" class="form-select">
+        <option value="">Filter by Session</option>
+        {% for s in sessions %}
+          <option value="{{ s.id }}" {% if session_filter == s.id|stringformat:"s" %}selected{% endif %}>
+            {{ s.ses_name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <a href="{% url 'exam_create' %}" class="btn btn-secondary">Reset</a>
+    </div>
+  </form>
+
+  <!-- Table -->
+  <table class="table table-bordered table-striped text-center">
+    <thead>
+      <tr>
+        <th>Exam Name</th>
+        <th>Session</th>
+        <th>Program</th>
+        <th>Group</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for exam in page_obj %}
+      <tr>
+        <td>{{ exam.exam_name }}</td>
+        <td>{{ exam.exam_session.ses_name }}</td>
+        <td>{{ exam.exam_class.pro_name }}</td>
+        <td>{{ exam.get_group_name_display|default:"—" }}</td>
+        <td>{{ exam.exam_start_date }}</td>
+        <td>{{ exam.exam_end_date }}</td>
+        <td class="d-flex justify-content-center gap-2">
+          <a href="{% url 'exam_edit' exam.id %}" class="btn btn-sm btn-primary">Edit</a>
+          <form action="{% url 'exam_delete' exam.id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this exam?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="text-center">No exams found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div class="card-footer mt-2">
+    {% if page_obj.has_other_pages %}
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if class_filter %}&class_filter={{ class_filter }}{% endif %}{% if session_filter %}&session_filter={{ session_filter }}{% endif %}">«</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if class_filter %}&class_filter={{ class_filter }}{% endif %}{% if session_filter %}&session_filter={{ session_filter }}{% endif %}">‹</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">«</span></li>
+            <li class="page-item disabled"><span class="page-link">‹</span></li>
+          {% endif %}
+
+          {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+              <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+            {% elif i > page_obj.number|add:-3 and i < page_obj.number|add:3 %}
+              <li class="page-item">
+                <a class="page-link"
+                   href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if class_filter %}&class_filter={{ class_filter }}{% endif %}{% if session_filter %}&session_filter={{ session_filter }}{% endif %}">{{ i }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if class_filter %}&class_filter={{ class_filter }}{% endif %}{% if session_filter %}&session_filter={{ session_filter }}{% endif %}">›</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if class_filter %}&class_filter={{ class_filter }}{% endif %}{% if session_filter %}&session_filter={{ session_filter }}{% endif %}">»</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">›</span></li>
+            <li class="page-item disabled"><span class="page-link">»</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+  </div>
+</div>
+
+<!-- JS -->
+<script>
+  // Load subjects for selected program
+  document.getElementById('show-subjects-btn').addEventListener('click', function () {
+    const classSelect = document.getElementById('id_exam_class');
+    const classId = classSelect ? classSelect.value : '';
+
+    if (!classId) {
+      alert("Please select a program.");
+      return;
+    }
+
+    fetch(`{% url 'get_subjects_by_class' 0 %}`.replace(/0/, classId))
+      .then(response => response.json())
+      .then(data => {
+        const subjectList = document.getElementById('subject-list');
+        subjectList.innerHTML = '';
+
+        data.subjects.forEach(subject => {
+          const div = document.createElement('div');
+          div.classList.add('col-md-4', 'mb-2');
+
+          div.innerHTML = `
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="subjects" value="${subject.id}" id="subject-${subject.id}">
+              <label class="form-check-label" for="subject-${subject.id}">${subject.name}</label>
+            </div>
+          `;
+          subjectList.appendChild(div);
+        });
+
+        document.getElementById('subject-container').style.display = 'block';
+      })
+      .catch(err => {
+        alert('Failed to load subjects. Please try again.');
+        console.error(err);
+      });
+  });
+
+  // (Django ModelForm will pick up checked inputs named "subjects")
+</script>
+{% endblock %}

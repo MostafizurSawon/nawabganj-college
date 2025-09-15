@@ -1,0 +1,18 @@
+<h3>{{ exam_record.student.add_name }} - Marks</h3>
+
+<table class="table">
+  <tr>
+    <th>Subject</th>
+    <th>Mark</th>
+  </tr>
+  {% for mark in subject_marks %}
+  <tr>
+    <td>{{ mark.subject.name }}</td>
+    <td>{{ mark.mark }}</td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="2">No marks added yet.</td></tr>
+  {% endfor %}
+</table>
+
+<a href="{% url 'add_subject_mark' exam_record.id %}" class="btn btn-success">Add Subject Mark</a>

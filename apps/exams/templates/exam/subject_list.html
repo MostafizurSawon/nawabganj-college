@@ -1,0 +1,185 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Subjects{% endblock %}
+
+{% block content %}
+
+<div class="">
+    {% if msg %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+
+    <div class="d-flex justify-content-between mb-3">
+        <h4>Subjects</h4>
+        <button class="btn btn-primary" id="addSubjectBtn" data-bs-toggle="modal" data-bs-target="#subjectModal">
+            ➕ Add Subject
+        </button>
+    </div>
+
+    <div class="card p-4">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="text-center">#</th>
+                    <th class="text-center">Code</th>
+                    <th>Name</th>
+                    <th>Programs</th>
+                    <th>Group</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject in subjects %}
+                <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td class="text-primary text-center">{{ subject.code|default:"" }}</td>
+                    <td>{{ subject.name }}</td>
+                    <td>
+                        {% with pro_list=subject.program.all %}
+                            {% if pro_list %}
+                                {% for p in pro_list %}
+                                    {{ p.pro_name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">No Program</span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        {{ subject.get_group_name_display|default:"—" }}
+                    </td>
+                    <td>
+                        {{ subject.get_status_display|default:"—" }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="subjectModal" tabindex="-1" aria-labelledby="subjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="subjectModalLabel">
+                            {% if edit_id %} ✏️ Edit Subject {% else %} ➕ Add Subject {% endif %}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Subject Name</label>
+                            {{ form.name }}
+                            {{ form.name.errors }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Subject Code</label>
+                            {{ form.code }}
+                            {{ form.code.errors }}
+                        </div>
+
+                        {% comment %} <div class="mb-3">
+                            <label class="form-label d-block mb-1">Programs (fixed)</label>
+                            <div class="small text-muted mb-2">Program is fixed and cannot be changed.</div>
+                            {% for checkbox in form.program %}
+                                <div class="form-check form-check-inline mb-2">
+                                    {{ checkbox.tag }}
+                                    <label class="form-check-label ms-1" for="{{ checkbox.id_for_label }}">
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                            {{ form.program.errors }}
+                        </div> {% endcomment %}
+
+                        <div class="mb-3">
+                            <label class="form-label d-block mb-1">Programs</label>
+                            {% for checkbox in form.program %}
+                                <div class="form-check form-check-inline mb-2">
+                                    {{ checkbox.tag }}
+                                    <label class="form-check-label ms-1" for="{{ checkbox.id_for_label }}">
+                                        {{ checkbox.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                            {{ form.program.errors }}
+                        </div>
+
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Group</label>
+                            {{ form.group_name }}
+                            {{ form.group_name.errors }}
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            {{ form.status }}
+                            {{ form.status.errors }}
+                        </div>
+
+                        {% if edit_id %}
+                            <input type="hidden" name="edit_id" value="{{ edit_id }}">
+                        {% endif %}
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">
+                            {% if edit_id %} Update {% else %} Save {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto-open modal if editing + URL cleanup -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const subjectModal = document.getElementById('subjectModal');
+
+            {% if edit_id %}
+                const myModal = new bootstrap.Modal(subjectModal);
+                myModal.show();
+            {% endif %}
+
+            subjectModal.addEventListener('hidden.bs.modal', function () {
+                const url = new URL(window.location.href);
+                if (url.searchParams.has('edit')) {
+                    url.searchParams.delete('edit');
+                    window.history.replaceState({}, document.title, url.pathname);
+                }
+            });
+
+            document.getElementById('addSubjectBtn').addEventListener('click', function () {
+                const url = new URL(window.location.href);
+                if (url.searchParams.has('edit')) {
+                    url.searchParams.delete('edit');
+                    window.history.replaceState({}, document.title, url.pathname);
+                }
+
+                // Clear form fields for fresh create
+                document.querySelector('form input[name="edit_id"]')?.remove();
+                const nameInput = document.querySelector('input[name="name"]');
+                if (nameInput) nameInput.value = '';
+                const codeInput = document.querySelector('input[name="code"]');
+                if (codeInput) codeInput.value = '';
+            });
+        });
+    </script>
+
+</div>
+
+{% endblock %}

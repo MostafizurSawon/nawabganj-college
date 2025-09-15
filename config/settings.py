@@ -15,6 +15,15 @@ from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
+
+import environ
+env = environ.Env()
+environ.Env.read_env()  # loads .env
+
+# JBD SMS
+JBD_SMS_TOKEN  = env("JBD_SMS_TOKEN", default="")
+JBD_SENDER_ID  = env("JBD_SENDER_ID", default="8809617615010")
+
 from .template import TEMPLATE_CONFIG, THEME_LAYOUT_DIR, THEME_VARIABLES
 
 load_dotenv()  # take environment variables from .env.
@@ -50,6 +59,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django_cleanup.apps.CleanupConfig',
     'django.contrib.humanize',
     "apps.sample",
     "apps.pages",
@@ -58,6 +68,7 @@ INSTALLED_APPS = [
     "apps.students",
     "apps.exams",
     "apps.teachers",
+    "apps.accounts",
 ]
 
 MIDDLEWARE = [
@@ -117,6 +128,22 @@ DATABASES = {
 }
 
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": "jshop_nawabganj",
+#         "USER": "jshop_nawab",
+#         "PASSWORD": "31012010@nawab",
+#         "HOST": "localhost",
+#         "PORT": "3306",
+#         'OPTIONS': {
+#             'charset': 'utf8mb4',
+#             'init_command': "SET time_zone = '+00:00'",
+#         },
+#     }
+# }
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -152,7 +179,7 @@ LANGUAGES = [
 # ! Make sure you have cleared the browser cache after changing the default language
 LANGUAGE_CODE = "en"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Dhaka"
 
 USE_I18N = True
 
@@ -175,6 +202,17 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+from django.contrib.messages import constants as messages
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'secondary',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',
+}
+
+
 # Default URL on which Django application runs for specific environment
 BASE_URL = os.environ.get("BASE_URL", default="http://127.0.0.1:8000")
 
@@ -196,3 +234,25 @@ THEME_VARIABLES = THEME_VARIABLES
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+
+
+
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 days
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5050",
+    "http://127.0.0.1:8000/",
+    "https://cms.nawabganjcitycollege.edu.bd",
+    "http://cms.nawabganjcitycollege.edu.bd",
+]
+
+AUTH_USER_MODEL = 'accounts.User'

@@ -1,0 +1,142 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Seatplan • Select Students{% endblock %}
+
+{% block content %}
+<div class="flex-grow-1 container-p-y">
+
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h4 class="mb-1">Seatplan — Select Students</h4>
+      <div class="text-muted">
+        {% if subject %}
+          <strong>Subject:</strong> {{ subject.sub_name }}
+          {% if subject.code %}<span class="ms-1 text-secondary">({{ subject.code }})</span>{% endif %}
+        {% endif %}
+        {% if active_session %} • <strong>Session:</strong> {{ active_session.ses_name }}{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Card -->
+  <div class="card">
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="subject_id" value="{{ subject.id }}"/>
+
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <label class="form-check m-0">
+            <input class="form-check-input" type="checkbox" id="toggleAll" checked>
+            <span class="form-check-label">Select / Deselect all</span>
+          </label>
+          <div class="text-muted small">
+            {% if students %}Total: {{ students|length }}{% endif %}
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th style="width:44px;"></th>
+                <th style="width:110px;">Roll</th>
+                <th>Name</th>
+                <th style="width:140px;">Group</th>
+                <th style="width:140px;">Class ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in students %}
+              <tr>
+                <td>
+                  <input class="form-check-input" type="checkbox" name="student_ids" value="{{ s.id }}" checked />
+                </td>
+                <td>{{ s.add_class_roll|default:"—" }}</td>
+                <td>{{ s.add_name }}</td>
+                <td>{{ s.get_add_admission_group_display }}</td>
+                <td>{{ s.add_class_id|default:"—" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5">
+                  <em class="text-muted">No students found for this subject.</em>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+            {# Default seatplan preview (new tab) #}
+            <button class="btn btn-primary" type="submit" name="mode" value="seatplan" formtarget="_blank">
+              Preview Seatplan
+            </button>
+          
+            {# Attendance preview (new tab) #}
+            <button class="btn btn-info" type="submit" name="mode" value="attendance" formtarget="_blank">
+              Preview Attendance
+            </button>
+          
+            <a href="{% url 'seatplan_subjects' %}" class="btn btn-outline-secondary">Back</a>
+        </div>
+          
+          
+          
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<!-- Minimal JS: select-all -->
+<script>
+  (function () {
+    const toggle = document.getElementById('toggleAll');
+    if (!toggle) return;
+    toggle.addEventListener('change', () => {
+      document.querySelectorAll('input[name="student_ids"]').forEach(cb => cb.checked = toggle.checked);
+    });
+  })();
+
+
+  (function () {
+    const toggle = document.getElementById('toggleAll');
+    if (toggle) {
+      toggle.addEventListener('change', () => {
+        document.querySelectorAll('input[name="student_ids"]').forEach(cb => cb.checked = toggle.checked);
+      });
+    }
+
+    // Attendance preview button
+    const btnSeatplan = document.getElementById("btnSeatplan");
+    if (btnSeatplan) {
+      btnSeatplan.addEventListener("click", function () {
+        const form = this.closest("form");
+        if (form) {
+          // change action to attendance mode url
+          form.action = "{% url 'seatplan_preview_mode' 'seatplan' %}";
+          form.target = "_blank";   // open in new tab
+          form.submit();
+        }
+      });
+    }
+  })();
+  
+</script>
+{% endblock content %}

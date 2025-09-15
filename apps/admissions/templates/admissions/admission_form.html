@@ -1,541 +1,844 @@
 {% extends layout_path %}
 {% load static %}
-{% block title %}Hsc Admission{% endblock %}
+{% block title %}HSC Admission{% endblock %}
 
 {% block content %}
-
-<div class="flex-grow-1 container-p-y">
-  <h4 class="fw-bold py-3 mb-4">
+<div class="flex-grow-1">
+  {% with grp=subjects_main.0.group|default:subjects_all.0.group|default:subjects_optional.0.group|default:'science' %}
+  <h4 class="fw-bold mb-4">
     <span class="text-muted fw-light">HSC Admission /</span>
-    {% if subjects_main.0.group == "commerce" %}
-      Business Studies
-    {% elif subjects_main.0.group == "arts" %}
-      Humanities
-    {% elif subjects_main.0.group == "science" %}
-      Science
-    {% else %}
-      Unknown Group
+    {% if grp == "commerce" %}Business Studies
+    {% elif grp == "arts" %}Humanities
+    {% elif grp == "science" %}Science
     {% endif %}
   </h4>
-
-
 
   {% if messages %}
     {% for message in messages %}
       <div class="alert alert-success alert-dismissible" role="alert">
         {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     {% endfor %}
   {% endif %}
 
+  <div class="alert alert-warning d-flex align-items-start gap-3 shadow-sm rounded-3 border border-warning border-2 my-3"
+       role="alert" style="border-left-width:.6rem;">
+    <div class="fs-3 lh-1">⚠️</div>
+    <div>
+      <div class="fw-bold text-uppercase small"></div>
+      <p class="mb-0 text-dark fw-bold">
+        সকল তথ্য সঠিকভাবে পূরণ করুন । ভুল তথ্য পূরণ করলে এডমিশন বাতিল বলে গণ্য হবে ।
+      </p>
+    </div>
+  </div>
+
   <form method="post" enctype="multipart/form-data">
     {% if form.non_field_errors %}
-      <div class="alert alert-danger">
-        {{ form.non_field_errors }}
-      </div>
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
     {% endif %}
-
     {% csrf_token %}
 
-    <div class="card mb-4">
-    <div class="card-header"><h5 class="mb-0">Personal Information</h5></div>
-      <div class="card-body row g-3">
+    <div class="text-center mb-4">
+      <button type="submit" class="btn btn-primary">Submit Admission</button>
+    </div>
 
-        <div class="col-md-6">
+    <!-- College Info -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">College Info</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label for="id_add_session" class="form-label">Session</label>
+          {{ form.add_session }}
+          {% if form.add_session.errors %}<div class="text-danger small">{{ form.add_session.errors.0 }}</div>{% endif %}
+        </div>
+        {% if not request.user.role == "student" %}
+        <div class="col-md-4">
+          <label for="id_add_class_roll" class="form-label">Class Roll</label>
+          {{ form.add_class_roll }}
+          {% if form.add_class_roll.errors %}<div class="text-danger small">{{ form.add_class_roll.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_class_id" class="form-label">Class ID</label>
+          {{ form.add_class_id }}
+          {% if form.add_class_id.errors %}<div class="text-danger small">{{ form.add_class_id.errors.0 }}</div>{% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Personal -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Personal Information</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
           <label for="id_add_name" class="form-label">Name (English)</label>
           {{ form.add_name }}
+          {% if form.add_name.errors %}<div class="text-danger small">{{ form.add_name.errors.0 }}</div>{% endif %}
         </div>
-
-        <div class="col-md-6">
-          <label for="id_add_name_bangla" class="form-label">Name (Bangla)</label>
-          {{ form.add_name_bangla }}
-        </div>
-
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="id_add_mobile" class="form-label">Mobile Number</label>
           {{ form.add_mobile }}
-          {% if form.add_mobile.errors %}
-            <div class="text-danger small">{{ form.add_mobile.errors.0 }}</div>
-          {% endif %}
+          {% if form.add_mobile.errors %}<div class="text-danger small">{{ form.add_mobile.errors.0 }}</div>{% endif %}
         </div>
-
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="id_add_birthdate" class="form-label">Date of Birth</label>
           {{ form.add_birthdate }}
+          {% if form.add_birthdate.errors %}<div class="text-danger small">{{ form.add_birthdate.errors.0 }}</div>{% endif %}
         </div>
-
-        <div class="col-md-3">
+        <div class="col-md-4">
+          <label for="id_add_age" class="form-label">Age</label>
+          {{ form.add_age }}
+          {% if form.add_age.errors %}<div class="text-danger small">{{ form.add_age.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
           <label for="id_add_gender" class="form-label">Gender</label>
           {{ form.add_gender }}
+          {% if form.add_gender.errors %}<div class="text-danger small">{{ form.add_gender.errors.0 }}</div>{% endif %}
         </div>
-
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="id_add_blood_group" class="form-label">Blood Group</label>
           {{ form.add_blood_group }}
+          {% if form.add_blood_group.errors %}<div class="text-danger small">{{ form.add_blood_group.errors.0 }}</div>{% endif %}
         </div>
-
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="id_add_nationality" class="form-label">Nationality</label>
           {{ form.add_nationality }}
+          {% if form.add_nationality.errors %}<div class="text-danger small">{{ form.add_nationality.errors.0 }}</div>{% endif %}
         </div>
-
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="id_add_religion" class="form-label">Religion</label>
           {{ form.add_religion }}
+          {% if form.add_religion.errors %}<div class="text-danger small">{{ form.add_religion.errors.0 }}</div>{% endif %}
         </div>
-
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="id_add_marital_status" class="form-label">Marital Status</label>
           {{ form.add_marital_status }}
+          {% if form.add_marital_status.errors %}<div class="text-danger small">{{ form.add_marital_status.errors.0 }}</div>{% endif %}
         </div>
-
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="id_add_birth_certificate_no" class="form-label">Birth Certificate No</label>
           {{ form.add_birth_certificate_no }}
+          {% if form.add_birth_certificate_no.errors %}<div class="text-danger small">{{ form.add_birth_certificate_no.errors.0 }}</div>{% endif %}
         </div>
 
-        <div class="col-md-6">
-          <label for="id_add_photo" class="form-label">Upload Photo</label>
-          {{ form.add_photo }}
-          {% if form.add_photo.errors %}
-            <div class="text-danger small">{{ form.add_photo.errors.0 }}</div>
+        <div class="col-md-8">
+          <div class="mb-3">
+            <label for="{{ form.add_photo.id_for_label }}" class="form-label fw-bold">
+              Upload Photo <span class="text-muted">(Max 500 KB)</span>
+            </label>
+
+            {% if student.add_photo %}
+              <div class="mb-2">
+                <img src="{{ student.add_photo.url }}" alt="Current photo"
+                     class="rounded border" style="max-height:160px;object-fit:cover">
+                <div class="small text-muted">Current photo</div>
+              </div>
+            {% endif %}
+
+            {{ form.add_photo }}
+            {% if form.add_photo.errors %}
+              <div class="text-danger small">{{ form.add_photo.errors.0 }}</div>
+            {% endif %}
+
+            <div class="form-text text-primary">
+              <strong>⚠️ অবশ্যই পাসপোর্ট সাইজের ছবি দিতে হবে এবং ছবির সাইজ ৫০০ কেবির মধ্যে হতে হবে।</strong>
+              {% if student.add_photo %}
+                <br><small>(যদি নতুন ছবি আপলোড না করতে চান, তবে এটি অপরিবর্তিত রাখা হবে।)</small>
+              {% endif %}
+            </div>
+            <div id="photo-size-hint" class="text-danger small mt-1" style="display:none;">
+              ⚠️ ফাইলের সাইজ ৫০০ কেবির বেশি। ⚠️
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>  {# <-- শুধু দুটি ক্লোজার: card-body + card #}
+
+    <!-- Parents & Guardian -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Parents & Guardian Information</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label for="id_add_father" class="form-label">Father's Name</label>
+          {{ form.add_father }}
+          {% if form.add_father.errors %}<div class="text-danger small">{{ form.add_father.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_father_mobile" class="form-label">Father's Mobile</label>
+          {{ form.add_father_mobile }}
+          {% if form.add_father_mobile.errors %}<div class="text-danger small">{{ form.add_father_mobile.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_father_nid" class="form-label">Father's NID</label>
+          {{ form.add_father_nid }}
+          {% if form.add_father_nid.errors %}<div class="text-danger small">{{ form.add_father_nid.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_father_birthdate" class="form-label">Father's Date of Birth</label>
+          {{ form.add_father_birthdate }}
+          {% if form.add_father_birthdate.errors %}<div class="text-danger small">{{ form.add_father_birthdate.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_mother" class="form-label">Mother's Name</label>
+          {{ form.add_mother }}
+          {% if form.add_mother.errors %}<div class="text-danger small">{{ form.add_mother.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_mother_mobile" class="form-label">Mother's Mobile</label>
+          {{ form.add_mother_mobile }}
+          {% if form.add_mother_mobile.errors %}<div class="text-danger small">{{ form.add_mother_mobile.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_mother_nid" class="form-label">Mother's NID</label>
+          {{ form.add_mother_nid }}
+          {% if form.add_mother_nid.errors %}<div class="text-danger small">{{ form.add_mother_nid.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_mother_birthdate" class="form-label">Mother's Date of Birth</label>
+          {{ form.add_mother_birthdate }}
+          {% if form.add_mother_birthdate.errors %}<div class="text-danger small">{{ form.add_mother_birthdate.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_select" class="form-label">Select Guardian</label>
+          {{ form.add_parent_select }}
+          {% if form.add_parent_select.errors %}<div class="text-danger small">{{ form.add_parent_select.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent" class="form-label">Guardian's Name</label>
+          {{ form.add_parent }}
+          {% if form.add_parent.errors %}<div class="text-danger small">{{ form.add_parent.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_mobile" class="form-label">Guardian's Mobile</label>
+          {{ form.add_parent_mobile }}
+          {% if form.add_parent_mobile.errors %}<div class="text-danger small">{{ form.add_parent_mobile.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_relation" class="form-label">Guardian Relation</label>
+          {{ form.add_parent_relation }}
+          {% if form.add_parent_relation.errors %}<div class="text-danger small">{{ form.add_parent_relation.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_service" class="form-label">Guardian Profession</label>
+          {{ form.add_parent_service }}
+          {% if form.add_parent_service.errors %}<div class="text-danger small">{{ form.add_parent_service.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_nid" class="form-label">Guardian NID</label>
+          {{ form.add_parent_nid }}
+          {% if form.add_parent_nid.errors %}<div class="text-danger small">{{ form.add_parent_nid.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_income" class="form-label">Guardian Income</label>
+          {{ form.add_parent_income }}
+          {% if form.add_parent_income.errors %}<div class="text-danger small">{{ form.add_parent_income.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Address -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Address</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label for="id_add_village" class="form-label">Village</label>
+          {{ form.add_village }}
+          {% if form.add_village.errors %}<div class="text-danger small">{{ form.add_village.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_post" class="form-label">Post Office</label>
+          {{ form.add_post }}
+          {% if form.add_post.errors %}<div class="text-danger small">{{ form.add_post.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_police" class="form-label">Police Station/Upazila</label>
+          {{ form.add_police }}
+          {% if form.add_police.errors %}<div class="text-danger small">{{ form.add_police.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_postal" class="form-label">Postal Code</label>
+          {{ form.add_postal }}
+          {% if form.add_postal.errors %}<div class="text-danger small">{{ form.add_postal.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_distric" class="form-label">District</label>
+          {{ form.add_distric }}
+          {% if form.add_distric.errors %}<div class="text-danger small">{{ form.add_distric.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-12 mt-2">
+          <label class="switch switch-success my-2">
+            {{ form.add_address_same }}
+            <span class="switch-toggle-slider">
+              <span class="switch-on"><i class="ti ti-check"></i></span>
+              <span class="switch-off"><i class="ti ti-x"></i></span>
+            </span>
+            <span class="switch-label">Same as Present Address</span>
+          </label>
+          {% if form.add_address_same.errors %}
+            <div class="text-danger small">{{ form.add_address_same.errors.0 }}</div>
           {% endif %}
         </div>
 
-
+        <div class="col-md-4">
+          <label for="id_add_village_per" class="form-label">Village (Permanent)</label>
+          {{ form.add_village_per }}
+          {% if form.add_village_per.errors %}<div class="text-danger small">{{ form.add_village_per.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_post_per" class="form-label">Post Office (Permanent)</label>
+          {{ form.add_post_per }}
+          {% if form.add_post_per.errors %}<div class="text-danger small">{{ form.add_post_per.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_police_per" class="form-label">Police Station/Upazila (Permanent)</label>
+          {{ form.add_police_per }}
+          {% if form.add_police_per.errors %}<div class="text-danger small">{{ form.add_police_per.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_postal_per" class="form-label">Postal Code (Permanent)</label>
+          {{ form.add_postal_per }}
+          {% if form.add_postal_per.errors %}<div class="text-danger small">{{ form.add_postal_per.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_distric_per" class="form-label">District (Permanent)</label>
+          {{ form.add_distric_per }}
+          {% if form.add_distric_per.errors %}<div class="text-danger small">{{ form.add_distric_per.errors.0 }}</div>{% endif %}
+        </div>
       </div>
     </div>
 
-
-  <!-- 🔷 Parents & Guardian Info -->
-  <div class="card mb-4">
-    <div class="card-header"><h5 class="mb-0">Parents & Guardian Information</h5></div>
-    <div class="card-body row g-3">
-      <div class="col-md-4">
-        <label>Father's Name</label>
-        {{ form.add_father }}
-      </div>
-      <div class="col-md-4">
-        <label>Father's Name (Bangla)</label>
-        {{ form.add_father_bangla }}
-      </div>
-      <div class="col-md-4">
-        <label>Father's Mobile</label>
-        {{ form.add_father_mobile }}
-        {% if form.add_father_mobile.errors %}
-          <div class="text-danger small">{{ form.add_father_mobile.errors.0 }}</div>
-        {% endif %}
-      </div>
-      <div class="col-md-4">
-        <label>Mother's Name</label>
-        {{ form.add_mother }}
-      </div>
-      <div class="col-md-4">
-        <label>Mother's Name (Bangla)</label>
-        {{ form.add_mother_bangla }}
-      </div>
-      <div class="col-md-4">
-        <label>Mother's Mobile</label>
-        {{ form.add_mother_mobile }}
-        {% if form.add_mother_mobile.errors %}
-          <div class="text-danger small">{{ form.add_mother_mobile.errors.0 }}</div>
-        {% endif %}
-      </div>
-      <div class="col-md-4">
-        <label for="id_add_parent_select" class="form-label">Select Guardian</label>
-        {{ form.add_parent_select }}
-      </div>
-
-      <div class="col-md-4">
-        <label>Guardian</label>
-        {{ form.add_parent }}
-      </div>
-
-      <div class="col-md-4">
-        <label>Guardian Mobile</label>
-        {{ form.add_parent_mobile }}
-        {% if form.add_parent_mobile.errors %}
-          <div class="text-danger small">{{ form.add_parent_mobile.errors.0 }}</div>
-        {% endif %}
-      </div>
-      <div class="col-md-4">
-        <label>Guardian Relation</label>
-        {{ form.add_parent_relation }}
-      </div>
-      <div class="col-md-4">
-        <label>Guardian Profession</label>
-        {{ form.add_parent_service }}
-      </div>
-      <div class="col-md-4">
-        <label>Guardian Income</label>
-        {{ form.add_parent_income }}
-      </div>
-      <div class="col-md-6">
-        <label>Land (Agricultural)</label>
-        {{ form.add_parent_land_agri }}
-      </div>
-      <div class="col-md-6">
-        <label>Land (Non-Agricultural)</label>
-        {{ form.add_parent_land_nonagri }}
-      </div>
-    </div>
-  </div>
-
-  <!-- 🔷 Academic Information -->
-  <div class="card mb-4">
-    <div class="card-header"><h5 class="mb-0">Academic Information (SSC)</h5></div>
-    <div class="card-body row g-3">
-      <div class="col-md-3">
-        <label>Roll</label>
-        {{ form.add_ssc_roll }}
-      </div>
-      <div class="col-md-3">
-        <label>Reg</label>
-        {{ form.add_ssc_reg }}
-      </div>
-      <div class="col-md-3">
-        <label>Board</label>
-        {{ form.add_ssc_board }}
-      </div>
-      <div class="col-md-3">
-        <label>Group</label>
-        {{ form.add_ssc_group }}
-      </div>
-      <div class="col-md-3">
-        <label>Pass Year</label>
-        {{ form.add_ssc_passyear }}
-      </div>
-      <div class="col-md-3">
-        <label>GPA</label>
-        {{ form.add_ssc_gpa }}
-      </div>
-      <div class="col-md-3">
-        <label>SSC Session</label>
-        {{ form.add_ssc_session }}
-      </div>
-    </div>
-  </div>
-
-  <!-- 🔷 Address Section -->
-  <div class="card mb-4">
-  <div class="card-header"><h5 class="mb-0">Address</h5></div>
-  <div class="card-body row g-3">
-
-    <!-- Present Address -->
-    <div class="col-md-3">
-      <label>Village</label>
-      {{ form.add_village }}
-    </div>
-    <div class="col-md-3">
-      <label>Post</label>
-      {{ form.add_post }}
-    </div>
-    <div class="col-md-3">
-      <label>Upazila</label>
-      {{ form.add_upojella }}
-    </div>
-    <div class="col-md-3">
-      <label>District</label>
-      {{ form.add_distric }}
-    </div>
-
-    <!-- Checkbox: Same as Present -->
-    <div class="col-md-12 mt-2">
-      <label class="switch switch-success my-2">
-        <input type="checkbox"
-              name="add_address_same"
-              id="id_add_address_same"
-              class="switch-input"
-              {% if form.add_address_same.value %}checked{% endif %}>
-        <span class="switch-toggle-slider">
-          <span class="switch-on">
-            <i class="ti ti-check"></i>
-          </span>
-          <span class="switch-off">
-            <i class="ti ti-x"></i>
-          </span>
-        </span>
-        <span class="switch-label">Same as present address</span>
-      </label>
-    </div>
-
-
-
-    <!-- Permanent Address -->
-    <div class="col-md-3">
-      <label>Village (Permanent)</label>
-      {{ form.add_village_per }}
-    </div>
-    <div class="col-md-3">
-      <label>Post (Permanent)</label>
-      {{ form.add_post_per }}
-    </div>
-    <div class="col-md-3">
-      <label>Upazila (Permanent)</label>
-      {{ form.add_upojella_per }}
-    </div>
-    <div class="col-md-3">
-      <label>District (Permanent)</label>
-      {{ form.add_distric_per }}
-    </div>
-  </div>
-</div>
-
-
-  <!-- 🔷 College Info -->
-  <div class="card mb-4">
-    <div class="card-header"><h5 class="mb-0">College Info</h5></div>
-    <div class="card-body row g-3">
-      <div class="col-md-4">
-        <label>Session</label>
-        {{ form.add_session }}
-      </div>
-      <div class="col-md-4">
-        <label>Merit Position</label>
-        {{ form.merit_position }}
-      </div>
-      <div class="col-md-4">
-        <label>Class Roll</label>
-        {{ form.add_class_roll }}
-      </div>
-      {% comment %} <div class="col-md-3">
-        <label>Year</label>
-        {{ form.add_hsc_year }}
-      </div> {% endcomment %}
-    </div>
-  </div>
-
-
-  <div class="card mb-4">
-    <div class="card-header"><h5 class="mb-0">Subject Selection</h5></div>
-    <div class="card-body row g-3">
-
-      <!-- 🔹 Common Subjects (All) -->
-      <div class="col-md-3">
-        <label class="form-label d-block mb-2">Common Subjects</label>
-        {% for sub in subjects_all %}
-          <div class="form-check mb-2">
-            <input class="form-check-input" type="radio" disabled checked>
-            <label class="form-check-label">{{ sub.sub_name }}</label>
-          </div>
-        {% endfor %}
-      </div>
-
-      <!-- 🔹 Optional Subjects -->
-      <div class="col-md-3">
-        <label class="form-label d-block mb-2">Optional Subjects</label>
-        {% for sub in subjects_optional %}
-          <div class="form-check mb-2">
-            <input class="form-check-input" type="radio" disabled checked>
-            <label class="form-check-label">{{ sub.sub_name }}</label>
-          </div>
-        {% endfor %}
-      </div>
-
-      <!-- Main Subject Selection -->
-      <div class="col-md-3">
-        <label class="form-label d-block mb-2">Main Subject</label>
-        {% for sub in subjects_main %}
-          <div class="form-check form-check-success mb-2 main-subject-option" data-sub-name="{{ sub.sub_name }}">
-            <input class="form-check-input main-subject"
-              type="radio"
-              name="main_subject"
-              id="main_subject_{{ sub.id }}"
-              value="{{ sub.id }}"
-              data-sub-name="{{ sub.sub_name }}"
-              {% if student and student.main_subject and student.main_subject.id == sub.id %}checked{% endif %}
-              required>
-            <label class="form-check-label" for="main_subject_{{ sub.id }}">{{ sub.sub_name }}</label>
-          </div>
-        {% endfor %}
-      </div>
-
-
-      <!-- Fourth Subject -->
-      <div class="col-md-3">
-        <label class="form-label d-block mb-2">Fourth Subject</label>
-        {% for sub in subjects_fourth %}
-          <div class="form-check form-check-success mb-2 fourth-subject-option" data-sub-name="{{ sub.sub_name }}">
-            <input class="form-check-input fourth-subject"
-              type="radio"
-              name="fourth_subject"
-              id="fourth_subject_{{ sub.id }}"
-              value="{{ sub.id }}"
-              data-sub-name="{{ sub.sub_name }}"
-              {% if student and student.fourth_subject and student.fourth_subject.id == sub.id %}checked{% endif %}
-              required>
-            <label class="form-check-label" for="fourth_subject_{{ sub.id }}">{{ sub.sub_name }}</label>
-          </div>
-        {% endfor %}
-      </div>
-
-    </div>
-  </div>
-
-
-
-
-
-
-
-    <!-- 🔷 Payment Info -->
+    <!-- Quota/Community Information -->
     <div class="card mb-4">
-      <div class="card-header"><h5 class="mb-0">Payment Details</h5></div>
+      <div class="card-header"><h5 class="mb-0">Quota/Community Information</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-2">
+          <label class="form-label">Quota Applicable</label>
+          <div class="form-check">
+            <input type="radio" name="qouta" id="id_qouta_yes" value="True" class="form-check-input" {% if form.qouta.value %}checked{% endif %}>
+            <label for="id_qouta_yes" class="form-check-label">Yes</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" name="qouta" id="id_qouta_no" value="False" class="form-check-input" {% if not form.qouta.value %}checked{% endif %}>
+            <label for="id_qouta_no" class="form-check-label">No</label>
+          </div>
+          {% if form.qouta.errors %}<div class="text-danger small">{{ form.qouta.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-10">
+          <div id="qouta_name_container" style="display: {% if form.qouta.value %}block{% else %}none{% endif %};">
+            <label for="id_qouta_name" class="form-label">Quota Name</label>
+            {{ form.qouta_name }}
+            {% if form.qouta_name.errors %}<div class="text-danger small">{{ form.qouta_name.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Community Applicable</label>
+          <div class="form-check">
+            <input type="radio" name="community" id="id_community_yes" value="True" class="form-check-input" {% if form.community.value %}checked{% endif %}>
+            <label for="id_community_yes" class="form-check-label">Yes</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" name="community" id="id_community_no" value="False" class="form-check-input" {% if not form.community.value %}checked{% endif %}>
+            <label for="id_community_no" class="form-check-label">No</label>
+          </div>
+          {% if form.community.errors %}<div class="text-danger small">{{ form.community.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-10">
+          <div id="community_name_container" style="display: {% if form.community.value %}block{% else %}none{% endif %};">
+            <label for="id_community_name" class="form-label">Community Name</label>
+            {{ form.community_name }}
+            {% if form.community_name.errors %}<div class="text-danger small">{{ form.community_name.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Academic (SSC) -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Academic Information (SSC)</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label for="id_add_ssc_roll" class="form-label">Roll</label>
+          {{ form.add_ssc_roll }}
+          {% if form.add_ssc_roll.errors %}<div class="text-danger small">{{ form.add_ssc_roll.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_reg" class="form-label">Registration No</label>
+          {{ form.add_ssc_reg }}
+          {% if form.add_ssc_reg.errors %}<div class="text-danger small">{{ form.add_ssc_reg.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_board" class="form-label">Board</label>
+          {{ form.add_ssc_board }}
+          {% if form.add_ssc_board.errors %}<div class="text-danger small">{{ form.add_ssc_board.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_group" class="form-label">Group</label>
+          {{ form.add_ssc_group }}
+          {% if form.add_ssc_group.errors %}<div class="text-danger small">{{ form.add_ssc_group.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_passyear" class="form-label">Pass Year</label>
+          {{ form.add_ssc_passyear }}
+          {% if form.add_ssc_passyear.errors %}<div class="text-danger small">{{ form.add_ssc_passyear.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_gpa" class="form-label">GPA</label>
+          {{ form.add_ssc_gpa }}
+          {% if form.add_ssc_gpa.errors %}<div class="text-danger small">{{ form.add_ssc_gpa.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_session" class="form-label">SSC Session</label>
+          {{ form.add_ssc_session }}
+          {% if form.add_ssc_session.errors %}<div class="text-danger small">{{ form.add_ssc_session.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-8">
+          <label for="id_add_ssc_institute" class="form-label">SSC Institute</label>
+          {{ form.add_ssc_institute }}
+          {% if form.add_ssc_institute.errors %}<div class="text-danger small">{{ form.add_ssc_institute.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Subject Selection -->
+    <div class="card mb-4">
+      <div class="alert alert-warning d-flex align-items-start gap-3 shadow-sm rounded-3 border border-warning border-2 m-3"
+           role="alert" style="border-left-width:.6rem;">
+        <div class="fs-3 lh-1">⚠️</div>
+        <div>
+          <div class="fw-bold text-uppercase small"></div>
+          <p class="mb-0 text-dark fw-bold">Note: Please choose subject carefully!</p>
+        </div>
+      </div>
+
+      <div class="card-header"><h5 class="mb-0">Subject Selection</h5></div>
+      <div class="card-body row g-3">
+        <!-- Common subjects -->
+        <div class="col-md-3">
+          <label class="form-label d-block mb-2">Common Subjects</label>
+          {% for sub in subjects_all %}
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" disabled checked>
+              <label class="form-check-label">{{ sub.sub_name }}</label>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Optional subjects -->
+        <div class="col-md-3">
+          <label class="form-label d-block mb-2">Optional Subjects</label>
+          {% for sub in subjects_optional %}
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" disabled checked>
+              <label class="form-check-label">{{ sub.sub_name }}</label>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if grp != 'commerce' %}
+        <div class="col-md-3">
+          <label class="form-label d-block mb-2">Main Subject *</label>
+          {% for sub in subjects_main %}
+            <div class="form-check form-check-success mb-2 main-subject-option" data-sub-name="{{ sub.sub_name }}">
+              <input class="form-check-input main-subject"
+                     type="radio" name="main_subject" id="main_subject_{{ sub.id }}"
+                     value="{{ sub.id }}" data-sub-name="{{ sub.sub_name }}" data-sub-code="{{ sub.code }}"
+                     {% if student and student.main_subject and student.main_subject.id == sub.id %}checked{% endif %}
+                     required>
+              <label class="form-check-label" for="main_subject_{{ sub.id }}">{{ sub.sub_name }}</label>
+            </div>
+          {% endfor %}
+          {% if form.main_subject.errors %}
+            <div class="text-danger small">{{ form.main_subject.errors.0 }}</div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="col-md-3">
+          <label class="form-label d-block mb-2">
+            {% if grp == 'commerce' %}Additional Subject{% else %}Additional/4th Subject *{% endif %}
+          </label>
+          {% for sub in subjects_fourth %}
+            {% if grp == 'commerce' %}
+              <div class="form-check mb-2 fourth-subject-option">
+                <input class="form-check-input" type="radio" name="fourth_subject"
+                       value="{{ sub.id }}" checked disabled>
+                <label class="form-check-label">{{ sub.sub_name }}</label>
+              </div>
+            {% else %}
+              <div class="form-check form-check-success mb-2 fourth-subject-option" data-sub-name="{{ sub.sub_name }}">
+                <input class="form-check-input fourth-subject"
+                       type="radio" name="fourth_subject" id="fourth_subject_{{ sub.id }}"
+                       value="{{ sub.id }}" data-sub-name="{{ sub.sub_name }}" data-sub-code="{{ sub.code }}"
+                       {% if student and student.fourth_subject and student.fourth_subject.id == sub.id %}checked{% endif %}
+                       required>
+                <label class="form-check-label" for="fourth_subject_{{ sub.id }}">{{ sub.sub_name }}</label>
+              </div>
+            {% endif %}
+          {% endfor %}
+          {% if form.fourth_subject.errors and grp != 'commerce' %}
+            <div class="text-danger small">{{ form.fourth_subject.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment -->
+    <div class="card mb-4">
+      <div class="alert alert-success d-flex align-items-start gap-3 shadow-sm rounded-3 border border-success border-2 m-3"
+           role="alert" style="border-left-width:.6rem;">
+        <div class="fs-3 lh-1">✅</div>
+        <div>
+          <div class="fw-bold text-uppercase small text-dark"></div>
+          <p class="mb-0 text-dark fw-bold">
+            For Instruction click
+            <a target="_blank" href="{% static 'cus/ins.jpeg' %}">here</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="card-header">
+        <h5 class="mb-0">Payment Details
+          {% if request.user.role == 'student' %}
+          <span class="badge bg-primary rounded-pill">
+            Payment Student ID :
+              {{ request.user.id }}
+          </span>
+          {% else %}
+          <span class="badge bg-primary rounded-pill">
+            Payment Student ID :
+              {{ student.created_by.id|default_if_none:0|default:0 }}
+          </span>
+          {% endif %}
+        </h5>
+      </div>
+
       <div class="card-body row g-3">
         <div class="col-md-6">
-          <label>Admission Fee</label>
+          <label for="id_add_amount" class="form-label">Admission Fee</label>
           {{ form.add_amount }}
+          {% if form.add_amount.errors %}<div class="text-danger small">{{ form.add_amount.errors.0 }}</div>{% endif %}
         </div>
         <div class="col-md-6">
-          <label>Payment Method</label>
+          <label for="{{ form.add_payment_method.id_for_label }}" class="form-label">Payment Method</label>
           {{ form.add_payment_method }}
-        </div>
-        <div class="col-md-6">
-          <label>Transaction ID</label>
-          {{ form.add_trxid }}
-        </div>
-        <div class="col-md-6">
-          <label>Note: </label>
-          {{ form.add_slip }}
+          {% if form.add_payment_method.errors %}<div class="text-danger small">{{ form.add_payment_method.errors.0 }}</div>{% endif %}
         </div>
 
+        <div class="col-md-6">
+          <label for="{{ form.add_trxid.id_for_label }}" class="form-label">
+            Transaction ID <span class="text-danger">*</span>
+          </label>
+          {{ form.add_trxid }}
+
+          {% if form.add_trxid.errors %}
+            <div class="text-danger small">{{ form.add_trxid.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="col-md-6">
+          <label for="{{ form.add_slip.id_for_label }}" class="form-label">
+            Payment From <span class="text-danger">*</span>
+          </label>
+          {{ form.add_slip }}
+
+          {% if form.add_slip.errors %}
+            <div class="text-danger small">{{ form.add_slip.errors.0 }}</div>
+          {% endif %}
+        </div>
       </div>
     </div>
 
-    <!-- 🔷 Submit -->
     <div class="text-center">
       <button type="submit" class="btn btn-primary">Submit Admission</button>
     </div>
   </form>
+
+  {% endwith %}
 </div>
 
-<!-- 🔷 Fee Load Script -->
 <script>
-
-  <!-- Guardian Section -->
-   document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
+  /* Guardian auto-fill */
+  (function () {
     const guardianSelect = document.getElementById("id_add_parent_select");
+    const fatherName     = document.getElementById("id_add_father");
+    const fatherMobile   = document.getElementById("id_add_father_mobile");
+    const fatherNid      = document.getElementById("id_add_father_nid");
+    const motherName     = document.getElementById("id_add_mother");
+    const motherMobile   = document.getElementById("id_add_mother_mobile");
+    const motherNid      = document.getElementById("id_add_mother_nid");
 
-    const fatherName = document.getElementById("id_add_father");
-    const fatherMobile = document.getElementById("id_add_father_mobile");
-    const motherName = document.getElementById("id_add_mother");
-    const motherMobile = document.getElementById("id_add_mother_mobile");
+    const gName   = document.getElementById("id_add_parent");
+    const gMobile = document.getElementById("id_add_parent_mobile");
+    const gNid    = document.getElementById("id_add_parent_nid");
+    const gRel    = document.getElementById("id_add_parent_relation");
 
-    const guardianName = document.getElementById("id_add_parent");
-    const guardianMobile = document.getElementById("id_add_parent_mobile");
-    const guardianRelation = document.getElementById("id_add_parent_relation");
-
-    function autoFillGuardianFields() {
-      const selected = guardianSelect.value;
-
-      if (selected === "father") {
-        guardianName.value = fatherName?.value || "";
-        guardianMobile.value = fatherMobile?.value || "";
-        guardianRelation.value = "Father";
-      } else if (selected === "mother") {
-        guardianName.value = motherName?.value || "";
-        guardianMobile.value = motherMobile?.value || "";
-        guardianRelation.value = "Mother";
+    function syncGuardian() {
+      const sel = guardianSelect?.value || "";
+      if (sel === "father") {
+        if (gName)   gName.value   = fatherName?.value || "";
+        if (gMobile) gMobile.value = fatherMobile?.value || "";
+        if (gNid)    gNid.value    = fatherNid?.value || "";
+        if (gRel)    gRel.value    = "Father";
+      } else if (sel === "mother") {
+        if (gName)   gName.value   = motherName?.value || "";
+        if (gMobile) gMobile.value = motherMobile?.value || "";
+        if (gNid)    gNid.value    = motherNid?.value || "";
+        if (gRel)    gRel.value    = "Mother";
       } else {
-        guardianName.value = "";
-        guardianMobile.value = "";
-        guardianRelation.value = "";
+        if (gName)   gName.value   = "";
+        if (gMobile) gMobile.value = "";
+        if (gNid)    gNid.value    = "";
+        if (gRel)    gRel.value    = "";
       }
     }
 
-    if (guardianSelect) {
-      guardianSelect.addEventListener("change", autoFillGuardianFields);
-      // ✅ Call once on page load also
-      autoFillGuardianFields();
-    }
-    fatherName.addEventListener("input", autoFillGuardianFields);
-    fatherMobile.addEventListener("input", autoFillGuardianFields);
-    motherName.addEventListener("input", autoFillGuardianFields);
-    motherMobile.addEventListener("input", autoFillGuardianFields);
+    guardianSelect?.addEventListener("change", syncGuardian);
+    fatherName?.addEventListener("input", syncGuardian);
+    fatherMobile?.addEventListener("input", syncGuardian);
+    fatherNid?.addEventListener("input", syncGuardian);
+    motherName?.addEventListener("input", syncGuardian);
+    motherMobile?.addEventListener("input", syncGuardian);
+    motherNid?.addEventListener("input", syncGuardian);
+    syncGuardian();
+  })();
 
-  });
+  /* Address live copy — safe for edit mode */
+(function () {
+  const cb = document.getElementById("id_add_address_same")
+            || document.querySelector('input[name="add_address_same"]');
+  const PAIRS = [
+    ["id_add_village", "id_add_village_per"],
+    ["id_add_post", "id_add_post_per"],
+    ["id_add_police", "id_add_police_per"],
+    ["id_add_postal", "id_add_postal_per"],
+    ["id_add_distric", "id_add_distric_per"],
+  ];
 
-
-  <!-- 🔷 Admission Fee Load Script -->
-
-  const selectedGroup = "{{ subjects_main.0.group|default_if_none:'science' }}";
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const sessionSelect = document.getElementById("id_add_session");
-    const feeField = document.getElementById("id_add_amount");
-
-    if (!sessionSelect || !feeField) return;
-
-    sessionSelect.addEventListener("change", function () {
-      const sessionId = this.value;
-
-      console.log("📦 Fetching fee for session:", sessionId);
-      console.log("🎯 Group selected:", selectedGroup);  // ✅ DEBUG
-
-      fetch(`/dashboard/api/fee/admission/?session=${sessionId}&program=HSC&group=${selectedGroup}`)
-        .then(res => res.json())
-        .then(data => {
-          console.log("💰 Fee response:", data);
-          feeField.value = data.amount;
-        })
-        .catch(err => console.error("❌ Fee fetch error:", err));
+  function setRO(ro){
+    PAIRS.forEach(([, d]) => {
+      const dst = document.getElementById(d);
+      if (dst) dst.readOnly = ro;
     });
-  });
+  }
 
-
-
-
-  <!-- 🔷 Subjects -->
-  document.addEventListener("DOMContentLoaded", function () {
-  const mainRadios = document.querySelectorAll('input[name="main_subject"]');
-  const fourthRadios = document.querySelectorAll('input[name="fourth_subject"]');
-
-  function updateVisibility() {
-    const selectedMain = document.querySelector('input[name="main_subject"]:checked')?.dataset.subName;
-    const selectedFourth = document.querySelector('input[name="fourth_subject"]:checked')?.dataset.subName;
-
-    fourthRadios.forEach(radio => {
-      const wrapper = radio.closest('.form-check');
-      const subName = radio.dataset.subName;
-      if (subName === selectedMain) {
-        wrapper.style.display = 'none';
-        if (radio.checked) radio.checked = false;
-      } else {
-        wrapper.style.display = '';
-      }
-    });
-
-    mainRadios.forEach(radio => {
-      const wrapper = radio.closest('.form-check');
-      const subName = radio.dataset.subName;
-      if (subName === selectedFourth) {
-        wrapper.style.display = 'none';
-        if (radio.checked) radio.checked = false;
-      } else {
-        wrapper.style.display = '';
+  function copyAll(){
+    PAIRS.forEach(([s, d]) => {
+      const src = document.getElementById(s);
+      const dst = document.getElementById(d);
+      if (src && dst) {
+        dst.value = src.value || "";
+        dst.dataset.autofilled = "1"; // mark
       }
     });
   }
 
-  mainRadios.forEach(r => r.addEventListener('change', updateVisibility));
-  fourthRadios.forEach(r => r.addEventListener('change', updateVisibility));
+  // live mirroring handlers
+  let unsubs = [];
+  function bindMirroring(){
+    unbindMirroring();
+    PAIRS.forEach(([s, d]) => {
+      const src = document.getElementById(s);
+      const dst = document.getElementById(d);
+      if (!src || !dst) return;
+      const h = () => {
+        dst.value = src.value || "";
+        dst.dataset.autofilled = "1";
+      };
+      src.addEventListener("input", h);
+      src.addEventListener("change", h);
+      unsubs.push(() => {
+        src.removeEventListener("input", h);
+        src.removeEventListener("change", h);
+      });
+    });
+  }
+  function unbindMirroring(){
+    unsubs.forEach(fn => fn());
+    unsubs = [];
+  }
 
-  updateVisibility(); // Initial check
+  function clearAutoFilled(){
+    PAIRS.forEach(([, d]) => {
+      const dst = document.getElementById(d);
+      if (dst && dst.dataset.autofilled === "1") {
+        dst.value = "";                // clear only ones we auto-filled
+        delete dst.dataset.autofilled; // unmark
+      }
+    });
+  }
+
+  if (!cb) return;
+
+  let initialized = false;
+  // remember previous state to know if user toggled off
+  cb.dataset.prev = cb.checked ? "1" : "0";
+
+  function apply(){
+    const isChecked = cb.checked;
+    const wasChecked = cb.dataset.prev === "1";
+
+    if (isChecked) {
+      copyAll();
+      bindMirroring();
+      setRO(true);
+    } else {
+      unbindMirroring();
+      setRO(false);
+      // Only clear if user turned it OFF now; don't clear on initial load
+      if (initialized && wasChecked && !isChecked) {
+        clearAutoFilled();
+      }
+    }
+
+    cb.dataset.prev = isChecked ? "1" : "0";
+    if (!initialized) initialized = true;
+  }
+
+  // Initial load: do nothing destructive; only apply if already checked
+  if (cb.checked) apply();
+  cb.addEventListener("change", apply);
+})();
+
+  /* Fee loader + hidden mirror if session disabled */
+  (function () {
+    const sessionSelect = document.getElementById("id_add_session");
+    const feeField      = document.getElementById("id_add_amount");
+    if (!sessionSelect || !feeField) return;
+
+    function inferGroup() {
+      let grp = "{{ subjects_main.0.group|default:subjects_all.0.group|default:subjects_optional.0.group|default:'science' }}";
+      return (grp || 'science').toLowerCase();
+    }
+
+    function ensureHiddenMirror() {
+      if (!sessionSelect.disabled) return;
+      let hidden = document.querySelector('input[name="add_session_hidden"]');
+      if (!hidden) {
+        hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = "add_session_hidden";
+        sessionSelect.parentNode.appendChild(hidden);
+      }
+      hidden.value = sessionSelect.value || "";
+    }
+
+    function loadFee() {
+      const sessionId = sessionSelect.value;
+      if (!sessionId) return;
+      const group = inferGroup();
+
+      fetch(`/dashboard/api/fee/admission/?session=${sessionId}&program=HSC&group=${group}`)
+        .then(res => res.json())
+        .then(data => { feeField.value = (data && data.amount) ? data.amount : 0; })
+        .catch(err => console.error("Fee fetch error:", err));
+
+      ensureHiddenMirror();
+    }
+
+    loadFee();
+    if (!sessionSelect.disabled) {
+      sessionSelect.addEventListener("change", loadFee);
+    } else {
+      setTimeout(loadFee, 0);
+      const mo = new MutationObserver(loadFee);
+      mo.observe(sessionSelect, { attributes: true, attributeFilter: ["value","disabled"] });
+    }
+  })();
+
+  /* Prevent same subject for main & fourth (+ special pair for science if needed) */
+  (function () {
+    const grp = ("{{ subjects_main.0.group|default:subjects_all.0.group|default:subjects_optional.0.group|default:'science' }}").toLowerCase();
+    const mainRadios   = document.querySelectorAll('input[name="main_subject"]');
+    const fourthRadios = document.querySelectorAll('input[name="fourth_subject"]');
+
+    function updateVisibility() {
+      const mainSel   = document.querySelector('input[name="main_subject"]:checked');
+      const mainName  = mainSel?.dataset.subName;
+      const mainCode  = mainSel?.dataset.subCode;
+      const fourthSel = document.querySelector('input[name="fourth_subject"]:checked');
+      const fourthName= fourthSel?.dataset.subName;
+
+      fourthRadios.forEach(r => {
+        const wrap = r.closest('.form-check');
+        if (!wrap) return;
+        const name = r.dataset.subName;
+        const code = r.dataset.subCode;
+        let hide = (name === mainName);
+        if (grp === 'science') {
+          if (mainCode === '265 - 266' && code === '239 - 240') hide = true;
+        }
+        wrap.style.display = hide ? 'none' : '';
+        if (hide && r.checked) r.checked = false;
+      });
+
+      mainRadios.forEach(r => {
+        const wrap = r.closest('.form-check');
+        if (!wrap) return;
+        const name = r.dataset.subName;
+        const hide = (name === fourthName);
+        wrap.style.display = hide ? 'none' : '';
+        if (hide && r.checked) r.checked = false;
+      });
+    }
+
+    mainRadios.forEach(r => r.addEventListener('change', updateVisibility));
+    fourthRadios.forEach(r => r.addEventListener('change', updateVisibility));
+    updateVisibility();
+  })();
+
+  /* Quota & Community toggle */
+  (function () {
+    function setupToggle(yesId,noId,containerId,inputId){
+      const yes=document.getElementById(yesId);
+      const no =document.getElementById(noId);
+      const cont=document.getElementById(containerId);
+      const inp=document.getElementById(inputId);
+      function apply(){
+        if(!cont) return;
+        const show = yes?.checked===true;
+        cont.style.display = show ? "block":"none";
+        if (inp){ inp.toggleAttribute("required", show); if(!show) inp.value=""; }
+      }
+      yes?.addEventListener("change",apply);
+      no ?.addEventListener("change",apply);
+      apply();
+    }
+    setupToggle("id_qouta_yes","id_qouta_no","qouta_name_container","id_qouta_name");
+    setupToggle("id_community_yes","id_community_no","community_name_container","id_community_name");
+  })();
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    const checkbox = document.getElementById("id_add_address_same");
-    checkbox.addEventListener("change", function () {
-      if (this.checked) {
-        document.getElementById("id_add_village_per").value = document.getElementById("id_add_village").value;
-        document.getElementById("id_add_post_per").value = document.getElementById("id_add_post").value;
-        document.getElementById("id_add_upojella_per").value = document.getElementById("id_add_upojella").value;
-        document.getElementById("id_add_distric_per").value = document.getElementById("id_add_distric").value;
-      }
-    });
+  var el = document.getElementById("id_add_slip");
+  if (!el) return;
+  el.setAttribute("required", "required");
+  el.setAttribute("title", "Payment Mobile Number");
+  el.addEventListener("invalid", function () {
+    this.setCustomValidity("Please enter the payment mobile number.");
   });
+  el.addEventListener("input", function () {
+    this.setCustomValidity("");
+  });
+});
 
+document.addEventListener("DOMContentLoaded", function () {
+  const input = document.getElementById("id_add_photo");
+  const hint  = document.getElementById("photo-size-hint");
+  if (!input) return;
+
+  input.addEventListener("change", function () {
+    hint && (hint.style.display = "none");
+    const file = this.files && this.files[0];
+    if (!file) return;
+    if (file.size > 500 * 1024) {
+      hint && (hint.style.display = "block");
+    }
+  });
+});
 </script>
-
 {% endblock %}

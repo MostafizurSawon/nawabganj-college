@@ -1,0 +1,86 @@
+
+{% extends layout_path %}
+{% load static %}
+{% block title %}Marks Entry - {{ subject.name }} | {{ exam.exam_name }}{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+  <div class="mb-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="card p-4">
+  <h4>Marks Entry for {{ subject.name }} ({{ exam.exam_name }})</h4>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+
+    {% if formset.non_form_errors %}
+      <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+    {% endif %}
+
+    <table class="table table-bordered table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Roll</th>
+          <th>Student Name</th>
+          <th>CQ</th>
+          <th>MCQ</th>
+          {# Practical কেবল তখনই দেখাই যদি ফর্মে practical_mark ফিল্ড থাকে #}
+          {% with f0=formset.forms.0 %}
+            {% if f0 and 'practical_mark' in f0.fields %}
+              <th>Practical</th>
+            {% endif %}
+          {% endwith %}
+          {# <th>CT</th>  লাগলে আনকমেন্ট করো #}
+        </tr>
+      </thead>
+      <tbody>
+        {% if formset.forms %}
+          {% for form in formset.forms %}
+            {% with rec=form.instance.exam_record stu=form.instance.exam_record.hsc_student %}
+            <tr>
+              <td>{{ stu.add_class_roll|default:"-" }}</td>
+              <td>
+                {{ stu.add_name|default:"(unknown)" }}
+                {{ form.id }} {# hidden id field #}
+              </td>
+              <td>
+                {{ form.cq_mark }}
+                {% if form.cq_mark.errors %}<div class="text-danger small">{{ form.cq_mark.errors }}</div>{% endif %}
+              </td>
+              <td>
+                {{ form.mcq_mark }}
+                {% if form.mcq_mark.errors %}<div class="text-danger small">{{ form.mcq_mark.errors }}</div>{% endif %}
+              </td>
+              {% if 'practical_mark' in form.fields %}
+                <td>
+                  {{ form.practical_mark }}
+                  {% if form.practical_mark.errors %}<div class="text-danger small">{{ form.practical_mark.errors }}</div>{% endif %}
+                </td>
+              {% endif %}
+              {# <td>{{ form.ct_mark }}</td> #}
+            </tr>
+            {% endwith %}
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="5" class="text-center">No records to display.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+
+    <div class="text-end mt-3">
+      <a class="btn btn-outline-secondary me-2" href="{% url 'exam_list_marks' %}">Back</a>
+      <button type="submit" class="btn btn-primary">Save Marks</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

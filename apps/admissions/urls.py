@@ -13,7 +13,8 @@ urlpatterns = [
 
     path('fees/', FeeListView.as_view(), name='fee_list'),
     path('fees/create/', FeeCreateView.as_view(), name='fee_create'),
-    path('fees/<int:pk>/update/', FeeUpdateView.as_view(), name='fee_update'),
+    # path('fees/<int:pk>/update/', FeeUpdateView.as_view(), name='fee_update'),
+    path('fees/<int:pk>/update/', views.fee_update, name='fee_update'),
     path('fees/<int:pk>/delete/', FeeDeleteView.as_view(), name='fee_delete'),
 
     # Hsc Apply
@@ -30,6 +31,15 @@ urlpatterns = [
 
     # Global filter by session
     path('set-session/', views.set_session_view, name='set_session'),
+
+
+    # subject wise student data
+    path("subjects/students/", views.SubjectWiseStudentsView.as_view(), name="subject_wise_students"),
+
+    path("subjects/pdf/", views.SubjectStudentsPDFView.as_view(), name="subject_students_pdf"),
+
+    # Tabulation (static PDF design)
+    path("tabulation", views.TabulationSheetPDFView.as_view(), name="tabulation_pdf"),
 
 ]
 

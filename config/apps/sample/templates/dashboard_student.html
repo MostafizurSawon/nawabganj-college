@@ -1,0 +1,572 @@
+{% extends layout_path %}
+{% load i18n static %}
+
+{% block title %}College Management Dashboard{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+
+<style>
+  /* Readability & responsive polish */
+  .page-hero {
+    border-left: .5rem solid var(--bs-primary);
+    background: linear-gradient(180deg, rgba(115,103,240,.06), rgba(0,0,0,0));
+  }
+  .card.rounded-4 { border-radius: 1rem; }
+  .list-group-item { padding: .9rem 1rem; }
+  .badge.bg-label-primary {
+    background-color: rgba(115, 103, 240, .12) !important;
+    color: #7367F0 !important;
+  }
+  .alert[role="alert"] { line-height: 1.55; }
+  .kicker { letter-spacing: .06em; text-transform: uppercase; font-size: .75rem; }
+  .truncate-70 { max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 576px){
+    .truncate-70 { max-width: 100%; }
+  }
+</style>
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/flatpickr/flatpickr.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_js %}
+{{ block.super }}
+<script src="{% static 'js/dashboards-crm.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% trans 'Close' %}"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% if mode == "list" %}
+
+    <div class="row g-4">
+
+      <!-- Your Admission -->
+      <div class="col-lg-12 col-md-12">
+        <div class="card h-100 p-0 border-0 shadow-sm rounded-4">
+          <div class="card-header bg-white pb-2 d-flex justify-content-between align-items-center rounded-top-4">
+            <h5 class="card-title mb-0">Your Admission Information</h5>
+            {% if admission_status %}
+              <span class="badge text-uppercase
+                {% if admission_status == 'paid' %} bg-success
+                {% elif admission_status == 'pending' %} bg-warning text-dark
+                {% elif admission_status == 'unpaid' %} bg-danger
+                {% else %} bg-secondary
+                {% endif %}">
+                {% if admission_status == 'paid' %}PAID
+                {% elif admission_status == 'pending' %}PENDING
+                {% elif admission_status == 'unpaid' %}UNPAID
+                {% else %}N/A{% endif %}
+              </span>
+            {% endif %}
+          </div>
+
+          <div class="card-body p-4">
+            {% if admission_group and admission_pk %}
+              <h6 class="mb-2">
+                You have filled a form for: HSC <strong>{{ admission_group }}</strong> Group
+              </h6>
+
+              <div class="d-flex flex-wrap gap-2 mt-2">
+
+                {% if admission_pk %}
+              <a href="{% url 'hsc_admission_view' pk=admission_pk %}" class="btn btn-success">
+                <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
+              </a>
+            {% else %}
+              <button class="btn btn-secondary" disabled>
+                <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
+              </button>
+            {% endif %}
+              
+              </div>
+              
+
+              {% if not admission_paid %}
+                <div class="small text-dark mt-2">
+                  পেমেন্ট নিশ্চিতকরণের পরে ইনভয়েস পাওয়া যাবে।
+                </div>
+              {% endif %}
+            {% else %}
+              <div class="alert alert-info mb-0" role="alert">
+                <strong>আপনি এখনো কোনো ফর্ম পূরণ করেননি</strong> 
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Admission Form Links -->
+  <div class="col-xxl-4 col-md-4">
+    <div class="card h-100 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <div class="badge p-2 bg-label-success mb-3 rounded">
+          <i class="ti ti-credit-card ti-28px"></i>
+        </div>
+        <h5 class="card-title mb-1">
+          <a href="{% url 'hsc_admission_create' %}">HSC Science Admission Form</a>
+        </h5>
+        <p class="text-dark small mb-0">ভর্তি যোগ্যতা ও প্রয়োজনীয় তথ্য আগে দেখে নিন।</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xxl-4 col-md-4">
+    <div class="card h-100 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <div class="badge p-2 bg-label-success mb-3 rounded">
+          <i class="ti ti-credit-card ti-28px"></i>
+        </div>
+        <h5 class="card-title mb-1">
+          <a href="{% url 'hsc_admission_create_arts' %}">HSC Humanities Admission Form</a>
+        </h5>
+        <p class="text-dark small mb-0">বিষয়সমূহ ও সিট সংক্রান্ত আপডেট দেখুন।</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xxl-4 col-md-4">
+    <div class="card h-100 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <div class="badge p-2 bg-label-success mb-3 rounded">
+          <i class="ti ti-credit-card ti-28px"></i>
+        </div>
+        <h5 class="card-title mb-1">
+          <a href="{% url 'hsc_admission_create_commerce' %}">HSC Business Studies Admission Form</a>
+        </h5>
+        <p class="text-dark small mb-0">আবেদনের পূর্বে ডকুমেন্ট প্রস্তুত রাখুন।</p>
+      </div>
+    </div>
+  </div>
+
+      
+
+  </div>
+
+{% elif mode == "sp" %}
+
+<div class="row g-4">
+
+  <!-- Your Admission -->
+  <div class="col-lg-12 col-md-12">
+    <div class="card h-100 p-0 border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white pb-2 d-flex justify-content-between align-items-center rounded-top-4">
+        <h5 class="card-title mb-0">Your Admission Payment Information</h5>
+        {% if admission_status %}
+          <span class="badge text-uppercase
+            {% if admission_status == 'paid' %} bg-success
+            {% elif admission_status == 'pending' %} bg-warning text-dark
+            {% elif admission_status == 'unpaid' %} bg-danger
+            {% else %} bg-secondary
+            {% endif %}">
+            {% if admission_status == 'paid' %}PAID
+            {% elif admission_status == 'pending' %}PENDING
+            {% elif admission_status == 'unpaid' %}UNPAID
+            {% else %}N/A{% endif %}
+          </span>
+        {% endif %}
+      </div>
+
+      <div class="card-body p-4">
+        {% if admission_group and admission_pk %}
+          <h6 class="mb-2">
+            You have filled a form for: HSC <strong>{{ admission_group }}</strong> Group
+          </h6>
+
+          <div class="d-flex flex-wrap gap-2 mt-2">
+
+            {% comment %} {% if admission_pk %}
+              <a href="{% url 'hsc_admission_view' pk=admission_pk %}" class="btn btn-success">
+                View Admission Details
+              </a>
+            {% else %}
+              <button class="btn btn-secondary" disabled>
+                View Admission Details
+              </button>
+            {% endif %} {% endcomment %}
+          
+            {% if admission_paid and invoice_url %}
+              <a href="{{ invoice_url }}" class="btn btn-success">
+                <i class="ti ti-file-invoice me-1"></i> Invoice
+              </a>
+            {% else %}
+              <button class="btn btn-secondary" disabled>
+                <i class="ti ti-file-invoice me-1"></i> Invoice (Pending)
+              </button>
+            {% endif %}
+          
+          </div>
+          
+
+          {% if not admission_paid %}
+            <div class="small text-dark mt-2">
+              পেমেন্ট নিশ্চিতকরণের পরে ইনভয়েস পাওয়া যাবে।
+            </div>
+          {% endif %}
+        
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+
+  
+
+</div>
+
+
+{% else %}
+
+<!-- Hero -->
+<div class="card page-hero shadow-sm mb-4 rounded-4">
+  <div class="card-body py-3">
+    <h3 class="mb-0 text-primary text-center fw-bold">Welcome to Your Dashboard!</h3>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Student Info (Redesigned) -->
+  <div class="col-lg-6">
+    <div class="card h-100 border-0 shadow-sm rounded-4">
+      <div class="w-100" style="height:6px; background:linear-gradient(90deg,#7367F0,#28C76F,#00CFE8); border-top-left-radius:1rem; border-top-right-radius:1rem;"></div>
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="d-flex align-items-center justify-content-center rounded-circle border" style="width: 56px; height: 56px; overflow: hidden;">
+            {% if admission.add_photo %}
+              <img src="{{ admission.add_photo.url }}" alt="Profile Photo" class="img-fluid rounded-circle w-100 h-100 object-fit-cover">
+            {% else %}
+              <i class="ti ti-user fs-2"></i>
+            {% endif %}
+          </div>
+          <div>
+            <h5 class="mb-0">Student Profile</h5>
+            <div class="kicker text-dark">আপনার প্রাথমিক তথ্য</div>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center p-3 border border-success rounded-3">
+              <div>
+                <div class="text-success small">Student ID: {{ request.user.id }}</div>
+                {% comment %} <div class="fw-semibold text-success">{{ request.user.id }}</div> {% endcomment %}
+              </div>
+              <span class="badge bg-label-success text-uppercase">Active</span>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="p-3 border rounded-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="me-2">
+                  <div class="text-dark small mb-1">Phone</div>
+                  <div class="fw-semibold">{{ request.user.phone_number|default:"Not provided" }}</div>
+                </div>
+                {% comment %} <a href="tel:{{ request.user.phone_number }}" class="btn btn-sm btn-primary {% if not request.user.phone_number %}disabled{% endif %}">
+                  <i class="ti ti-phone-call me-1"></i> Call
+                </a> {% endcomment %}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="p-3 border rounded-3 bg-white">
+              <div class="text-dark small mb-1">Student Name: </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="fw-semibold truncate-70">{{admission.add_name|default:""}}</div>
+                {% comment %} <a href="mailto:{{ request.user.email }}" class="btn btn-sm btn-outline-secondary {% if not request.user.email %}disabled{% endif %}">
+                  <i class="ti ti-mail me-1"></i> Email
+                </a> {% endcomment %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 d-flex flex-wrap gap-2">
+          {% comment %} <a href="{% url 'hsc_admission_create' %}" class="btn btn-success">
+            <i class="ti ti-edit me-1"></i> ফর্ম পূরণ করুন
+          </a> {% endcomment %}
+        
+          {% comment %} {% if admission_pk %}
+            <a href="{% url 'hsc_admission_view' pk=admission_pk %}" class="btn btn-outline-secondary">
+              <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
+            </a>
+          {% else %}
+            <button class="btn btn-outline-secondary" disabled>
+              <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
+            </button>
+          {% endif %} {% endcomment %}
+        </div>
+        
+
+        <div class="mt-3 small text-dark">
+          🔒 কোন ভুল থাকলে কলেজ থেকে ঠিক করে নিতে হবে।
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Your Admission -->
+  <div class="col-lg-6">
+    <div class="card h-100 p-0 border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white pb-2 d-flex justify-content-between align-items-center rounded-top-4">
+        <h5 class="card-title mb-0">Your Admission Information</h5>
+        {% if admission_status %}
+          <span class="badge text-uppercase
+            {% if admission_status == 'paid' %} bg-success
+            {% elif admission_status == 'pending' %} bg-warning text-dark
+            {% elif admission_status == 'unpaid' %} bg-danger
+            {% else %} bg-secondary
+            {% endif %}">
+            {% if admission_status == 'paid' %}PAID
+            {% elif admission_status == 'pending' %}PENDING
+            {% elif admission_status == 'unpaid' %}UNPAID
+            {% else %}N/A{% endif %}
+          </span>
+        {% endif %}
+      </div>
+
+      <div class="card-body p-4">
+        {% if admission_group and admission_pk %}
+          <h6 class="mb-2">
+            You have filled a form for: HSC <strong>{{ admission_group }}</strong> Group
+          </h6>
+
+          <div class="d-flex flex-wrap gap-2 mt-2">
+
+            {% if admission_pk %}
+              <a href="{% url 'hsc_admission_view' pk=admission_pk %}" class="btn btn-success">
+                <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
+              </a>
+            {% else %}
+              <button class="btn btn-secondary" disabled>
+                <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
+              </button>
+            {% endif %}
+            
+          
+            {% if admission_paid and invoice_url %}
+              <a href="{{ invoice_url }}" class="btn btn-success">
+                <i class="ti ti-file-invoice me-1"></i> Invoice
+              </a>
+            {% else %}
+              <button class="btn btn-secondary" disabled>
+                <i class="ti ti-file-invoice me-1"></i> Invoice (Pending)
+              </button>
+            {% endif %}
+          
+          </div>
+          
+
+          {% if not admission_paid %}
+            <div class="small text-dark mt-2">
+              পেমেন্ট নিশ্চিতকরণের পরে ইনভয়েস পাওয়া যাবে।
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="alert alert-info mb-0" role="alert">
+            <strong>আপনি এখনো কোনো ফর্ম পূরণ করেননি</strong> 
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- HSC Admission Notice -->
+  <div class="col-12">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-transparent pt-3 pb-0">
+        <h4 class="card-title mb-2">এইচ.এস.সি ভর্তি নির্দেশনা</h4>
+        <p class="text-dark mb-3">ফর্ম পূরণের আগে/পরে যা যা জানা দরকার</p>
+      </div>
+
+      <div class="card-body">
+        <!-- Status / Callout -->
+
+        {% if not admission_pk %}
+        <div class="alert alert-warning d-flex align-items-start gap-3 border-2 border-warning rounded-3"
+            role="alert" style="border-left-width:.5rem;">
+          <div class="fs-3 lh-1">📝</div>
+          <div>
+            <div class="fw-semibold mb-1 text-danger">
+              আপনি এখনো কোনো ফর্ম পূরণ করেননি
+            </div>
+            <div class="small text-success">
+              নিচের মেনু থেকে আপনার গ্রুপ অনুযায়ী ফর্ম পূরণ করুন। 
+              ফর্ম সাবমিটের পর প্রিন্ট নিয়ে কলেজে জমা দিন।
+            </div>
+
+            <div class="mt-3 d-flex flex-wrap gap-2">
+              <a href="{% url 'hsc_admission_create' %}" class="btn btn-sm btn-primary">
+                <i class="ti ti-edit me-1"></i> Science ফর্ম পূরণ করুন
+              </a>
+              <a href="{% url 'hsc_admission_create_arts' %}" class="btn btn-sm btn-primary">
+                <i class="ti ti-edit me-1"></i> Humanities ফর্ম পূরণ করুন
+              </a>
+              <a href="{% url 'hsc_admission_create_commerce' %}" class="btn btn-sm btn-primary">
+                <i class="ti ti-edit me-1"></i> Business Studies ফর্ম পূরণ করুন
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+
+        <!-- What to submit -->
+        <div class="mb-3">
+          <div class="kicker text-dark mb-2">ফর্ম জমা দেওয়ার ধাপ</div>
+          <ol class="ps-3">
+            <li class="mb-1">অনলাইন পোর্টালে ফর্ম পূরণ করুন</li>
+            <li class="mb-1">পেমেন্ট সম্পন্ন করুন</li>
+            <li class="mb-1">ফর্মের <span class="fw-semibold">প্রিন্টেড কপি</span> সহ প্রয়োজনীয় ডকুমেন্ট কলেজে জমা দিন</li>
+          </ol>
+        </div>
+
+        <div class="mb-2">
+          <div class="kicker text-dark mb-2">যে সব কাগজপত্র জমা দিতে হবে</div>
+          <ul class="list-group list-group-flush rounded-3 overflow-hidden">
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">1</span>
+              কলেজের অনলাইন পোর্টালে পূরণকৃত <span class="fw-semibold ms-1">প্রিন্টেড আবেদন কপি</span>।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">2</span>
+              এস.এস.সি/সমমানের <span class="fw-semibold ms-1">মূল নম্বরপত্র ও মূল প্রশংসাপত্র</span>।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">3</span>
+              উপরোক্ত দুটির <span class="fw-semibold ms-1">ফটোকপি ১ টি</span>।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">4</span>
+              <span class="fw-semibold">রেজিস্ট্রেশন কার্ড ও এডমিট কার্ডের </span>&nbsp;ফটোকপি ১টি করে।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">5</span>
+              ছাত্র/ছাত্রীর <span class="fw-semibold ms-1">জন্ম সনদের ফটোকপি ১টি</span>।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">6</span>
+              <span class="fw-semibold">পাসপোর্ট সাইজের ২ কপি ছবি</span>।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">7</span>
+              পিতা ও মাতার <span class="fw-semibold ms-1">জাতীয় পরিচয়পত্রের ফটোকপি ১টি করে।</span> 
+            </li>
+          </ul>
+        </div>
+
+        <div class="small text-dark mt-3">
+          ℹ️ সকল কাগজপত্রে তথ্য মিল আছে কি না একবার যাচাই করে নেবেন। প্রিন্ট কপি সিগনেচার করে জমা দিন।
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admission Form Links -->
+  {% comment %} <div class="col-xxl-4 col-md-4">
+    <div class="card h-100 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <div class="badge p-2 bg-label-success mb-3 rounded">
+          <i class="ti ti-credit-card ti-28px"></i>
+        </div>
+        <h5 class="card-title mb-1">
+          <a href="{% url 'hsc_admission_create' %}">HSC Science Admission Form</a>
+        </h5>
+        <p class="text-dark small mb-0">ভর্তি যোগ্যতা ও প্রয়োজনীয় তথ্য আগে দেখে নিন।</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xxl-4 col-md-4">
+    <div class="card h-100 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <div class="badge p-2 bg-label-success mb-3 rounded">
+          <i class="ti ti-credit-card ti-28px"></i>
+        </div>
+        <h5 class="card-title mb-1">
+          <a href="{% url 'hsc_admission_create_arts' %}">HSC Humanities Admission Form</a>
+        </h5>
+        <p class="text-dark small mb-0">বিষয়সমূহ ও সিট সংক্রান্ত আপডেট দেখুন।</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xxl-4 col-md-4">
+    <div class="card h-100 border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <div class="badge p-2 bg-label-success mb-3 rounded">
+          <i class="ti ti-credit-card ti-28px"></i>
+        </div>
+        <h5 class="card-title mb-1">
+          <a href="{% url 'hsc_admission_create_commerce' %}">HSC Business Studies Admission Form</a>
+        </h5>
+        <p class="text-dark small mb-0">আবেদনের পূর্বে ডকুমেন্ট প্রস্তুত রাখুন।</p>
+      </div>
+    </div>
+  </div> {% endcomment %}
+</div>
+
+<!-- Footer callouts -->
+<div class="col-12 mt-4">
+  <div class="card h-100 border-0 shadow-sm rounded-4">
+    <div class="card-body pt-4">
+
+      {% comment %} <div class="alert alert-success d-flex align-items-start gap-3 shadow-sm rounded-3 border border-success border-2"
+           role="alert" style="border-left-width:.6rem;">
+        <div class="fs-3 lh-1">✅</div>
+        <div>
+          <p class="mb-0 text-dark fw-bold">
+            After Payment, print the form and submit to college.
+          </p>
+        </div>
+      </div> {% endcomment %}
+
+      <!-- Alert: Notice -->
+      {% comment %} <div class="alert alert-success d-flex align-items-start gap-3 shadow-sm rounded-3 border border-success border-2 mb-4"
+      role="alert" style="border-left-width:.6rem;">
+        <div class="fs-3 lh-1">⚠️</div>
+        <div>
+          <div class="fw-bold text-uppercase small"></div>
+          <p class="mb-0 text-dark fw-bold">
+            নোট: সফটওয়্যার সম্পর্কে কিছু জানতে বা টেকনিক্যাল সমস্যায় পড়লে আমাদের সঙ্গে যোগাযোগ করুন।
+          </p>
+        </div>
+      </div> {% endcomment %}
+
+      {% comment %} <div class="alert alert-primary d-flex align-items-start gap-3 shadow-sm rounded-3 border border-primary border-2 mb-0"
+           role="alert" style="border-left-width:.6rem;">
+        <div>
+          <h3 class="card-title mb-2">JBD IT</h3>
+          <h5 class="mb-2">
+            Email: <a class="text-dark" href="mailto:support@jbdit.com.bd">support@jbdit.com.bd</a>
+          </h5>
+          <h5 class="mb-0">
+            Mobile: <a class="text-dark" href="tel:+8801716905615">+88 01716 905615</a>
+          </h5>
+        </div>
+      </div> {% endcomment %}
+
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

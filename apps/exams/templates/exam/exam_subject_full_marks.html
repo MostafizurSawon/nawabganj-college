@@ -1,0 +1,97 @@
+{% extends layout_path %}
+
+{% load static %}
+
+{% block title %}Exam Full Marks{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+<div class="card p-4 table-responsive">
+  <h3>Set Full Marks for Exam: <strong>{{ exam.exam_name }}</strong> ({{ exam.exam_class.pro_name }}, Session: {{ exam.exam_session.ses_name }})</h3>
+  
+  
+
+  <form method="post" class="mt-4">
+    {% csrf_token %}
+    <table class="table table-bordered table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Subject</th>
+          <th>Full Marks</th>
+          <th>Pass Marks</th>
+          <th>CQ Marks</th>
+          <th>CQ Pass</th>
+          <th>MCQ Marks</th>
+          <th>MCQ Pass</th>
+
+          {% if exam.exam_class.name != '6' and exam.exam_class.name != '7' and exam.exam_class.name != '8' %}
+          <th>Practical Marks</th>
+          <th>Practical Pass</th>
+          {% endif %}
+
+          {% comment %} <th>CT Marks</th>
+          <th>CT Pass</th> {% endcomment %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for esub in exam_subjects %}
+        <tr>
+          <td>{{ esub.subject.name }}</td>
+          <td>
+            <input type="number" name="subject_{{ esub.subject.id }}_full_marks" min="0" class="form-control" style="min-width: 80px;" value="{{ esub.full_marks }}">
+          </td>
+          <td>
+            <input type="number" name="subject_{{ esub.subject.id }}_pass_marks" min="0" class="form-control" style="min-width: 80px;" value="{{ esub.pass_marks }}">
+          </td>
+          <td>
+            <input type="number" name="subject_{{ esub.subject.id }}_cq_marks" min="0" class="form-control" style="min-width: 80px;" value="{{ esub.cq_marks|default_if_none:'' }}">
+          </td>
+          <td>
+            <input type="number" name="subject_{{ esub.subject.id }}_cq_pass_marks" min="0" class="form-control" style="min-width: 80px;" value="{{ esub.cq_pass_marks|default_if_none:'' }}">
+          </td>
+          <td>
+            <input type="number" name="subject_{{ esub.subject.id }}_mcq_marks" min="0" class="form-control" style="min-width: 80px;" value="{{ esub.mcq_marks|default_if_none:'' }}">
+          </td>
+          <td>
+            <input type="number" name="subject_{{ esub.subject.id }}_mcq_pass_marks" min="0" class="form-control" style="min-width: 80px;" value="{{ esub.mcq_pass_marks|default_if_none:'' }}">
+          </td>
+
+          {% if exam.exam_class.name != '6' and exam.exam_class.name != '7' and exam.exam_class.name != '8' %}
+          <td>
+            <input type="number" name="subject_{{ esub.subject.id }}_practical_marks" min="0" class="form-control" style="min-width: 80px;" value="{{ esub.practical_marks|default_if_none:'' }}">
+          </td>
+          <td>
+            <input type="number" name="subject_{{ esub.subject.id }}_practical_pass_marks" min="0" class="form-control" style="min-width: 80px;" value="{{ esub.practical_pass_marks|default_if_none:'' }}">
+          </td>
+          {% endif %}
+
+          {% comment %} <td>
+            <input type="number" name="subject_{{ esub.subject.id }}_ct_marks" min="0" class="form-control" style="min-width: 80px;" value="{{ esub.ct_marks|default_if_none:'' }}">
+          </td>
+          <td>
+            <input type="number" name="subject_{{ esub.subject.id }}_ct_pass_marks" min="0" class="form-control" style="min-width: 80px;" value="{{ esub.ct_pass_marks|default_if_none:'' }}">
+          </td> {% endcomment %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="my-3">
+
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-save"></i> Save Full Marks
+        </button>
+        <a href="{% url 'exam_list' %}" class="btn btn-secondary ms-2">Back to Exam List</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

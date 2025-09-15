@@ -6,12 +6,45 @@ urlpatterns = [
     path('admitted-students/<int:pk>/view/', views.HscAdmissionDetailView2.as_view(), name='hsc_admission_view'),
     # path('admitted-students/<int:pk>/view/', views.HscAdmissionDetailView.as_view(), name='hsc_admission_view'),
 
+    # payment confirmation
+    path(
+        "admitted-students-hsc/<int:pk>/payment/",
+        views.HscPaymentReviewUpdateView.as_view(),
+        name="hsc_payment_review",
+    ),
+
+    # update mosal
+    path(
+        "admitted-students/<int:pk>/payment/update/",
+        views.update_admission_payment,
+        name="hsc_payment_update",
+    ),
+
     # 👇 Update and delete
     path('admitted-students/<int:pk>/edit/', views.HscAdmissionUpdateView.as_view(), name='hsc_admission_update'),
+    path('admitted-students-business/<int:pk>/edit/', views.HscAdmissionUpdateCommerceView.as_view(), name='hsc_admission_update_business'),
     path('admitted-students/<int:pk>/delete/', views.HscAdmissionDeleteView.as_view(), name='hsc_admission_delete'),
 
     # Arts Update and delete
     path('admitted-students/<int:pk>/edit/arts/', views.HscAdmissionUpdateArtsView.as_view(), name='hsc_admission_update_arts'),
+
+    # hsc invoice
+    path("student/<int:pk>/invoice/", views.admission_invoice_view, name="hsc_admission_invoice"),
+
+    # srudent acount theke invoice
+    # path(
+    #     "dashboard/student/<int:pk>/invoice/",
+    #     views.StudentInvoiceView.as_view(),
+    #     name="student_invoice",
+    # ),
+
+
+    # স্টাফ/অ্যাডমিন
+    # path("students/<int:pk>/invoice/", admission_invoice_view, name="admission_invoice"),
+
+    # স্টুডেন্ট (নিজের ইনভয়েস)
+    path("student/<int:pk>/my-invoice/", views.student_admission_invoice_view, name="student_invoice"),
+
 
     # Degree Admitted Students
     path('admitted-students/degree/', views.DegreeAdmittedStudentListView.as_view(), name='degree_admitted_students_list'),

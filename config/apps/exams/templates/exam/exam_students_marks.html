@@ -1,0 +1,104 @@
+{% extends layout_path %}
+{% load static %}
+{% load dict_filters %}
+
+{% block content %}
+<div class="flex-grow-1">
+  <!-- Title and Breadcrumb -->
+
+  <div class="px-4 pt-3 pb-2 mb-4 border-start border-4 border-primary bg-light-subtle rounded shadow-sm">
+    <h4 class="mb-0 text-primary fw-bold">
+      <span class="text-muted fw-light">Exams /</span>
+        {{ exam.exam_name }} ({{ exam.exam_year.name }}) / Marks Entry 
+        - class {{ exam.students.first.add_program.pro_name }}
+
+    </h4>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+  <div class="mb-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Card -->
+  <div class="card">
+    <div class="card-body ">
+      <h4 class="text-primary fw-bold">
+        Enter Marks for Students
+      </h4>
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="table-responsive text-nowrap">
+          <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light text-center">
+              <tr>
+                <th style="min-width: 8px;">ID</th>
+                <th style="min-width: 180px;">Student Name</th>
+                {% for subject in subjects %}
+                  <th>{{ subject.name }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for record in exam_records %}
+              <tr>
+                <td><strong>{{ record.student.add_name }}</strong></td>
+                <td><strong>{{ record.student.add_class_roll }}</strong></td>
+                {% for subject in subjects %}
+                <td>
+                  <div class="d-grid gap-1">
+                    <input 
+                      type="number" min="0" max="100"
+                      name="cq_{{ record.id }}_{{ subject.id }}"
+                      value="{{ marks_dict|dict_get:record.id|dict_get:subject.id.cq_mark }}"
+                      class="form-control form-control-sm" placeholder="CQ"
+                    >
+                    <input 
+                      type="number" min="0" max="100"
+                      name="mcq_{{ record.id }}_{{ subject.id }}"
+                      value="{{ marks_dict|dict_get:record.id|dict_get:subject.id.mcq_mark }}"
+                      class="form-control form-control-sm" placeholder="MCQ"
+                    >
+                    <input 
+                      type="number" min="0" max="100"
+                      name="practical_{{ record.id }}_{{ subject.id }}"
+                      value="{{ marks_dict|dict_get:record.id|dict_get:subject.id.practical_mark }}"
+                      class="form-control form-control-sm" placeholder="Practical"
+                    >
+                    <input 
+                      type="number" min="0" max="100"
+                      name="ct_{{ record.id }}_{{ subject.id }}"
+                      value="{{ marks_dict|dict_get:record.id|dict_get:subject.id.ct_mark }}"
+                      class="form-control form-control-sm" placeholder="CT"
+                    >
+                  </div>
+                </td>
+                
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+          <a href="{% url 'exam_create' %}" class="btn btn-outline-primary">
+            <i class="bx bx-arrow-back me-1"></i> Back to Exam List
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="bx bx-save me-1"></i> Save All Marks
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

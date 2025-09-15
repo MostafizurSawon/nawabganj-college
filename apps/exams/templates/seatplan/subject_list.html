@@ -1,0 +1,67 @@
+{% extends layout_path %}
+{% load static %}
+
+{% block title %}Seatplan • Subjects{% endblock %}
+
+{% block content %}
+<div class="flex-grow-1 container-p-y">
+
+  <!-- Page header -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h4 class="mb-1">Seatplan – Pick a subject</h4>
+      {% if active_session %}
+        <div class="text-muted">Active session: <strong>{{ active_session.ses_name }}</strong></div>
+      {% else %}
+        <div class="text-muted"><em>No active session selected</em></div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Subjects grid -->
+  <div class="row g-3">
+    {% for s in subjects %}
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <div class="card h-100">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="text-uppercase small text-muted">
+                {% if s.group %}{{ s.get_group_display }}{% else %}All{% endif %}
+              </span>
+              {% if s.code %}
+                <span class="badge bg-label-info">{{ s.code }}</span>
+              {% endif %}
+            </div>
+
+            <h6 class="card-title mb-2">{{ s.sub_name }}</h6>
+
+            <div class="mt-auto pt-2">
+              <a class="btn btn-outline-primary btn-sm w-100"
+                 href="{% url 'seatplan_students' %}?subject={{ s.id }}">
+                Select
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-warning mb-0">No active subjects found.</div>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock content %}

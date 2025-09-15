@@ -1,0 +1,434 @@
+{% comment %} {% extends layout_path %}
+
+{% load static %}
+
+{% block title %}Student Marksheet{% endblock %}
+
+{% block content %}
+
+
+<div class="card p-4">
+    <h4>Marksheet</h4>
+    <hr>
+    <p><strong>Name:</strong> {{ record.student.add_name }}</p>
+    <p><strong>Class:</strong> {{ record.exam.exam_class.name }}</p>
+    <p><strong>Exam:</strong> {{ record.exam.exam_name }}</p>
+    <p><strong>Year:</strong> {{ record.exam.exam_year.name }}</p>
+  
+    <table class="table table-bordered mt-3">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>CQ</th>
+          <th>MCQ</th>
+          {% if record.exam.exam_class.name != '6' and record.exam.exam_class.name != '7' and record.exam.exam_class.name != '8' %}
+          <th>Practical</th>
+          {% endif %}
+          <th>CT</th>
+          <th>Total</th>
+          <th>Grade</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for mark in subject_marks %}
+        <tr>
+          <td>{{ mark.subject.name }}</td>
+          <td>{{ mark.cq_mark|default:"-" }}</td>
+          <td>{{ mark.mcq_mark|default:"-" }}</td>
+          {% if record.exam.exam_class.name != '6' and record.exam.exam_class.name != '7' and record.exam.exam_class.name != '8' %}
+          <td>{{ mark.practical_mark|default:"-" }}</td>
+          {% endif %}
+          <td>{{ mark.ct_mark|default:"-" }}</td>
+          <td>{{ mark.total_mark }}</td>
+          <td>{{ mark.grade|default:"-" }}</td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  
+    <p class="mt-4"><strong>Total Marks:</strong> {{ record.total_marks }}</p>
+    <p><strong>Grade:</strong> {{ record.grade }}</p>
+    <p><strong>GPA:</strong> {{ gpa|default:"N/A" }}</p>
+
+    <p><strong>Remarks:</strong> {{ record.remarks }}</p>
+  
+    <div class="text-end mt-3">
+      <button onclick="window.print()" class="btn btn-outline-primary">Print Marksheet</button>
+    </div>
+  </div>
+  
+
+  {% endblock %} {% endcomment %}
+
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IKKSHU GABESHAWANA HIGH SCHOOL - Final Examination 2024</title>
+  
+  <!-- jsPDF and html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+    }
+
+    .a4-container {
+      width: 21cm;
+      min-height: 29.7cm;
+      padding: 1.5cm;
+      margin: 0 auto;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header img {
+      width: 80px;
+      vertical-align: middle;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin: 0;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 15px;
+    }
+
+    .header p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .header h2 {
+      font-size: 20px;
+      margin-top: 10px;
+      border: 1px solid black;
+      padding: 5px;
+      display: inline-block;
+    }
+
+    .student-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .student-info-left, .student-info-right {
+      border: 1px solid black;
+      padding: 5px;
+      width: 48%;
+    }
+
+    .student-info-left table, .student-info-right table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    .student-info-left td, .student-info-right td {
+      padding: 2px 5px;
+      border: 1px solid black;
+    }
+
+    .grade-table-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .marks-table {
+      width: 80%;
+      border-collapse: collapse;
+    }
+
+    .marks-table th, .marks-table td {
+      border: 1px solid black;
+      padding: 6px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .marks-table th {
+      background-color: #f2f2f2;
+    }
+
+    .grade-legend {
+      width: 18%;
+      border-collapse: collapse;
+    }
+
+    .grade-legend th, .grade-legend td {
+      border: 1px solid black;
+      padding: 4px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .grade-legend th {
+      background-color: #f2f2f2;
+    }
+
+    .nb-footer {
+      font-size: 12px;
+      margin-top: 5px;
+      font-weight: bold;
+    }
+
+    .attendance-report {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .attendance-report table {
+      width: 40%;
+      border-collapse: collapse;
+    }
+
+    .attendance-report th, .attendance-report td {
+      border: 1px solid black;
+      padding: 5px;
+      text-align: left;
+    }
+
+    .attendance-report th {
+      background-color: #f2f2f2;
+      text-align: center;
+    }
+
+    .signatures {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .signature-line {
+      border-top: 1px solid black;
+      width: 180px;
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .signature-block {
+      text-align: center;
+    }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 12px;
+    }
+
+    .buttons {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .buttons button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 0 10px;
+    }
+
+    @media print {
+      body {
+        background-color: white;
+      }
+      .a4-container {
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+      }
+      .buttons {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="a4-container" id="reportCard">
+    <div class="header">
+            <img src="./assets/logo/logo.png" alt="School Logo">
+            <h1>Ishurdi Girls School and College</h1>
+            <p>BSRI, ISHWARDI, PABNA</p>
+            <h2>FINAL EXAMINATION- 2024</h2>
+        </div>
+
+        <div class="student-info">
+             <div class="student-info-left">
+                <table>
+                    <tr>
+                        <td><strong>Student's Name:</strong></td>
+                        <td>RAFAT ISLAM RAINE</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Class:</strong></td>
+                        <td>EIGHT</td>
+                    </tr>
+                     <tr>
+                        <td><strong>Group:</strong></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="student-info-right">
+                <table>
+                    <tr>
+                        <td><strong>SID:</strong></td>
+                        <td>220802</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Class ID:</strong></td>
+                        <td>220802</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="grade-table-container">
+            <table class="marks-table">
+                <thead>
+                    <tr>
+                        <th>Name of the Subject</th>
+                        <th>Full Mark</th>
+                        <th>SA</th>
+                        <th>SA HM</th>
+                        <th>70% OF SA (A)</th>
+                        <th>CA FULL MARKS</th>
+                        <th>CA (B)</th>
+                        <th>CA HM</th>
+                        <th>TOTAL (A+B)</th>
+                        <th>GP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Bangla</td><td>100</td><td>71</td><td>95</td><td>49.7</td><td>30</td><td>19</td><td>29</td><td>68.7</td><td>3.5</td></tr>
+                    <tr><td>English</td><td>100</td><td>79</td><td>93</td><td>55.3</td><td>30</td><td>21</td><td>28</td><td>76.3</td><td>4.0</td></tr>
+                    <tr><td>Mathematics</td><td>100</td><td>89</td><td>99</td><td>62.3</td><td>30</td><td>22</td><td>30</td><td>84.3</td><td>5.0</td></tr>
+                    <tr><td>Science</td><td>100</td><td>80</td><td>93</td><td>56</td><td>30</td><td>23</td><td>30</td><td>79.0</td><td>4.0</td></tr>
+                    <tr><td>History & Social Science</td><td>100</td><td>74</td><td>95</td><td>51.8</td><td>30</td><td>20</td><td>29</td><td>71.8</td><td>4.0</td></tr>
+                    <tr><td>Digital Technology</td><td>100</td><td>83</td><td>95</td><td>58.1</td><td>30</td><td>24</td><td>29</td><td>82.1</td><td>5.0</td></tr>
+                    <tr><td>Live and livelihood</td><td>100</td><td>66</td><td>89</td><td>46.2</td><td>30</td><td>13</td><td>27</td><td>59.2</td><td>3.0</td></tr>
+                    <tr><td>Islam/Hindu Studies</td><td>100</td><td>80</td><td>98</td><td>56</td><td>30</td><td>29</td><td>30</td><td>85.0</td><td>5.0</td></tr>
+                    <tr><td>Art & Culture</td><td>100</td><td>81</td><td>98</td><td>56.7</td><td>30</td><td>15</td><td>30</td><td>71.7</td><td>4.0</td></tr>
+                    <tr><td>Well Being</td><td>100</td><td>81</td><td>95</td><td>56.7</td><td>30</td><td>22</td><td>27</td><td>78.7</td><td>4.0</td></tr>
+                </tbody>
+            </table>
+
+            <div style="display: flex; flex-direction: column; justify-content: space-between; width: 18%;">
+                <table class="grade-legend">
+                    <thead>
+                        <tr><th>Letter Grade</th><th>Class Interval (%)</th><th>Grade Point</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>A+</td><td>80 - 100</td><td>5</td></tr>
+                        <tr><td>A</td><td>70 - 79</td><td>4</td></tr>
+                        <tr><td>A-</td><td>60 - 69</td><td>3.5</td></tr>
+                        <tr><td>B</td><td>50 - 59</td><td>3</td></tr>
+                        <tr><td>C</td><td>40 - 49</td><td>2</td></tr>
+                        <tr><td>D</td><td>33 - 39</td><td>1</td></tr>
+                        <tr><td>F</td><td>0 - 32</td><td>0</td></tr>
+                    </tbody>
+                </table>
+                <table class="grade-legend" style="margin-top: 10px;">
+                    <tr>
+                        <td style="border: 1px solid black; padding: 5px;"><strong>Total Mark</strong></td>
+                        <td style="border: 1px solid black; padding: 5px;"><strong>GPA</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid black; padding: 20px 5px;">757</td>
+                        <td style="border: 1px solid black; padding: 20px 5px;">4.15</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <p class="nb-footer">NB: SA= Summative Assessment    CA=Continuous Assessment    GPA=Grade Point Average,    HM=Highest Mark</p>
+        
+        <div class="attendance-report">
+             <table>
+                <thead>
+                    <tr><th colspan="2">Attendance Report</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Name of the Examination</td><td>FINAL EXAMINATION- 2024</td></tr>
+                    <tr><td>Attendance</td><td>130</td></tr>
+                    <tr><td>Working Days</td><td>176</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="margin-top: 15px; font-size: 14px;">
+            <strong>Class Teacher's Comment:</strong>
+            <div style="border: 1px solid black; height: 40px; margin-top: 5px;"></div>
+        </div>
+
+
+        <div class="signatures">
+            <div class="signature-block">
+                <p class="signature-line"></p>
+                <p>Class Teacher's Signature</p>
+            </div>
+            <div class="signature-block">
+                <p class="signature-line"></p>
+                <p>Guardian's Signature</p>
+            </div>
+            <div class="signature-block">
+                <p class="signature-line"></p>
+                <p>Signature of Head Teacher</p>
+            </div>
+           
+        </div>
+
+        <div class="footer-text">
+            © 2025 - Ishurdi Girls School and College, BSRI, Ishwardi, Pabna. All Rights Reserved. Designed & Developed BY: JBD IT
+        </div>
+  </div>
+  <div class="buttons">
+    <button onclick="downloadPDF()">Download PDF</button>
+    <button onclick="window.print()">Print</button>
+  </div>
+
+  <script>
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const reportCard = document.getElementById('reportCard');
+
+      const canvas = await html2canvas(reportCard, {
+        scale: 2,
+        useCORS: true,
+        scrollY: -window.scrollY
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pageWidth;
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save('Report-Card-RAFAT-ISLAM-RAINE.pdf');
+    }
+  </script>
+</body>
+</html>

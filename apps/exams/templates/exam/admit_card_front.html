@@ -1,0 +1,434 @@
+{% load dict_filters %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admit Cards | {{ site_settings.name }}</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- html2canvas -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+
+  <!-- jsPDF UMD -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+    integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+    defer></script>
+
+  <!-- Bengali webfonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+  :root{
+    --bn-font: "Hind Siliguri","Noto Sans Bengali",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    /* default (screen/print) in mm */
+    --pageW: 210mm; --pageH: 297mm;
+    --pad: 10mm;   --mid: 20mm;
+    --eps: 0mm;
+    --hcard: calc((var(--pageH) - (var(--pad) * 2) - var(--mid)) / 2);
+  }
+  /* PDF mode → pixel-locked (drift free) */
+  body.pdf{
+    --pageW: 794px;   /* 210mm @96dpi */
+    --pageH: 1123px;  /* 297mm @96dpi */
+    --pad: 38px;      /* ~10mm */
+    --mid: 76px;      /* ~20mm */
+    --eps: 0px;
+  }
+
+  html,body{ font-family: var(--bn-font); }
+
+  /* SCREEN --------------------------------------------------------------- */
+  #admitContainer{ max-width: 794px; margin:12px auto; }
+  .a4-sheet{
+    background:#fff; margin:12px auto; padding: var(--pad);
+    box-sizing:border-box; width:100%;
+    border:1px solid #e5e7eb;
+  }
+  .sheet-inner{ display:flex; flex-direction:column; min-height: 900px; }
+  .mid-slot{ display:flex; align-items:center; height: var(--mid); }
+  .dash-svg{ display:block; width:100%; height:1px; }
+
+  /* PRINT --------------------------------------------------------------- */
+  @media print{
+    @page { size: A4 portrait; margin: 0; }
+    body{ -webkit-print-color-adjust: exact; background:#fff !important; }
+    .fixed{ display:none !important; }
+
+    #admitContainer{ width: var(--pageW); margin:0 auto; }
+    .a4-sheet{
+      width: var(--pageW); height: var(--pageH);
+      padding: var(--pad); margin:0 auto;
+      page-break-after: always; box-sizing:border-box; border:0;
+    }
+    .a4-sheet:last-child{ page-break-after: auto; }
+
+    .sheet-inner{
+      height: calc(var(--pageH) - (var(--pad) * 2));
+      display:flex; flex-direction:column;
+    }
+    .mid-slot{ height: var(--mid); }
+
+    .admit-card{
+      height: var(--hcard);
+      border:1px solid #c5c5c5; box-shadow:none;
+    }
+  }
+
+  /* PDF MODE (during capture) ------------------------------------------- */
+  body.pdf #admitContainer{ width: var(--pageW); margin:0 auto; }
+  body.pdf .a4-sheet{
+    width: var(--pageW);
+    height: calc(var(--pageH) - var(--eps));
+    padding: var(--pad); margin:0 auto; border:0;
+  }
+  body.pdf .sheet-inner{
+    height: calc(var(--pageH) - var(--eps) - (var(--pad) * 2));
+    display:flex; flex-direction:column;
+  }
+  body.pdf .mid-slot{ height: var(--mid); }
+  body.pdf .admit-card{
+    height: calc((var(--pageH) - var(--eps) - (var(--pad) * 2) - var(--mid)) / 2);
+  }
+
+  .html2pdf__page-break{ height:0 !important; margin:0 !important; border:0 !important; }
+
+  /* Card ----------------------------------------------------------------- */
+  .admit-card{
+    background:#fff; color:#000;
+    border:1px solid #d1d5db; border-radius:6px;
+    box-shadow:0 2px 10px rgba(0,0,0,.06);
+    padding:12px; box-sizing:border-box; width:100%;
+    break-inside:avoid; page-break-inside:avoid;
+    font-size:11px; display:flex; flex-direction:column;
+  }
+
+  /* Header --------------------------------------------------------------- */
+  /* Header bar */
+    .header-bar{
+      display:grid;
+      grid-template-columns: auto 1fr auto; /* logo | center | photo */
+      align-items:center;
+      gap:10px;
+      width:100%;
+      border:2px solid #1e40af;
+      padding:8px;
+      border-radius:6px;
+      background:linear-gradient(#eaf2ff,#ffffff);
+    }
+    
+    /* Center portion (school name + meta + badge) */
+    .brand-wrap{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      width:100%;
+    }
+    
+    /* ✅ School name (no clipping) */
+    .header-title{
+      font-weight:800;
+      font-size:20px;
+      line-height:1.3;
+      text-align:center;
+      word-break:break-word;   /* break if too long */
+      white-space:normal;      /* allow wrapping */
+      overflow:visible;        /* no hidden text */
+      max-width:100%;          /* never overflow box */
+    }
+    
+    /* ✅ Meta line under name */
+    .header-meta{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:10px;
+      font-size:11px;
+      margin-top:2px;
+    }
+    
+    /* ✅ Admit Card pill centered */
+    .badge-red{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin-top:10px;
+      height:26px;
+      padding:0 7px 12px 7px;
+      background:#ef4444;
+      color:#fff;
+      font-weight:700;
+      font-size:11px;
+      border-radius:9999px;
+      letter-spacing:.2px;
+    }
+
+
+
+  /* Info grid ------------------------------------------------------------ */
+  .info-block{ padding-right: 18px; }
+  @media print{ .info-block{ padding-right: 10mm !important; } }
+  .info-grid{ display:grid; grid-template-columns:max-content 22px 1fr; align-items:baseline; row-gap:2px; }
+  .info-grid > *:nth-child(3n){ padding-left:6px; }
+  .info-grid > *:nth-child(3n-1){ text-align:right; }
+
+  /* Subjects (5 + 5) ----------------------------------------------------- */
+    .subjects-wrap{
+      display:grid; grid-template-columns:1fr 1fr; gap:0;
+      border:1px solid #9ca3af; border-radius:4px; overflow:hidden;
+      position: relative;                  /* for middle divider */
+    }
+    
+    .sub-table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+    }
+    
+    .sub-table th,
+    .sub-table td{
+      /* ✅ balanced vertical spacing */
+      padding: 0 0 12px 10px;            
+      line-height: 1.25;
+      vertical-align: middle;
+    
+      border:1px solid #9ca3af;
+      font-size:11px;
+      text-align:left;
+    
+      /* ✅ keep a minimum height so text never hugs the bottom */
+      min-height: 28px;            /* single‑line হলে কেন্দ্রেই থাকবে */
+    }
+    
+    .sub-table th{
+      background:#e5f0ff;
+      text-align:center;
+      font-weight:600;
+    }
+    
+    .sub-table thead th:first-child,
+    .sub-table tbody td:first-child{
+      width:56px;
+      text-align:center;
+    }
+    
+    /* === Middle vertical divider (between the two tables) === */
+    .subjects-wrap::after{
+      content:"";
+      position:absolute;
+      top:0; bottom:0;
+      left:50%;
+      width:1px;
+      background:#9ca3af;
+      transform:translateX(-0.5px);
+      pointer-events:none;
+    }
+    
+    /* outer top/bottom via wrapper border only */
+    .subjects-wrap .sub-table thead th{ border-top-width:0; }
+    .subjects-wrap .sub-table tr:last-child td{ border-bottom-width:0; }
+
+
+  /* Signatures ----------------------------------------------------------- */
+  .sig-line{ border-top:1px solid #6b7280; width:120px; text-align:center;  font-size:11px; }
+  .sig-row{ display:flex; justify-content:space-between; align-items:flex-end; margin-top:auto;  }
+
+  .table-note{ font-size:10px; text-align:center; margin-top:6px; }
+
+  .header-bar, .sub-table th, .sub-table td{
+    transform: translateZ(0);
+    -webkit-font-smoothing: antialiased;
+  }
+</style>
+
+</head>
+
+<body class="bg-gray-100 pb-28">
+  <!-- Bottom toolbar (screen only) -->
+  <div class="fixed bottom-0 left-0 w-full bg-white z-50 flex justify-center gap-4 py-3 shadow-md print:hidden"
+       data-html2canvas-ignore="true">
+    <button onclick="downloadPDF()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+      ⬇️ Download PDF
+    </button>
+  </div>
+
+  <div id="admitContainer">
+    {% for record in students %}
+      {% if forloop.counter0|divisibleby:2 %}
+      <!-- ১ শিট = ১ পেজ -->
+      <div class="a4-sheet">
+        <div class="sheet-inner">
+      {% endif %}
+
+          <!-- TOP/BOTTOM SLOT CARD -->
+          <div class="admit-card">
+            <!-- Header -->
+            <div class="header-bar">
+              <!-- left: logo -->
+              <img src="{{ site_settings.logo.url }}" alt="Logo"
+                   class="header-logo w-16 h-16 object-cover rounded-full border" />
+
+              <!-- center: name + meta + badge -->
+              <div class="brand-wrap">
+                  <div class="header-title">{{ site_settings.name }}</div>
+                  <div class="header-meta">
+                    <div><span class="font-semibold">Established:</span> {{ site_settings.established }}</div>
+                    <div><span class="font-semibold">EIIN No:</span> {{ site_settings.eiin }}</div>
+                    <div><span class="font-semibold">Mobile:</span> {{ site_settings.phone }}</div>
+                  </div>
+                  <span class="badge-red">ADMIT CARD</span>
+                </div>
+
+
+              <!-- right: student photo -->
+              {% if record.student.add_photo %}
+                <img src="{{ record.student.add_photo.url }}" alt="Photo"
+                     class="header-photo object-cover rounded border"
+                     style="width:72px;height:86px;">
+              {% endif %}
+            </div>
+
+            <!-- Examinee info -->
+            <div class="grid grid-cols-12 gap-2 mt-2 info-block">
+              <div class="col-span-9">
+                <div class="info-grid">
+                  <div class="font-semibold whitespace-nowrap">Exam Name</div><div>:</div><div>{{ record.exam.exam_name }}</div>
+                  <div class="font-semibold whitespace-nowrap">Examinee Name</div><div>:</div><div>{{ record.student.add_name }}</div>
+                  <div class="font-semibold whitespace-nowrap">Father's Name</div><div>:</div><div>{{ record.student.add_father|default:"" }}</div>
+                  <div class="font-semibold whitespace-nowrap">Mother's Name</div><div>:</div><div>{{ record.student.add_mother|default:"" }}</div>
+                </div>
+              </div>
+              <div class="col-span-3">
+                <div class="info-grid">
+                  <div class="font-semibold whitespace-nowrap">ID No</div><div>:</div><div>{{ record.student.add_class_roll|default:"" }}</div>
+                  <div class="font-semibold whitespace-nowrap">Session</div><div>:</div><div>{{ record.exam.exam_year.name }}</div>
+                  {% if record.student.group %}
+                  <div class="font-semibold whitespace-nowrap">Group</div><div>:</div><div>{{ record.student.get_group_display|default:"" }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Subjects (exact 5 + 5) -->
+            <div class="subjects-wrap mt-2">
+              <table class="sub-table">
+                <thead><tr><th>Code</th><th>Subject Name</th></tr></thead>
+                <tbody>
+                  {% for subject in record.exam.subjects.all|slice:":5" %}
+                    <tr><td class="!text-center">{{ subject.code|default:"" }}</td><td>{{ subject.name }}</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              <table class="sub-table">
+                <thead><tr><th>Code</th><th>Subject Name</th></tr></thead>
+                <tbody>
+                  {% for subject in record.exam.subjects.all|slice:"5:10" %}
+                    <tr><td class="!text-center">{{ subject.code|default:"" }}</td><td>{{ subject.name }}</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-note">N.B: Mobile phone is not allowed in the exam room.</div>
+
+            <!-- Signatures -->
+            <div class="sig-row">
+              <div class="sig-line text-center">Student Signature</div>
+              <div class="sig-line text-center">Head Teacher Signature</div>
+            </div>
+          </div>
+
+          <small class="block text-center relative top-[5px] print:top-[5px] text-[10px] opacity-80">
+            This is software generated copy. Design & Develop by JBD IT
+          </small>
+
+          {% if not forloop.last and not forloop.counter0|add:1|divisibleby:2 %}
+            <!-- middle dashed line -->
+            <div class="mid-slot" aria-hidden="true">
+              <svg class="dash-svg" viewBox="0 0 100 1" preserveAspectRatio="none">
+                <line x1="0" y1="0.5" x2="100" y2="0.5" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="8 8"/>
+              </svg>
+            </div>
+          {% endif %}
+
+      {% if forloop.counter0|add:1|divisibleby:2 or forloop.last %}
+        </div></div>
+        {% if not forloop.last %}<div class="html2pdf__page-break"></div>{% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Page-wise PDF generator -->
+  <script>
+    const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+
+    async function html2canvasPage(el){
+      // ensure all images are loaded
+      const imgs = el.querySelectorAll('img');
+      await Promise.all(Array.from(imgs).map(img => {
+        if (img.complete) return;
+        return new Promise(res=>{
+          try { img.crossOrigin = img.crossOrigin || 'anonymous'; } catch(e){}
+          img.addEventListener('load', res, {once:true});
+          img.addEventListener('error', res, {once:true});
+        });
+      }));
+
+      if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(e){} }
+      await new Promise(r => requestAnimationFrame(()=>requestAnimationFrame(r)));
+      await sleep(10);
+
+      return await html2canvas(el, {
+        scale: 2,                 // constant 2x, stable
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: Math.max(document.documentElement.clientWidth, el.scrollWidth),
+        windowHeight: Math.max(document.documentElement.clientHeight, el.scrollHeight)
+      });
+    }
+
+    async function downloadPDF(){
+      const { jsPDF } = window.jspdf;
+
+      // lock to PDF mode (px integers)
+      document.body.classList.add('pdf');
+
+      try{
+        const pages = document.querySelectorAll('.a4-sheet');
+        if (!pages.length) { alert('No .a4-sheet found!'); return; }
+
+        const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+
+        let pageIndex = 0;
+        for (const page of pages) {
+          const canvas = await html2canvasPage(page);
+          const img = canvas.toDataURL('image/jpeg', 0.95);
+
+          if (pageIndex > 0) pdf.addPage('a4', 'portrait');
+
+          // exact-fit (canvas already A4 ratio @px-locked layout)
+          pdf.addImage(img, 'JPEG', 0, 0, 210, 297);
+
+          await sleep(20);
+          pageIndex++;
+        }
+
+        pdf.save('admit_cards.pdf');
+      } finally {
+        document.body.classList.remove('pdf');
+      }
+    }
+  </script>
+</body>
+</html>

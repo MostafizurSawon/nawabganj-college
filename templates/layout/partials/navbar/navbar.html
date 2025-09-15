@@ -18,7 +18,8 @@
           <span class="app-brand-logo demo">
             {% include 'partials/logo.html' %}
           </span>
-          <span class="app-brand-text demo menu-text text-sm fw-bold">{% get_theme_variables 'template_name' %}</span>
+          {% comment %} <span class="app-brand-text demo menu-text text-sm fw-bold">{% get_theme_variables 'template_name' %}</span> {% endcomment %}
+          <span class="app-brand-text demo menu-text text-sm fw-bold">User Dashboard</span>
         </a>
 
         {% if menu_horizontal %}
@@ -68,6 +69,7 @@
         <!-- / Style Switcher-->
 
         <ul class="navbar-nav flex-row align-items-center ms-auto">
+          {% if not request.user.role == 'student' %}
           <li class="me-3">
             <form method="POST" action="{% url 'set_session' %}">
               {% csrf_token %}
@@ -84,48 +86,88 @@
               </div>
             </form>
           </li>
+          {% endif %}
 
 
 
           <!-- User -->
          <li class="nav-item navbar-dropdown dropdown-user dropdown">
+
+
+            
+
             <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
               <div class="avatar avatar-online">
-                <img src="{% static 'img/avatars/1.png' %}" alt class="h-auto rounded-circle">
+                {% if user.is_authenticated and user.role == 'student' %}
+                
+                    {% for admission in user.hsc_admissions_created.all %}
+                        {% if admission.add_photo %}
+                        
+                            <img src="{{ admission.add_photo.url }}" alt class="rounded-circle">
+                        {% else %}
+                        
+                        <img src="{% static 'img/avatars/1.png' %}" alt class="h-auto rounded-circle">
+                        {% endif %}
+                    {% empty %}
+                    <img src="{% static 'img/avatars/1.png' %}" alt class="h-auto rounded-circle">
+                    {% endfor %}
+                {% else %}
+                  <img src="{% static 'img/avatars/1.png' %}" alt class="h-auto rounded-circle">
+                {% endif %}
               </div>
             </a>
+
+
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
                 <a class="dropdown-item" href="javascript:void(0);">
                   <div class="d-flex">
                     <div class="flex-shrink-0 me-3">
                       <div class="avatar avatar-online">
-                        <img src="{% static 'img/avatars/1.png' %}" alt class="h-auto rounded-circle">
+
+                        {% if user.is_authenticated and user.role == 'student' %}
+                            {% for admission in user.hsc_admissions_created.all %}
+                                {% if admission.add_photo %}
+                                
+                                    <img src="{{ admission.add_photo.url }}" alt class="rounded-circle">
+                                {% else %}
+                                
+                                <img src="{% static 'img/avatars/1.png' %}" alt class="h-auto rounded-circle">
+                                {% endif %}
+                            {% empty %}
+                            <img src="{% static 'img/avatars/1.png' %}" alt class="h-auto rounded-circle">
+                            {% endfor %}
+                        {% else %}
+                          <img src="{% static 'img/avatars/1.png' %}" alt class="h-auto rounded-circle">
+                        {% endif %}
+
                       </div>
                     </div>
                     <div class="flex-grow-1">
                       <span class="fw-medium d-block">{{request.user}}</span>
-                      <small class="text-muted">Admin</small>
+                      <small class="text-muted">{{ user.get_role_display }}</small>
                     </div>
                   </div>
                 </a>
               </li>
-              <li>
+              {% comment %} <li>
                 <div class="dropdown-divider"></div>
-              </li>
-              <li>
+              </li> {% endcomment %}
+              {% comment %} <li>
                 <a class="dropdown-item" href="javascript:void(0);">
                   <i class="ti ti-user me-3 ti-md"></i>
                   <span class="align-middle">My Profile</span>
                 </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="javascript:void(0);">
+              </li> {% endcomment %}
+              {% if request.user.role == 'student' %}
+              <li class="mb-3">
+                <a class="dropdown-item" href="{% url 'guest_change_password_dashboard' %}">
                   <i class="ti ti-settings me-3 ti-md"></i>
-                  <span class="align-middle">Settings</span>
+                  <span class="align-middle">Change Password</span>
                 </a>
               </li>
-              <li>
+              {% endif %}
+              {% comment %} <li>
                 <a class="dropdown-item" href="javascript:void(0);">
                   <span class="d-flex align-items-center align-middle">
                     <i class="flex-shrink-0 ti ti-file-dollar me-3 ti-md"></i>
@@ -133,11 +175,13 @@
                     <span class="flex-shrink-0 badge bg-danger d-flex align-items-center justify-content-center">2</span>
                   </span>
                 </a>
-              </li>
-              <li>
+              </li> {% endcomment %}
+
+              {% comment %} <li>
                 <div class="dropdown-divider"></div>
-              </li>
-              <li>
+              </li> {% endcomment %}
+              {% comment %} <li>
+
                 <form method="post" action="{% url 'logout' %}">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-sm btn-danger d-flex w-100">
@@ -145,7 +189,17 @@
                     <i class="ti ti-logout ms-2 ti-14px"></i>
                   </button>
                 </form>
-              </li>
+              </li> {% endcomment %}
+
+              <li>
+                <form method="post" action="{% url 'logoutt' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-danger d-flex w-100">
+                        <span class="align-middle">Log Out</span>
+                        <i class="ti ti-logout ms-2 ti-14px"></i>
+                    </button>
+                </form>
+            </li>
 
             </ul>
           </li>

@@ -6,7 +6,8 @@
       <span class="app-brand-logo demo">
         {% include 'partials/logo.html' %}
       </span>
-      <span class="app-brand-text demo menu-text fw-bold">{% get_theme_variables 'template_name' %}</span>
+      <span class="app-brand-text demo menu-text fw-bold">{{request.user.get_role_display}} Panel</span>
+      {% comment %} <span class="app-brand-text demo menu-text fw-bold">{% get_theme_variables 'template_name' %}</span> {% endcomment %}
     </a>
 
     <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">

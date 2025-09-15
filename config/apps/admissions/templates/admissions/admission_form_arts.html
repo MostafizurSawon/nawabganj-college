@@ -1,0 +1,827 @@
+{% extends layout_path %}
+{% load static %}
+{% block title %}HSC Humanities Admission{% endblock %}
+
+{% block content %}
+<div class="flex-grow-1 ">
+  <h4 class="fw-bold mb-4">
+    <span class="text-muted fw-light">HSC Admission /</span> Humanities
+  </h4>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="alert alert-warning d-flex align-items-start gap-3 shadow-sm rounded-3 border border-warning border-2 my-3"
+       role="alert" style="border-left-width:.6rem;">
+    <div class="fs-3 lh-1">⚠️</div>
+    <div>
+      <div class="fw-bold text-uppercase small"></div>
+      <p class="mb-0 text-dark fw-bold">
+        সকল তথ্য সঠিকভাবে পূরণ করুন । ভুল তথ্য পূরণ করলে এডমিশন বাতিল বলে গণ্য হবে ।
+      </p>
+    </div>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+    {% csrf_token %}
+
+    <!-- Personal -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Personal Information</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label for="id_add_name" class="form-label">Name (English)</label>
+          {{ form.add_name }}
+          {% if form.add_name.errors %}<div class="text-danger small">{{ form.add_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_mobile" class="form-label">Mobile Number</label>
+          {{ form.add_mobile }}
+          {% if form.add_mobile.errors %}<div class="text-danger small">{{ form.add_mobile.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_birthdate" class="form-label">Date of Birth</label>
+          {{ form.add_birthdate }}
+          {% if form.add_birthdate.errors %}<div class="text-danger small">{{ form.add_birthdate.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_age" class="form-label">Age</label>
+          {{ form.add_age }}
+          {% if form.add_age.errors %}<div class="text-danger small">{{ form.add_age.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_gender" class="form-label">Gender</label>
+          {{ form.add_gender }}
+          {% if form.add_gender.errors %}<div class="text-danger small">{{ form.add_gender.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_blood_group" class="form-label">Blood Group</label>
+          {{ form.add_blood_group }}
+          {% if form.add_blood_group.errors %}<div class="text-danger small">{{ form.add_blood_group.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_nationality" class="form-label">Nationality</label>
+          {{ form.add_nationality }}
+          {% if form.add_nationality.errors %}<div class="text-danger small">{{ form.add_nationality.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_religion" class="form-label">Religion</label>
+          {{ form.add_religion }}
+          {% if form.add_religion.errors %}<div class="text-danger small">{{ form.add_religion.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_marital_status" class="form-label">Marital Status</label>
+          {{ form.add_marital_status }}
+          {% if form.add_marital_status.errors %}<div class="text-danger small">{{ form.add_marital_status.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_birth_certificate_no" class="form-label">Birth Certificate No</label>
+          {{ form.add_birth_certificate_no }}
+          {% if form.add_birth_certificate_no.errors %}<div class="text-danger small">{{ form.add_birth_certificate_no.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_photo" class="form-label">Upload Photo</label>
+          {{ form.add_photo }}
+          {% if form.add_photo.errors %}<div class="text-danger small">{{ form.add_photo.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Parents & Guardian -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Parents & Guardian Information</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label for="id_add_father" class="form-label">Father's Name</label>
+          {{ form.add_father }}
+          {% if form.add_father.errors %}<div class="text-danger small">{{ form.add_father.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_father_mobile" class="form-label">Father's Mobile</label>
+          {{ form.add_father_mobile }}
+          {% if form.add_father_mobile.errors %}<div class="text-danger small">{{ form.add_father_mobile.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_father_nid" class="form-label">Father's NID</label>
+          {{ form.add_father_nid }}
+          {% if form.add_father_nid.errors %}<div class="text-danger small">{{ form.add_father_nid.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_father_birthdate" class="form-label">Father's Date of Birth</label>
+          {{ form.add_father_birthdate }}
+          {% if form.add_father_birthdate.errors %}<div class="text-danger small">{{ form.add_father_birthdate.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_mother" class="form-label">Mother's Name</label>
+          {{ form.add_mother }}
+          {% if form.add_mother.errors %}<div class="text-danger small">{{ form.add_mother.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_mother_mobile" class="form-label">Mother's Mobile</label>
+          {{ form.add_mother_mobile }}
+          {% if form.add_mother_mobile.errors %}<div class="text-danger small">{{ form.add_mother_mobile.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_mother_nid" class="form-label">Mother's NID</label>
+          {{ form.add_mother_nid }}
+          {% if form.add_mother_nid.errors %}<div class="text-danger small">{{ form.add_mother_nid.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_mother_birthdate" class="form-label">Mother's Date of Birth</label>
+          {{ form.add_mother_birthdate }}
+          {% if form.add_mother_birthdate.errors %}<div class="text-danger small">{{ form.add_mother_birthdate.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_select" class="form-label">Select Guardian</label>
+          {{ form.add_parent_select }}
+          {% if form.add_parent_select.errors %}<div class="text-danger small">{{ form.add_parent_select.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent" class="form-label">Guardian's Name</label>
+          {{ form.add_parent }}
+          {% if form.add_parent.errors %}<div class="text-danger small">{{ form.add_parent.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_mobile" class="form-label">Guardian's Mobile</label>
+          {{ form.add_parent_mobile }}
+          {% if form.add_parent_mobile.errors %}<div class="text-danger small">{{ form.add_parent_mobile.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_relation" class="form-label">Guardian Relation</label>
+          {{ form.add_parent_relation }}
+          {% if form.add_parent_relation.errors %}<div class="text-danger small">{{ form.add_parent_relation.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_service" class="form-label">Guardian Profession</label>
+          {{ form.add_parent_service }}
+          {% if form.add_parent_service.errors %}<div class="text-danger small">{{ form.add_parent_service.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_nid" class="form-label">Guardian NID</label>
+          {{ form.add_parent_nid }}
+          {% if form.add_parent_nid.errors %}<div class="text-danger small">{{ form.add_parent_nid.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_parent_income" class="form-label">Guardian Income</label>
+          {{ form.add_parent_income }}
+          {% if form.add_parent_income.errors %}<div class="text-danger small">{{ form.add_parent_income.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Address -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Address</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label for="id_add_village" class="form-label">Village</label>
+          {{ form.add_village }}
+          {% if form.add_village.errors %}<div class="text-danger small">{{ form.add_village.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_post" class="form-label">Post Office</label>
+          {{ form.add_post }}
+          {% if form.add_post.errors %}<div class="text-danger small">{{ form.add_post.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_police" class="form-label">Police Station/Upazila</label>
+          {{ form.add_police }}
+          {% if form.add_police.errors %}<div class="text-danger small">{{ form.add_police.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_postal" class="form-label">Postal Code</label>
+          {{ form.add_postal }}
+          {% if form.add_postal.errors %}<div class="text-danger small">{{ form.add_postal.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_distric" class="form-label">District</label>
+          {{ form.add_distric }}
+          {% if form.add_distric.errors %}<div class="text-danger small">{{ form.add_distric.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="col-md-12 mt-2">
+          <label class="switch switch-success my-2">
+            <input type="checkbox" name="add_address_same" id="id_add_address_same" class="switch-input"
+                   {% if form.add_address_same.value %}checked{% endif %}>
+            <span class="switch-toggle-slider">
+              <span class="switch-on"><i class="ti ti-check"></i></span>
+              <span class="switch-off"><i class="ti ti-x"></i></span>
+            </span>
+            <span class="switch-label">Same as Present Address</span>
+          </label>
+        </div>
+
+        <div class="col-md-4">
+          <label for="id_add_village_per" class="form-label">Village (Permanent)</label>
+          {{ form.add_village_per }}
+          {% if form.add_village_per.errors %}<div class="text-danger small">{{ form.add_village_per.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_post_per" class="form-label">Post Office (Permanent)</label>
+          {{ form.add_post_per }}
+          {% if form.add_post_per.errors %}<div class="text-danger small">{{ form.add_post_per.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_police_per" class="form-label">Police Station/Upazila (Permanent)</label>
+          {{ form.add_police_per }}
+          {% if form.add_police_per.errors %}<div class="text-danger small">{{ form.add_police_per.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_postal_per" class="form-label">Postal Code (Permanent)</label>
+          {{ form.add_postal_per }}
+          {% if form.add_postal_per.errors %}<div class="text-danger small">{{ form.add_postal_per.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_distric_per" class="form-label">District (Permanent)</label>
+          {{ form.add_distric_per }}
+          {% if form.add_distric_per.errors %}<div class="text-danger small">{{ form.add_distric_per.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quota/Community Information -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Quota/Community Information</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-2">
+          <label class="form-label">Quota Applicable</label>
+          <div class="form-check">
+            <input type="radio" name="qouta" id="id_qouta_yes" value="True" class="form-check-input" {% if form.qouta.value %}checked{% endif %}>
+            <label for="id_qouta_yes" class="form-check-label">Yes</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" name="qouta" id="id_qouta_no" value="False" class="form-check-input" {% if not form.qouta.value %}checked{% endif %}>
+            <label for="id_qouta_no" class="form-check-label">No</label>
+          </div>
+          {% if form.qouta.errors %}<div class="text-danger small">{{ form.qouta.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-10">
+          <div id="qouta_name_container" style="display: {% if form.qouta.value %}block{% else %}none{% endif %};">
+            <label for="id_qouta_name" class="form-label">Quota Name</label>
+            {{ form.qouta_name }}
+            {% if form.qouta_name.errors %}<div class="text-danger small">{{ form.qouta_name.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Community Applicable</label>
+          <div class="form-check">
+            <input type="radio" name="community" id="id_community_yes" value="True" class="form-check-input" {% if form.community.value %}checked{% endif %}>
+            <label for="id_community_yes" class="form-check-label">Yes</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" name="community" id="id_community_no" value="False" class="form-check-input" {% if not form.community.value %}checked{% endif %}>
+            <label for="id_community_no" class="form-check-label">No</label>
+          </div>
+          {% if form.community.errors %}<div class="text-danger small">{{ form.community.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-10">
+          <div id="community_name_container" style="display: {% if form.community.value %}block{% else %}none{% endif %};">
+            <label for="id_community_name" class="form-label">Community Name</label>
+            {{ form.community_name }}
+            {% if form.community_name.errors %}<div class="text-danger small">{{ form.community_name.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- College Info -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">College Info</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label for="id_add_session" class="form-label">Session</label>
+          {{ form.add_session }}
+          {% if form.add_session.errors %}<div class="text-danger small">{{ form.add_session.errors.0 }}</div>{% endif %}
+        </div>
+        {% if not request.user.role == "student" %}
+        <div class="col-md-4">
+          <label for="id_add_class_roll" class="form-label">Class Roll</label>
+          {{ form.add_class_roll }}
+          {% if form.add_class_roll.errors %}<div class="text-danger small">{{ form.add_class_roll.errors.0 }}</div>{% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Academic (SSC) -->
+    <div class="card mb-4">
+      <div class="card-header"><h5 class="mb-0">Academic Information (SSC)</h5></div>
+      <div class="card-body row g-3">
+        <div class="col-md-4">
+          <label for="id_add_ssc_roll" class="form-label">Roll</label>
+          {{ form.add_ssc_roll }}
+          {% if form.add_ssc_roll.errors %}<div class="text-danger small">{{ form.add_ssc_roll.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_reg" class="form-label">Registration No</label>
+          {{ form.add_ssc_reg }}
+          {% if form.add_ssc_reg.errors %}<div class="text-danger small">{{ form.add_ssc_reg.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_board" class="form-label">Board</label>
+          {{ form.add_ssc_board }}
+          {% if form.add_ssc_board.errors %}<div class="text-danger small">{{ form.add_ssc_board.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_group" class="form-label">Group</label>
+          {{ form.add_ssc_group }}
+          {% if form.add_ssc_group.errors %}<div class="text-danger small">{{ form.add_ssc_group.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_passyear" class="form-label">Pass Year</label>
+          {{ form.add_ssc_passyear }}
+          {% if form.add_ssc_passyear.errors %}<div class="text-danger small">{{ form.add_ssc_passyear.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_gpa" class="form-label">GPA</label>
+          {{ form.add_ssc_gpa }}
+          {% if form.add_ssc_gpa.errors %}<div class="text-danger small">{{ form.add_ssc_gpa.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label for="id_add_ssc_session" class="form-label">SSC Session</label>
+          {{ form.add_ssc_session }}
+          {% if form.add_ssc_session.errors %}<div class="text-danger small">{{ form.add_ssc_session.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-8">
+          <label for="id_add_ssc_institute" class="form-label">SSC Institute</label>
+          {{ form.add_ssc_institute }}
+          {% if form.add_ssc_institute.errors %}<div class="text-danger small">{{ form.add_ssc_institute.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Subject Selection -->
+    <div class="card mb-4">
+      <div class="alert alert-warning d-flex align-items-start gap-3 shadow-sm rounded-3 border border-warning border-2 m-3"
+           role="alert" style="border-left-width:.6rem;">
+        <div class="fs-3 lh-1">⚠️</div>
+        <div>
+          <div class="fw-bold text-uppercase small"></div>
+          <p class="mb-0 text-dark fw-bold">Note: Please choose subject carefully!</p>
+        </div>
+      </div>
+
+      <div class="card-header"><h5 class="mb-0">Subject Selection</h5></div>
+      <div class="card-body row g-3">
+        <!-- Common -->
+        <div class="col-md-4">
+          <label class="form-label d-block mb-2">Common Subjects</label>
+          {% for sub in subjects_all %}
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" disabled checked>
+              <label class="form-check-label">{{ sub.sub_name }}</label>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Optional A -->
+        <div class="col-md-4">
+          <label class="form-label d-block mb-2">Elective/Optional Subjects (Group: A) *</label>
+          {% for sub in subjects_optional %}
+            <div class="form-check form-check-success mb-2 optional-subject-option" data-sub-name="{{ sub.sub_name }}">
+              <input class="form-check-input optional-subject"
+                     type="radio" name="optional_subject" id="optional_{{ sub.id }}"
+                     value="{{ sub.id }}" data-sub-name="{{ sub.sub_name }}" data-sub-code="{{ sub.code }}"
+                     {% if sub.full %}disabled{% endif %}
+                     {% if student and student.optional_subject and student.optional_subject.id == sub.id %}checked{% endif %}
+                     required>
+              <label class="form-check-label" for="optional_{{ sub.id }}">
+                {{ sub.sub_name }}
+                {% if sub.limit %}<small class="text-muted"> ({{ sub.used|default:0 }}/{{ sub.limit }})</small>{% endif %}
+                {% if sub.full %}<span class="badge bg-danger ms-1">Seat Full</span>{% endif %}
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Optional B -->
+        <div class="col-md-4">
+          <label class="form-label d-block mb-2">Elective/Optional Subjects (Group: B) *</label>
+          {% for sub in subjects_optional2 %}
+            <div class="form-check form-check-success mb-2 optional2-subject-option" data-sub-name="{{ sub.sub_name }}">
+              <input class="form-check-input optional2-subject"
+                     type="radio" name="optional_subject_2" id="optional2_{{ sub.id }}"
+                     value="{{ sub.id }}" data-sub-name="{{ sub.sub_name }}" data-sub-code="{{ sub.code }}"
+                     {% if sub.full %}disabled{% endif %}
+                     {% if student and student.optional_subject_2 and student.optional_subject_2.id == sub.id %}checked{% endif %}
+                     required>
+              <label class="form-check-label" for="optional2_{{ sub.id }}">
+                {{ sub.sub_name }}
+                {% if sub.limit %}<small class="text-muted"> ({{ sub.used|default:0 }}/{{ sub.limit }})</small>{% endif %}
+                {% if sub.full %}<span class="badge bg-danger ms-1">Seat Full</span>{% endif %}
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Main -->
+        <div class="col-md-4">
+          <label class="form-label d-block mb-2">Main Subject *</label>
+          {% for sub in subjects_main %}
+            <div class="form-check form-check-success mb-2 main-subject-option" data-sub-name="{{ sub.sub_name }}">
+              <input class="form-check-input main-subject"
+                     type="radio" name="main_subject" id="main_{{ sub.id }}"
+                     value="{{ sub.id }}" data-sub-name="{{ sub.sub_name }}" data-sub-code="{{ sub.code }}"
+                     {% if sub.full %}disabled{% endif %}
+                     {% if student and student.main_subject and student.main_subject.id == sub.id %}checked{% endif %}
+                     required>
+              <label class="form-check-label" for="main_{{ sub.id }}">
+                {{ sub.sub_name }}
+                {% if sub.limit %}<small class="text-muted"> ({{ sub.used|default:0 }}/{{ sub.limit }})</small>{% endif %}
+                {% if sub.full %}<span class="badge bg-danger ms-1">Seat Full</span>{% endif %}
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Fourth -->
+        <div class="col-md-4">
+          <label class="form-label d-block mb-2">Additional/4th Subjects *</label>
+          {% for sub in subjects_fourth %}
+            <div class="form-check form-check-success mb-2 fourth-subject-option" data-sub-name="{{ sub.sub_name }}" data-sub-code="{{ sub.code }}">
+              <input class="form-check-input fourth-subject"
+                     type="radio" name="fourth_subject" id="fourth_{{ sub.id }}"
+                     value="{{ sub.id }}" data-sub-name="{{ sub.sub_name }}" data-sub-code="{{ sub.code }}"
+                     {% if sub.full %}disabled{% endif %}
+                     {% if student and student.fourth_subject and student.fourth_subject.id == sub.id %}checked{% endif %}
+                     required>
+              <label class="form-check-label" for="fourth_{{ sub.id }}">
+                {{ sub.sub_name }}
+                {% if sub.limit %}<small class="text-muted"> ({{ sub.used|default:0 }}/{{ sub.limit }})</small>{% endif %}
+                {% if sub.full %}<span class="badge bg-danger ms-1">Seat Full</span>{% endif %}
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Payment -->
+    <div class="card mb-4">
+      <div class="alert alert-success d-flex align-items-start gap-3 shadow-sm rounded-3 border border-success border-2 m-3"
+           role="alert" style="border-left-width:.6rem;">
+        <div class="fs-3 lh-1">✅</div>
+        <div>
+          <div class="fw-bold text-uppercase small text-dark"></div>
+          <p class="mb-0 text-dark fw-bold">
+            For Instruction click <a target="_blank" href="#">here</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="card-header">
+        <h5 class="mb-0">Payment Details
+          {% if request.user.role == 'student' %}
+          <span class="badge bg-primary rounded-pill">Student ID : {{ request.user.id }}</span>
+          {% endif %}
+        </h5>
+      </div>
+      <div class="card-body row g-3">
+        <div class="col-md-6">
+          <label for="id_add_amount" class="form-label">Admission Fee</label>
+          {{ form.add_amount }}
+          {% if form.add_amount.errors %}<div class="text-danger small">{{ form.add_amount.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label for="id_add_payment_method" class="form-label">Payment Method</label>
+          {{ form.add_payment_method }}
+          {% if form.add_payment_method.errors %}<div class="text-danger small">{{ form.add_payment_method.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label for="id_add_trxid" class="form-label">Transaction ID</label>
+          {{ form.add_trxid }}
+          {% if form.add_trxid.errors %}<div class="text-danger small">{{ form.add_trxid.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label for="id_add_slip" class="form-label">Payment From</label>
+          {{ form.add_slip }}
+          {% if form.add_slip.errors %}<div class="text-danger small">{{ form.add_slip.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary">Submit Admission</button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  /* -----------------------------
+     Guardian auto-fill
+  ------------------------------*/
+  (function () {
+    const guardianSelect   = document.getElementById("id_add_parent_select");
+    const fatherName       = document.getElementById("id_add_father");
+    const fatherMobile     = document.getElementById("id_add_father_mobile");
+    const fatherNid        = document.getElementById("id_add_father_nid");
+    const motherName       = document.getElementById("id_add_mother");
+    const motherMobile     = document.getElementById("id_add_mother_mobile");
+    const motherNid        = document.getElementById("id_add_mother_nid");
+
+    const guardianName     = document.getElementById("id_add_parent");
+    const guardianMobile   = document.getElementById("id_add_parent_mobile");
+    const guardianNid      = document.getElementById("id_add_parent_nid");
+    const guardianRelation = document.getElementById("id_add_parent_relation");
+
+    function autoFillGuardianFields() {
+      const selected = guardianSelect ? guardianSelect.value : "";
+      if (selected === "father") {
+        if (guardianName)     guardianName.value     = fatherName?.value   || "";
+        if (guardianMobile)   guardianMobile.value   = fatherMobile?.value || "";
+        if (guardianNid)      guardianNid.value      = fatherNid?.value    || "";
+        if (guardianRelation) guardianRelation.value = "Father";
+      } else if (selected === "mother") {
+        if (guardianName)     guardianName.value     = motherName?.value   || "";
+        if (guardianMobile)   guardianMobile.value   = motherMobile?.value || "";
+        if (guardianNid)      guardianNid.value      = motherNid?.value    || "";
+        if (guardianRelation) guardianRelation.value = "Mother";
+      } else {
+        if (guardianName)     guardianName.value     = "";
+        if (guardianMobile)   guardianMobile.value   = "";
+        if (guardianNid)      guardianNid.value      = "";
+        if (guardianRelation) guardianRelation.value = "";
+      }
+    }
+
+    guardianSelect?.addEventListener("change", autoFillGuardianFields);
+    fatherName?.addEventListener("input", autoFillGuardianFields);
+    fatherMobile?.addEventListener("input", autoFillGuardianFields);
+    fatherNid?.addEventListener("input", autoFillGuardianFields);
+    motherName?.addEventListener("input", autoFillGuardianFields);
+    motherMobile?.addEventListener("input", autoFillGuardianFields);
+    motherNid?.addEventListener("input", autoFillGuardianFields);
+    autoFillGuardianFields();
+  })();
+
+
+  /* -----------------------------
+     Address: Present -> Permanent (live)
+     - checked: live sync + readonly
+     - unchecked: stop sync + clear permanent
+  ------------------------------*/
+  (function () {
+    const cb = document.getElementById("id_add_address_same");
+
+    const pairs = [
+      ["id_add_village", "id_add_village_per"],
+      ["id_add_post", "id_add_post_per"],
+      ["id_add_police", "id_add_police_per"],
+      ["id_add_postal", "id_add_postal_per"],
+      ["id_add_distric", "id_add_distric_per"],
+    ];
+
+    function copyAll() {
+      pairs.forEach(([srcId, dstId]) => {
+        const src = document.getElementById(srcId);
+        const dst = document.getElementById(dstId);
+        if (src && dst) dst.value = src.value || "";
+      });
+    }
+
+    function clearAll() {
+      pairs.forEach(([_, dstId]) => {
+        const dst = document.getElementById(dstId);
+        if (dst) dst.value = "";
+      });
+    }
+
+    function setReadonly(readonly) {
+      pairs.forEach(([_, dstId]) => {
+        const dst = document.getElementById(dstId);
+        if (dst) dst.readOnly = readonly;
+      });
+    }
+
+    let unbinders = [];
+    function bindSync() {
+      unbindSync();
+      pairs.forEach(([srcId, dstId]) => {
+        const src = document.getElementById(srcId);
+        const dst = document.getElementById(dstId);
+        if (!src || !dst) return;
+        const handler = () => { dst.value = src.value || ""; };
+        src.addEventListener("input", handler);
+        src.addEventListener("change", handler);
+        unbinders.push(() => {
+          src.removeEventListener("input", handler);
+          src.removeEventListener("change", handler);
+        });
+      });
+    }
+    function unbindSync() {
+      unbinders.forEach(off => off());
+      unbinders = [];
+    }
+
+    function applyState() {
+      if (cb?.checked) {
+        copyAll();
+        bindSync();
+        setReadonly(true);
+      } else {
+        unbindSync();
+        setReadonly(false);
+        clearAll();
+      }
+    }
+
+    cb?.addEventListener("change", applyState);
+    applyState();
+  })();
+
+
+  /* -----------------------------
+     Fee loader (works even if session is disabled)
+     + hidden mirror so value POSTS even if disabled
+  ------------------------------*/
+  (function () {
+    const sessionSelect = document.getElementById("id_add_session");
+    const feeField      = document.getElementById("id_add_amount");
+    if (!sessionSelect || !feeField) return;
+
+    
+
+    function inferGroup() {
+      // get the current group from the student object; fallback 'arts'
+      const grp = "{{ student.add_admission_group|default:'arts' }}";
+      return grp.toLowerCase();
+    }
+    
+
+    // ensure hidden mirror exists if select is disabled (so server receives value)
+    function ensureHiddenMirror() {
+      let hidden = document.querySelector('input[name="add_session_hidden"]');
+      if (!hidden) {
+        hidden = document.createElement("input");
+        hidden.type = "hidden";
+        hidden.name = "add_session_hidden";
+        sessionSelect.parentNode.appendChild(hidden);
+      }
+      hidden.value = sessionSelect.value || "";
+    }
+
+    function loadFee() {
+      const sessionId = sessionSelect.value;
+      if (!sessionId) return;
+      const group = inferGroup();
+
+      fetch(`/dashboard/api/fee/admission/?session=${sessionId}&program=HSC&group=${group}`)
+        .then(res => res.json())
+        .then(data => { feeField.value = (data && data.amount) ? data.amount : 0; })
+        .catch(err => console.error("Fee fetch error:", err));
+
+      if (sessionSelect.disabled) {
+        ensureHiddenMirror();
+      }
+    }
+
+    // initial
+    loadFee();
+
+    if (!sessionSelect.disabled) {
+      sessionSelect.addEventListener("change", loadFee);
+    } else {
+      // if value/disabled change after hydrate
+      setTimeout(loadFee, 0);
+      const mo = new MutationObserver(loadFee);
+      mo.observe(sessionSelect, { attributes: true, attributeFilter: ["value", "disabled"] });
+    }
+  })();
+
+
+  /* -----------------------------
+     Prevent same subject code across groups
+     (any radio with data-sub-code)
+  ------------------------------*/
+  (function () {
+    const allInputs = document.querySelectorAll('input[type="radio"][data-sub-code]');
+
+    function updateVisibility() {
+      const selectedCodes = Array.from(allInputs)
+        .filter(i => i.checked)
+        .map(i => i.dataset.subCode);
+
+      allInputs.forEach(input => {
+        const wrap = input.closest('.form-check');
+        if (!wrap) return;
+        const code = input.dataset.subCode || "";
+
+        if (selectedCodes.includes(code) && !input.checked) {
+          wrap.style.display = 'none';
+          input.checked = false;
+        } else {
+          if (wrap.dataset.keepHidden !== "1") {
+            wrap.style.display = '';
+          }
+        }
+      });
+    }
+
+    // expose for board filter
+    window.updateVisibility = updateVisibility;
+
+    allInputs.forEach(i => i.addEventListener('change', updateVisibility));
+    updateVisibility();
+  })();
+
+
+  /* -----------------------------
+     Board-based filter for 4th subjects
+     - If board = Madrasah → only allow specific codes
+  ------------------------------*/
+  (function () {
+    const boardSelect   = document.getElementById("id_add_ssc_board");
+    const fourthOptions = document.querySelectorAll(".fourth-subject-option");
+    const madrasaCodes  = ["133 - 134", "249 - 250"]; // allowed for Madrasah
+
+    function filterFourthSubjects() {
+      const selectedBoard = (boardSelect?.value || '').toLowerCase();
+
+      fourthOptions.forEach(option => {
+        const code  = option.dataset.subCode || "";
+        const radio = option.querySelector('input[type="radio"]');
+
+        option.removeAttribute('data-keep-hidden');
+
+        if (selectedBoard === "madrasah") {
+          if (madrasaCodes.includes(code)) {
+            option.style.display = "";
+          } else {
+            option.style.display = "none";
+            option.setAttribute('data-keep-hidden', '1');
+            if (radio && radio.checked) radio.checked = false;
+          }
+        } else {
+          option.style.display = "";
+        }
+      });
+
+      if (typeof window.updateVisibility === 'function') {
+        window.updateVisibility();
+      }
+    }
+
+    boardSelect?.addEventListener("change", filterFourthSubjects);
+    filterFourthSubjects();
+  })();
+
+
+  /* -----------------------------
+     Quota & Community visibility (reusable)
+     - Yes → show & required
+     - No  → hide & clear & not required
+  ------------------------------*/
+  (function () {
+    function setupToggle({ yesId, noId, containerId, inputId }) {
+      const yes = document.getElementById(yesId);
+      const no = document.getElementById(noId);
+      const container = document.getElementById(containerId);
+      const input = document.getElementById(inputId);
+
+      function apply() {
+        if (!container) return;
+        const show = yes?.checked === true;
+        container.style.display = show ? "block" : "none";
+        if (input) {
+          input.toggleAttribute("required", show);
+          if (!show) input.value = "";
+        }
+      }
+
+      yes?.addEventListener("change", apply);
+      no?.addEventListener("change", apply);
+      apply(); // initial
+    }
+
+    setupToggle({
+      yesId: "id_qouta_yes",
+      noId: "id_qouta_no",
+      containerId: "qouta_name_container",
+      inputId: "id_qouta_name",
+    });
+
+    setupToggle({
+      yesId: "id_community_yes",
+      noId: "id_community_no",
+      containerId: "community_name_container",
+      inputId: "id_community_name",
+    });
+  })();
+
+}); // DOMContentLoaded
+</script>
+{% endblock %}

@@ -1,0 +1,310 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>All Student Marksheets | {{ exam.exam_name|default:"Exam" }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- html2canvas + jsPDF -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<style>
+  @page { size: A4; margin: 0; }
+  body { background: #f3f4f6; font-family: Arial, sans-serif; }
+
+  .sheet { width: 210mm; background: #fff; margin: 0 auto 24px auto; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,.08); }
+  .sheet-inner { padding: 10mm; box-sizing: border-box; display: flex; flex-direction: column; min-height: 297mm; gap: 8px; }
+
+  .force-outline { box-shadow: 0 0 0 1px #000; backface-visibility: hidden; -webkit-font-smoothing: antialiased; }
+  @media print { .force-outline { box-shadow: none; } }
+
+  @media screen {
+    .table-tight { border-collapse: separate; border-spacing: 0; box-shadow: inset 1.25px 0 0 #000, inset -1.25px 0 0 #000; }
+    .table-tight th, .table-tight td { border-width: 1.25px; border-color: #000; }
+    .table-tight thead th { border-bottom-width: 1.5px; }
+
+    .total-tight th, .total-tight td { border-width: 1.25px; border-color: #000; }
+
+    .sig-line, .border-t { border-top-width: 1.6px !important; transform: translateZ(0); }
+  }
+
+  .title-tight { line-height: 1.15; padding-bottom: .65rem; }
+  .total-tight th, .total-tight td { vertical-align: middle; line-height: 1.2; padding-top: .35rem; padding-bottom: 1.00rem; }
+  .grade-tight th, .grade-tight td { vertical-align: middle; line-height: 1.2; padding-top: .20rem; padding-bottom: .60rem; }
+
+  .actions { gap: .5rem; }
+  @media print { body { background: #fff; } .actions { display: none !important; } .sheet { box-shadow: none !important; width: 210mm; height: 297mm; } .sheet-inner { transform-origin: top left; } }
+
+  .table-tight th, .table-tight td { vertical-align: middle; padding-top: 0.45rem; padding-bottom: 1.00rem; line-height: 1.2; }
+  .table-tight .subj { padding-top: 0.35rem; padding-bottom: 1.00rem; line-height: 1.15; }
+
+  table { border-collapse: collapse; }
+</style>
+</head>
+
+<body class="p-5 print:p-0">
+
+<!-- Top Buttons (not printed) -->
+<div class="actions flex justify-center mb-4">
+  <button onclick="downloadAllPDF()" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">Download All (PDF)</button>
+  <button onclick="window.print()" class="px-4 py-2 rounded bg-slate-700 text-white hover:bg-slate-800">Print</button>
+  <a href="{% url 'exam_record_list' %}" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">Back</a>
+</div>
+
+<div id="pdfContainer">
+  {% for data in all_data %}
+  <div class="sheet">
+    <div class="sheet-inner">
+
+      <!-- Header -->
+      <div class="relative">
+        <div class="flex justify-center">
+          <div class="text-center">
+            <h1 class="text-2xl font-bold">{{ site_settings.name }}</h1>
+            <p class="text-sm mb-2">{{ site_settings.upozilla }}, {{ site_settings.district }}</p>
+            {% if site_settings.logo %}
+              <div class="w-20 h-20 mx-auto mb-2 rounded-full overflow-hidden ring-1 ring-gray-300">
+                <img src="{{ site_settings.logo.url }}" alt="School Logo" class="w-full h-full object-cover">
+              </div>
+            {% endif %}
+            <div class="inline-block border border-black px-4 font-bold title-tight">
+              {{ data.record.exam.exam_name }} – {{ data.record.exam.exam_year.name }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Grade Box (top-right) -->
+        <div class="absolute right-0 top-0 w-36">
+          <table class="grade-tight w-full border border-black border-collapse text-[7px] text-center">
+            <thead>
+              <tr>
+                <th class="border border-black p-1">Marks</th>
+                <th class="border border-black p-1">Letter<br>Grade</th>
+                <th class="border border-black p-1">Grade<br>Point</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="border border-black p-1">80–100</td><td class="border border-black p-1">A+</td><td class="border border-black p-1">5.00</td></tr>
+              <tr><td class="border border-black p-1">70–79</td><td class="border border-black p-1">A</td><td class="border border-black p-1">4.00</td></tr>
+              <tr><td class="border border-black p-1">60–69</td><td class="border border-black p-1">A-</td><td class="border border-black p-1">3.50</td></tr>
+              <tr><td class="border border-black p-1">50–59</td><td class="border border-black p-1">B</td><td class="border border-black p-1">3.00</td></tr>
+              <tr><td class="border border-black p-1">40–49</td><td class="border border-black p-1">C</td><td class="border border-black p-1">2.00</td></tr>
+              <tr><td class="border border-black p-1">33–39</td><td class="border border-black p-1">D</td><td class="border border-black p-1">1.00</td></tr>
+              <tr><td class="border border-black p-1">0–32</td><td class="border border-black p-1">F</td><td class="border border-black p-1">0.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Student Information -->
+      <div class="flex justify-between mt-6 mb-2 text-sm">
+        <div class="space-y-1">
+          <div class="flex"><span class="w-40 font-semibold">Name of Student</span><span>:&nbsp;&nbsp;&nbsp;&nbsp;{{ data.record.student.add_name }}</span></div>
+          <div class="flex"><span class="w-40 font-semibold">Father's Name</span><span>:&nbsp;&nbsp;&nbsp;&nbsp;{{ data.record.student.add_father|default:"" }}</span></div>
+          <div class="flex"><span class="w-40 font-semibold">Mother's Name</span><span>:&nbsp;&nbsp;&nbsp;&nbsp;{{ data.record.student.add_mother|default:"" }}</span></div>
+          <div class="flex"><span class="w-40 font-semibold">Religion</span><span>:&nbsp;&nbsp;&nbsp;&nbsp;{{ data.record.student.add_religion|default:"" }}</span></div>
+        </div>
+        <div class="space-y-1">
+          <div class="flex"><span class="w-40 font-semibold">Class</span><span>:&nbsp;&nbsp;&nbsp;&nbsp;{{ data.record.exam.exam_class.name }}</span></div>
+          <div class="flex"><span class="w-40 font-semibold">Section</span><span>:&nbsp;&nbsp;&nbsp;&nbsp;{{ data.record.student.get_add_class_section_display }}</span></div>
+          <div class="flex"><span class="w-40 font-semibold">Class ID</span><span>:&nbsp;&nbsp;&nbsp;&nbsp;{{ data.record.student.add_class_roll }}</span></div>
+          <div class="flex"><span class="w-40 font-semibold">Year</span><span>:&nbsp;&nbsp;&nbsp;&nbsp;{{ data.record.exam.exam_year.name }}</span></div>
+        </div>
+      </div>
+
+      <!-- Marks Table -->
+      <div class="grid mt-2">
+        <div class="overflow-x-auto rounded-lg border border-gray-300 shadow-sm print:shadow-none">
+          <table class="table-tight w-full text-[13px] print:text-[11px]">
+            <thead class="bg-gray-100 text-gray-800">
+              <tr>
+                <th class="px-3 py-2 border border-gray-300 text-left">Subject</th>
+                <th class="px-2 py-2 border border-gray-300 text-center">Full</th>
+                <th class="px-2 py-2 border border-gray-300 text-center">CQ</th>
+                <th class="px-2 py-2 border border-gray-300 text-center">MCQ</th>
+                {% if data.record.exam.exam_class.name not in '678' %}
+                  <th class="px-2 py-2 border border-gray-300 text-center">Practical</th>
+                  <th class="px-2 py-2 border border-gray-300 text-center">CT</th>
+                {% endif %}
+                <th class="px-2 py-2 border border-gray-300 text-center">Total</th>
+                <th class="px-2 py-2 border border-gray-300 text-center">GPA</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if data.combined_results %}
+                {% for subject in data.combined_results %}
+                  {% if subject.name == "Bangla" %}
+                    {% for paper in data.bangla_papers %}
+                      <tr class="odd:bg-white even:bg-gray-50">
+                        <td class="subj px-3 border border-gray-200 text-left">{{ paper.subject.name }}</td>
+                        <td class="px-2 border border-gray-200 text-center">
+                          {% if data.record.exam.exam_class.name in '678' %}
+                            {% if paper.subject.name == 'Bangla 1st Paper' or paper.subject.name == 'English 1st Paper' %}100
+                            {% elif paper.subject.name == 'Bangla 2nd Paper' or paper.subject.name == 'English 2nd Paper' %}50
+                            {% else %}{{ paper.full_marks }}{% endif %}
+                          {% else %}
+                            {% if paper.subject.name == 'Bangla 1st Paper' or paper.subject.name == 'English 1st Paper' %}100
+                            {% elif paper.subject.name == 'Bangla 2nd Paper' or paper.subject.name == 'English 2nd Paper' %}100
+                            {% else %}{{ paper.full_marks }}{% endif %}
+                          {% endif %}
+                        </td>
+                        <td class="px-2 border border-gray-200 text-center">{{ paper.cq_mark|default:"-" }}</td>
+                        <td class="px-2 border border-gray-200 text-center">{{ paper.mcq_mark|default:"-" }}</td>
+                        {% if data.record.exam.exam_class.name not in '678' %}
+                          <td class="px-2 border border-gray-200 text-center">-</td>
+                          <td class="px-2 border border-gray-200 text-center">{{ paper.ct_mark|default:"-" }}</td>
+                        {% endif %}
+                        <td class="px-2 border border-gray-200 text-center">-</td>
+                        <td class="px-2 border border-gray-200 text-center">-</td>
+                      </tr>
+                    {% endfor %}
+                  {% elif subject.name == "English" %}
+                    {% for paper in data.english_papers %}
+                      <tr class="odd:bg-white even:bg-gray-50">
+                        <td class="subj px-3 border border-gray-200 text-left">{{ paper.subject.name }}</td>
+                        <td class="px-2 border border-gray-200 text-center">
+                          {% if data.record.exam.exam_class.name in '678' %}
+                            {% if paper.subject.name == 'Bangla 1st Paper' or paper.subject.name == 'English 1st Paper' %}100
+                            {% elif paper.subject.name == 'Bangla 2nd Paper' or paper.subject.name == 'English 2nd Paper' %}50
+                            {% else %}{{ paper.full_marks }}{% endif %}
+                          {% else %}
+                            {{ paper.full_marks }}
+                          {% endif %}
+                        </td>
+                        <td class="px-2 border border-gray-200 text-center">{{ paper.cq_mark|default:"-" }}</td>
+                        <td class="px-2 border border-gray-200 text-center">{{ paper.mcq_mark|default:"-" }}</td>
+                        {% if data.record.exam.exam_class.name not in '678' %}
+                          <td class="px-2 border border-gray-200 text-center">-</td>
+                          <td class="px-2 border border-gray-200 text-center">{{ paper.ct_mark|default:"-" }}</td>
+                        {% endif %}
+                        <td class="px-2 border border-gray-200 text-center">-</td>
+                        <td class="px-2 border border-gray-200 text-center">-</td>
+                      </tr>
+                    {% endfor %}
+                  {% endif %}
+
+                  <!-- Combined row with Total + GPA + Grade -->
+                  <tr class="bg-emerald-50 font-semibold text-emerald-800">
+                    <td class="subj px-3 border border-emerald-200 text-left">Total {{ subject.name }}</td>
+                    <td class="px-2 border border-emerald-200 text-center">{{ subject.full_marks }}</td>
+                    <td class="px-2 border border-emerald-200 text-center">{{ subject.cq }}</td>
+                    <td class="px-2 border border-emerald-200 text-center">{{ subject.mcq }}</td>
+                    {% if data.record.exam.exam_class.name not in '678' %}
+                      <td class="px-2 border border-emerald-200 text-center">{{ subject.practical|default:"-" }}</td>
+                      <td class="px-2 border border-emerald-200 text-center">{{ subject.ct|default:"-" }}</td>
+                    {% endif %}
+                    <td class="px-2 border border-emerald-200 text-center">{{ subject.total }}</td>
+                    <td class="px-2 border border-emerald-200 text-center">
+                      {{ subject.gpa }} ({{ subject.grade }})
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <!-- Batch-only simple rows -->
+                {% for mark in data.subject_marks %}
+                  <tr class="odd:bg-white even:bg-gray-50">
+                    <td class="subj px-3 border border-gray-200 text-left">{{ mark.subject.name }}</td>
+                    <td class="px-2 border border-gray-200 text-center">{{ mark.full_marks|default:"-" }}</td>
+                    <td class="px-2 border border-gray-200 text-center">{{ mark.cq_mark|default:"-" }}</td>
+                    <td class="px-2 border border-gray-200 text-center">{{ mark.mcq_mark|default:"-" }}</td>
+                    {% if data.record.exam.exam_class.name not in '678' %}
+                      <td class="px-2 border border-gray-200 text-center">{{ mark.practical_mark|default:"-" }}</td>
+                      <td class="px-2 border border-gray-200 text-center">{{ mark.ct_mark|default:"-" }}</td>
+                    {% endif %}
+                    <td class="px-2 border border-gray-200 text-center">{{ mark.total_mark|default:"-" }}</td>
+                    <td class="px-2 border border-gray-200 text-center">{{ mark.gpa|default:"0" }} ({{ mark.grade|default:"-" }})</td>
+                  </tr>
+                {% endfor %}
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Attendance & Totals -->
+      <div class="flex justify-between mt-2">
+        <div><!-- optional attendance --></div>
+        <div class="pt-1 flex justify-end">
+          <div style="transform: scale(0.8); transform-origin: top right;">
+            <table class="total-tight text-sm border border-black border-collapse force-outline">
+              <thead>
+                <tr class="bg-emerald-100">
+                  <th class="border border-black px-2 py-1">Total Marks</th>
+                  <th class="border border-black px-2 py-1">GPA</th>
+                  <th class="border border-black px-2 py-1">Grade</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="bg-emerald-50">
+                  <td class="border border-black px-2 py-1 text-center">{{ data.record.total_marks }}</td>
+                  <td class="border border-black px-2 py-1 text-center">{{ data.gpa|default:"-" }}</td>
+                  <td class="border border-black px-2 py-1 text-center">{{ data.record.grade|default:"-" }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signatures -->
+      <div class="flex justify-between items-end mt-8">
+        <div class="w-1/3 text-center"><div class="inline-block"><div class="border-t border-black w-48"></div><div class="mt-1">Class Teacher</div></div></div>
+        <div class="w-1/3 text-center"><div class="inline-block"><div class="border-t border-black w-48"></div><div class="mt-1">Guardian</div></div></div>
+        <div class="w-1/3 text-center"><div class="inline-block"><div class="border-t border-black w-48"></div><div class="mt-1">Head Teacher</div></div></div>
+      </div>
+
+      <small class="block text-center mt-auto">This is a software-generated copy. Design &amp; Develop by JBD IT</small>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+async function downloadAllPDF() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p','mm','a4');
+  const cards = document.querySelectorAll('.sheet');
+  for (let i = 0; i < cards.length; i++) {
+    const canvas = await html2canvas(cards[i], { scale: 2, useCORS: true, scrollY: -window.scrollY });
+    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const ratio = Math.min(pageW / canvas.width, pageH / canvas.height);
+    const imgW = canvas.width * ratio;
+    const imgH = canvas.height * ratio;
+    const x = (pageW - imgW) / 2;
+    const y = (pageH - imgH) / 2;
+
+    if (i) pdf.addPage();
+    pdf.addImage(imgData, 'JPEG', x, y, imgW, imgH);
+  }
+  pdf.save('All_Student_Marksheets_6-8.pdf');
+}
+
+/* Auto-scale for PRINT so everything fits on one A4 page */
+(function () {
+  const MM_TO_PX = 3.7795275591;
+  function applyPrintScale() {
+    const inners = document.querySelectorAll('.sheet-inner');
+    inners.forEach(inner => {
+      const targetH = 297 * MM_TO_PX;
+      const actualH = inner.scrollHeight;
+      const scale = Math.min(1, targetH / actualH);
+      inner.style.transform = `scale(${scale})`;
+    });
+  }
+  function resetScale() {
+    const inners = document.querySelectorAll('.sheet-inner');
+    inners.forEach(inner => inner.style.transform = '');
+  }
+  window.addEventListener('beforeprint', applyPrintScale);
+  window.addEventListener('afterprint', resetScale);
+})();
+</script>
+
+</body>
+</html>
