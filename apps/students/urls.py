@@ -20,6 +20,13 @@ urlpatterns = [
         name="hsc_payment_update",
     ),
 
+    # degree payment modal
+    path(
+        "admitted-students/degree/<int:pk>/payment/update/",
+        views.update_degree_admission_payment,
+        name="degree_payment_update",
+    ),
+
     # 👇 Update and delete
     path('admitted-students/<int:pk>/edit/', views.HscAdmissionUpdateView.as_view(), name='hsc_admission_update'),
     path('admitted-students-business/<int:pk>/edit/', views.HscAdmissionUpdateCommerceView.as_view(), name='hsc_admission_update_business'),

@@ -576,39 +576,79 @@ def update_admission_payment(request, pk):
         messages.error(request, "❌ Payment update failed due to a database error.")
     return redirect(next_url)
 
-from django.views.generic import UpdateView
-from apps.admissions.forms import HscPaymentReviewForm
 
 
-@method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
-class HscPaymentReviewUpdateView(UpdateView):
-    model = HscAdmissions
-    form_class = HscPaymentReviewForm
-    template_name = "students/payment_review_form.html"
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx = TemplateLayout.init(self, ctx)
-        ctx["layout"] = "vertical"
-        ctx["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", ctx)
-        ctx["page_title"] = "Payment Review / Confirm"
-        ctx["student"] = self.object
-        return ctx
 
-    def form_valid(self, form):
-        self.object = form.save()
-        messages.success(self.request, "✅ Payment information updated.")
-        return super().form_valid(form)
+# Degree payment modal
 
-    def form_invalid(self, form):
-        messages.error(self.request, "❌ Failed to update payment info.")
-        return super().form_invalid(form)
+from apps.admissions.forms import DegreePaymentReviewForm
 
-    def get_success_url(self):
-        nxt = self.request.GET.get("next")
-        if nxt:
-            return nxt
-        return reverse("admitted_students_list")
+@require_POST
+@role_required(['master_admin', 'admin', 'sub_admin', 'teacher'])
+def update_degree_admission_payment(request, pk):
+    obj = get_object_or_404(DegreeAdmission, pk=pk)
+    form = DegreePaymentReviewForm(request.POST, instance=obj)
+    next_url = request.POST.get("next") or request.META.get("HTTP_REFERER") or "/"
+
+    if not form.is_valid():
+        messages.error(request, "❌ Payment update failed. Please check the form.")
+        return redirect(next_url)
+
+    # Update only editable fields
+    partial = form.save(commit=False)
+    try:
+        # Update only the fields that are editable in the form
+        obj.add_payment_status = partial.add_payment_status
+        obj.add_payment_note = partial.add_payment_note
+
+        # Save only the editable fields
+        obj.save(update_fields=[
+            "add_payment_status",
+            "add_payment_note",
+            "updated_at",
+        ])
+
+        messages.success(request, f"✅ Payment updated for {obj.add_name or obj.id}.")
+    except IntegrityError:
+        messages.error(request, "❌ Payment update failed due to a database error.")
+    return redirect(next_url)
+
+
+
+
+# from django.views.generic import UpdateView
+# from apps.admissions.forms import HscPaymentReviewForm
+
+# @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
+# class HscPaymentReviewUpdateView(UpdateView):
+#     model = HscAdmissions
+#     form_class = HscPaymentReviewForm
+#     template_name = "students/payment_review_form.html"
+
+#     def get_context_data(self, **kwargs):
+#         ctx = super().get_context_data(**kwargs)
+#         ctx = TemplateLayout.init(self, ctx)
+#         ctx["layout"] = "vertical"
+#         ctx["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", ctx)
+#         ctx["page_title"] = "Payment Review / Confirm"
+#         ctx["student"] = self.object
+#         return ctx
+
+#     def form_valid(self, form):
+#         self.object = form.save()
+#         messages.success(self.request, "✅ Payment information updated.")
+#         return super().form_valid(form)
+
+#     def form_invalid(self, form):
+#         messages.error(self.request, "❌ Failed to update payment info.")
+#         return super().form_invalid(form)
+
+#     def get_success_url(self):
+#         nxt = self.request.GET.get("next")
+#         if nxt:
+#             return nxt
+#         return reverse("admitted_students_list")
 
 
 
@@ -1217,7 +1257,7 @@ class DegreeAdmittedStudentListView(ListView):
     context_object_name = 'students'
     paginate_by = 25
 
-    # --- helpers (same vibe as HSC) ---
+    # ---- helpers (same vibe as HSC) ----
     def _normalize_mobile_digits(self, val: str) -> str:
         if not val:
             return ''
@@ -1232,7 +1272,7 @@ class DegreeAdmittedStudentListView(ListView):
             .select_related('add_session', 'add_program', 'created_by')
         )
 
-        # filters
+        # ---- filters ----
         session = self.request.GET.get('session') or self.request.session.get('active_session_id')
         program = self.request.GET.get('program')
         group   = self.request.GET.get('group')
@@ -1244,7 +1284,7 @@ class DegreeAdmittedStudentListView(ListView):
         if group:
             qs = qs.filter(add_admission_group=group)
 
-        # search (id/name/mobile/roll/class_id/admission_roll)
+        # ---- search (id/name/mobile/roll/class_id/admission_roll) ----
         search = self.request.GET.get('search')
         if search:
             norm = self._normalize_mobile_digits(search)
@@ -1267,27 +1307,35 @@ class DegreeAdmittedStudentListView(ListView):
                     Q(add_class_id__icontains=search)
                 )
 
-        # order (default asc)
+        # ---- order (default asc) ----
         order = (self.request.GET.get('order') or 'asc').lower()
-        if order == 'desc':
-            qs = qs.order_by('-add_class_roll')
-        else:
-            qs = qs.order_by('add_class_roll')
+        qs = qs.order_by('-add_class_roll' if order == 'desc' else 'add_class_roll')
 
         return qs
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
-        # Vuexy layout
+        # ---- Vuexy layout ----
         ctx = TemplateLayout.init(self, ctx)
         ctx["layout"] = "vertical"
         ctx["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", ctx)
 
-        # filter sources
+        # ---- filter sources ----
         ctx['sessions'] = Session.objects.all()
         ctx['programs'] = DegreePrograms.objects.all()
         ctx['groups']   = ['Ba', 'Bss', 'Bbs', 'Bsc']
+
+        # ---- attach payment form per student (needed for modal) ----
+        # Use your actual Degree payment form here:
+        try:
+            from apps.admissions.forms import DegreePaymentReviewForm
+            for s in ctx['students']:
+                s.payment_form = DegreePaymentReviewForm(instance=s)
+        except Exception:
+            # If the form import/fields differ in your project, you can safely ignore
+            # and the template will still render the rest.
+            pass
 
         return ctx
 

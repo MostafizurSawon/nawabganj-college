@@ -9,12 +9,24 @@
   .name-column   { width: 28%; }
   .mobile-column { width: 16%; white-space: nowrap; font-family: monospace; }
   .roll-column   { width: 8%; white-space: nowrap; }
-  .group-column, .session-column, .program-column { width: 8%; white-space: nowrap; }
+  .group-column, .trxid-column { width: 10%; white-space: nowrap; }
+  .status-column { width: 14%; min-width: 180px; }
+
+
+  {% comment %} .status-column .btn, .status-column .badge {
+    font-size: .75rem; padding: .25rem .5rem;
+  } {% endcomment %}
+
   .actions-column { width: 110px; min-width: 110px; white-space: nowrap; text-align: center; }
+
   .btn-icon { --btn-size: 28px; width: var(--btn-size); height: var(--btn-size); padding: 0;
               display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
   .btn-icon i { font-size: 16px; }
   .actions-column .btn-group { gap: .25rem; }
+
+  .btn-icon-xs { --btn-size: 24px; width: var(--btn-size); height: var(--btn-size); padding: 0;
+                 display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+  .btn-icon-xs i { font-size: 14px; }
 </style>
 
 <div class="flex-grow-1 container-p-y">
@@ -31,6 +43,7 @@
   <div class="card mb-4 p-2">
     <h3 class="m-4">Admitted Students — Degree</h3>
 
+    <!-- Filter form -->
     <div class="px-3">
       <form method="get" class="w-100">
         <div class="row g-2 align-items-end">
@@ -50,42 +63,41 @@
               {% endfor %}
             </select>
           </div>
-{% comment %}
-          <div class="col-md-3">
-            <label class="form-label">Program</label>
-            <select name="program" class="form-select">
-              <option value="">All Programs</option>
-              {% for p in programs %}
-                <option value="{{ p.id }}" {% if request.GET.program == p.id|stringformat:'s' %}selected{% endif %}>
-                  {{ p.deg_name }}
-                </option>
-              {% endfor %}
-            </select>
-          </div> {% endcomment %}
 
           <div class="col-md-2 d-flex gap-2">
             <button type="submit" class="btn btn-primary w-100">Filter</button>
             <a href="{% url 'degree_admitted_students_list' %}" class="btn btn-outline-secondary w-100">Reset</a>
           </div>
+
+          <div class="col-md-3 d-flex justify-content-end">
+            {% comment %} <a class="btn btn-sm btn-success" aria-disabled="true"
+               href="?{{ request.GET.urlencode }}&export=csv">
+              Download CSV
+            </a> {% endcomment %}
+            <a class="btn btn-sm btn-success disabled" tabindex="-1" aria-disabled="true">
+              Download CSV
+            </a>
+          </div>
         </div>
       </form>
     </div>
 
-    <!-- Asc / Desc toggle same-row buttons -->
+    <!-- Asc / Desc -->
     <div class="col-md-3 d-flex gap-2 p-2 justify-content-center mt-3">
       {% if request.GET.order == 'desc' %}
-        <a href="?{{ request.GET.urlencode|default_if_none:''|cut:'order=desc' }}{% if request.GET %}&{% endif %}order=asc"
+        <a href="?{{ request.GET.urlencode|cut:'order=desc' }}{% if request.GET %}&{% endif %}order=asc"
            class="btn btn-secondary w-50">Asc</a>
-        <a href="?{{ request.GET.urlencode|default_if_none:''|cut:'order=asc' }}{% if request.GET %}&{% endif %}order=desc"
+        <a href="?{{ request.GET.urlencode|cut:'order=asc' }}{% if request.GET %}&{% endif %}order=desc"
            class="btn btn-primary w-50">Desc</a>
       {% else %}
-        <a href="?{{ request.GET.urlencode|default_if_none:''|cut:'order=desc' }}{% if request.GET %}&{% endif %}order=asc"
+        <a href="?{{ request.GET.urlencode|cut:'order=desc' }}{% if request.GET %}&{% endif %}order=asc"
            class="btn btn-primary w-50">Asc</a>
-        <a href="?{{ request.GET.urlencode|default_if_none:''|cut:'order=asc' }}{% if request.GET %}&{% endif %}order=desc"
+        <a href="?{{ request.GET.urlencode|cut:'order=asc' }}{% if request.GET %}&{% endif %}order=desc"
            class="btn btn-secondary w-50">Desc</a>
       {% endif %}
     </div>
 
+    <!-- Table -->
     <div class="table-responsive p-2">
       <p class="ms-0 text-muted">Total students: {{ page_obj.paginator.count }}</p>
 
@@ -98,67 +110,53 @@
             <th class="name-column text-start">Name</th>
             <th class="mobile-column">Mobile</th>
             <th class="group-column">Group</th>
-            <th class="session-column">Session</th>
-            <th class="program-column">Program</th>
+            <th class="trxid-column">TrxID</th>
+            <th class="status-column">Status</th>
           </tr>
         </thead>
         <tbody class="text-center">
           {% for student in students %}
             <tr>
-              <td class="roll-column">{{ student.add_class_roll|default:"" }}</td>
-              <td class="roll-column">{{ student.add_class_id|default:"" }}</td>
+              <td>{{ student.add_class_roll|default:"" }}</td>
+              <td>{{ student.add_class_id|default:"" }}</td>
 
-              <!-- actions -->
+              <!-- Actions -->
               <td class="actions-column">
                 <div class="btn-group btn-group-sm" role="group">
-                  <!-- Print / View -->
                   <a href="{% url 'degree_admission_view' student.id %}"
                      target="_blank"
-                     class="btn btn-outline-info btn-icon"
-                     title="Print / View">
+                     class="btn btn-outline-info btn-icon" title="Print / View">
                     <i class="ti ti-printer"></i>
                   </a>
 
-                  <!-- Edit (group-wise) -->
                   {% if student.add_admission_group == 'Ba' %}
                     <a href="{% url 'ba_admission_edit' student.id %}"
-                       class="btn btn-outline-warning btn-icon"
-                       title="Edit">
+                       class="btn btn-outline-warning btn-icon" title="Edit">
                       <i class="ti ti-pencil"></i>
                     </a>
                   {% elif student.add_admission_group == 'Bss' %}
                     <a href="{% url 'bss_admission_edit' student.id %}"
-                       class="btn btn-outline-warning btn-icon"
-                       title="Edit">
+                       class="btn btn-outline-warning btn-icon" title="Edit">
                       <i class="ti ti-pencil"></i>
                     </a>
                   {% elif student.add_admission_group == 'Bbs' %}
                     <a href="{% url 'bbs_admission_edit' student.id %}"
-                       class="btn btn-outline-warning btn-icon"
-                       title="Edit">
+                       class="btn btn-outline-warning btn-icon" title="Edit">
                       <i class="ti ti-pencil"></i>
                     </a>
                   {% elif student.add_admission_group == 'Bsc' %}
                     <a href="{% url 'bsc_admission_edit' student.id %}"
-                       class="btn btn-outline-warning btn-icon"
-                       title="Edit">
+                       class="btn btn-outline-warning btn-icon" title="Edit">
                       <i class="ti ti-pencil"></i>
                     </a>
                   {% endif %}
 
-                  <!-- Delete -->
                   <a href="{% url 'degree_admission_delete' student.add_admission_group student.id %}"
-                    class="btn btn-icon btn-sm btn-outline-danger"
-                    title="Delete"
-                    onclick="return confirm('Are you sure you want to delete this admission? This action cannot be undone!')">
-                    <i class="ti ti-trash"></i>
-                  </a>
-                  {% comment %} <a href="{% url 'degree_admission_delete' student.id %}"
                      class="btn btn-outline-danger btn-icon"
                      title="Delete"
                      onclick="return confirm('Are you sure you want to delete this admission? This action cannot be undone!')">
                     <i class="ti ti-trash"></i>
-                  </a> {% endcomment %}
+                  </a>
                 </div>
               </td>
 
@@ -172,22 +170,144 @@
                 {% endif %}
               </td>
 
-              <td class="mobile-column">{{ student.add_mobile }}</td>
-              <td class="group-column">{{ student.add_admission_group|upper }}</td>
-              <td class="session-column">{{ student.add_session.ses_name|default:"" }}</td>
-              <td class="program-column">
-                {{ student.add_program.deg_name|default:"Degree" }}
+              <td>{{ student.add_mobile }}</td>
+              <td>{{ student.add_admission_group|upper }}</td>
+
+              <!-- TrxID -->
+              <td>
+                {% if student.add_trxid %}
+                  <div class="d-inline-flex align-items-center gap-1">
+                    <span id="trx-{{ student.id }}" class="fw-semibold small">{{ student.add_trxid }}</span>
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-icon-xs copy-trxid"
+                            data-target="#trx-{{ student.id }}" title="Copy TrxID">
+                      <i class="ti ti-copy"></i>
+                    </button>
+                  </div>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+
+              <!-- Status (3-line, HSC style) -->
+              <td class="status-column text-nowrap">
+                <div class="d-flex flex-column align-items-start gap-1">
+
+                  <!-- 1) current status badge -->
+                  <span class="badge d-inline-flex align-items-center px-2 py-1
+                    {% if student.add_payment_status == 'paid' %} bg-success
+                    {% elif student.add_payment_status == 'pending' %} bg-warning text-dark
+                    {% elif student.add_payment_status == 'unpaid' %} bg-danger
+                    {% else %} bg-secondary
+                    {% endif %}">
+                    <i class="ti
+                      {% if student.add_payment_status == 'paid' %} ti-circle-check
+                      {% elif student.add_payment_status == 'pending' %} ti-clock
+                      {% elif student.add_payment_status == 'unpaid' %} ti-circle-x
+                      {% else %} ti-dots
+                      {% endif %} me-1"></i>
+                    {{ student.get_add_payment_status_display|default:"N/A" }}
+                  </span>
+
+                  <!-- 2) Pay button (opens modal) -->
+                  <a href="#"
+                    class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center"
+                    title="Update payment"
+                    data-bs-toggle="modal"
+                    data-bs-target="#payModal-{{ student.id }}">
+                    <i class="ti ti-credit-card me-1"></i> Pay
+                  </a>
+
+                  <!-- 3) Invoice button -->
+                  {% if student.add_payment_status == 'paid' %}
+                    <a href="{% url 'degree_admission_view' student.id %}"
+                      class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
+                      title="View/Download invoice">
+                      <i class="ti ti-file-invoice me-1"></i> Invoice
+                    </a>
+                  {% else %}
+                    <a href="#"
+                      class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center disabled"
+                      title="Invoice available after payment"
+                      tabindex="-1" aria-disabled="true" onclick="return false;">
+                      <i class="ti ti-file-invoice me-1"></i> Invoice
+                    </a>
+                  {% endif %}
+                </div>
               </td>
             </tr>
           {% empty %}
-            <tr>
-              <td colspan="8" class="text-center">No students found.</td>
-            </tr>
+            <tr><td colspan="8" class="text-center">No students found.</td></tr>
           {% endfor %}
         </tbody>
       </table>
+
+      <!-- Payment modal -->
+      {% for student in students %}
+      <div class="modal fade" id="payModal-{{ student.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+          <div class="modal-content">
+            <form method="post" action="{% url 'degree_payment_update' student.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+              <div class="modal-header">
+                <h5 class="modal-title d-flex align-items-center gap-2">
+                  Payment Review — {{ student.add_name|default:"N/A" }}
+                  {% if student.created_by_id %}
+                    <span class="badge bg-primary rounded-pill">
+                      Payment Student ID: {{ student.created_by_id }}
+                    </span>
+                  {% endif %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+
+              <div class="modal-body">
+                {% if student.payment_form.non_field_errors %}
+                  <div class="alert alert-danger mb-3">{{ student.payment_form.non_field_errors }}</div>
+                {% endif %}
+
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label">Payment Method</label>
+                    {{ student.payment_form.add_payment_method }}
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Amount</label>
+                    {{ student.payment_form.add_amount }}
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Transaction ID</label>
+                    {{ student.payment_form.add_trxid }}
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Payment From (Mobile)</label>
+                    {{ student.payment_form.add_slip }}
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Payment Status</label>
+                    {{ student.payment_form.add_payment_status }}
+                  </div>
+                  <div class="col-md-12">
+                    <label class="form-label">Teacher Note</label>
+                    {{ student.payment_form.add_payment_note }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
     </div>
 
+    <!-- Pagination -->
     <div class="alert alert-info mx-4">
       Total records: {{ page_obj.paginator.count }},
       Per page: {{ page_obj.paginator.per_page }},
@@ -204,7 +324,6 @@
                 <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ page_obj.previous_page_number }}">«</a>
               </li>
             {% endif %}
-
             {% for i in paginator.page_range %}
               {% if i <= 2 or i > paginator.num_pages|add:'-2' or i >= page_obj.number|add:'-2' and i <= page_obj.number|add:'2' %}
                 <li class="page-item {% if page_obj.number == i %}active{% endif %}">
@@ -214,7 +333,6 @@
                 <li class="page-item disabled"><span class="page-link">…</span></li>
               {% endif %}
             {% endfor %}
-
             {% if page_obj.has_next %}
               <li class="page-item">
                 <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ page_obj.next_page_number }}">»</a>
@@ -228,7 +346,7 @@
 </div>
 
 <script>
-  // smooth scroll + keep existing query params on pagination (anchors already preserve via urlencode)
+  // Smooth scroll pagination
   document.addEventListener("DOMContentLoaded", function () {
     const containerCard = document.querySelector(".card.mb-4, .card.p-2") || document.querySelector(".card");
     const paginationLinks = document.querySelectorAll(".pagination .page-link");
@@ -239,11 +357,35 @@
         if (containerCard) {
           window.scrollTo({ top: containerCard.offsetTop - 30, behavior: "smooth" });
           setTimeout(() => { window.location.href = targetUrl; }, 300);
-        } else {
-          window.location.href = targetUrl;
-        }
+        } else { window.location.href = targetUrl; }
       });
     });
+  });
+
+  // Copy TrxID
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.copy-trxid');
+    if (!btn) return;
+    let val = '';
+    const targetSel = btn.getAttribute('data-target');
+    if (targetSel) {
+      const el = document.querySelector(targetSel);
+      if (el) val = (el.value ?? el.innerText ?? el.textContent ?? '').trim();
+    }
+    if (!val && btn.dataset.clipboardText) val = (btn.dataset.clipboardText || '').trim();
+    if (!val) {
+      const input = btn.closest('.input-group')?.querySelector('input, textarea');
+      val = (input?.value || '').trim();
+    }
+    const flash = (html, ok=true) => {
+      const old = btn.innerHTML, oldClasses = btn.className;
+      btn.innerHTML = html;
+      btn.className = ok ? 'btn btn-success btn-icon-xs' : 'btn btn-danger btn-icon-xs';
+      setTimeout(() => { btn.innerHTML = old; btn.className = oldClasses; }, 1200);
+    };
+    if (!val) { flash('<i class="ti ti-alert-circle"></i>', false); return; }
+    navigator.clipboard.writeText(val).then(() => flash('<i class="ti ti-check"></i>', true))
+      .catch(() => flash('<i class="ti ti-x"></i>', false));
   });
 </script>
 {% endblock %}

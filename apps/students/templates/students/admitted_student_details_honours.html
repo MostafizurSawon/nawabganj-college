@@ -1,909 +1,447 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="bn">
-
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>ভর্তি আবেদন ফর্ম</title>
-    <style>
-        * {
-            font-family: 'Siyam Rupali', sans-serif;
-            margin: o;
-            padding: 0;
-            box-sizing: border-box;
-
-        }
-
-        :root {
-            --font-size-one: 28px;
-            --font-size-two: 16px;
-            --font-size-three: 12px;
-        }
-
-        .admission-pdf-form-container {
-            width: 800px;
-            margin: auto;
-            background: white;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            text-align: left;
-        }
-
-        .header-logo-part {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0;
-            flex-grow: 1;
-            padding-bottom: 5px;
-            border-bottom:2px solid #5151AE;
-        }
-
-        .header-text {
-            text-align: center;
-            padding-top: 30px;
-            display: flex;
-            flex-direction: column; /* উপরে থেকে নিচে কনটেন্ট সাজাবে */
-            align-items: center;     /* অনুভূমিকভাবে সেন্টার */
-            justify-content: center; /* উল্লম্বভাবে সেন্টার */
-        }
-
-        .header-text h1 {
-            font-size: var(--font-size-one);
-            margin: 0;
-        }
-
-        .input-group {
-            font-size: var(--font-size-three);
-        }
-
-        .header-text h3 {
-            font-size: var(--font-size-two);
-            font-weight: normal;
-            margin: 0 !important;
-        }
-
-        .header-text p {
-            font-size: var(--font-size-three);
-            font-weight: lighter;
-            color: #939393;
-            margin: 0 !important;
-        }
-
-        .badge_admission {
-            background-color: rgb(81, 81, 174);
-            color: white;
-            padding: 5px;
-            border-radius: 5px;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .badge_admission2 {
-            background-color: ;
-            color: rgb(81, 81, 174);
-            padding: 5px;
-            border-radius: 5px;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-
-        .logo {
-            width: 144px;
-            padding: 0px 9px;
-        }
-
-        .photo {
-            width: 150px;
-            height: 150px;
-
-        }
-
-        .photo img {
-            width: 150px;
-            height: 150px;
-            object-fit: contain;
-
-
-        }
-
-
-
-
-        .multi-line {
-            width: 100%;
-            height: 20px;
-            border-bottom: 1px solid black;
-        }
-
-        .education-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: var(--font-size-three);
-
-        }
-
-        .education-table,
-        th,
-        td {
-            border: 1px solid black;
-            text-align: center;
-            padding: 5px;
-        }
-
-        ul {
-            margin: 5px 0 5px;
-        }
-
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: var(--font-size-three);
-            margin-top: 10px;
-        }
-
-        /* section one */
-        .form-section-one {
-            margin-top: 10px;
-            border: 1px solid black;
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            justify-content: center;
-            align-items: center;
-            text-align: left;
-        }
-
-        .form-section-one>.input-group:nth-child(1) {
-            grid-row: span 2;
-        }
-
-        .form-section-one>.input-group:nth-child(2) {
-            grid-column: span 5;
-            text-align: left;
-            padding: 5px;
-            border-left: 1px solid black;
-            border-right: 1px solid black;
-            border-bottom: 1px solid black;
-
-        }
-
-        .form-section-one>.input-group:nth-child(4) {
-            grid-column: span 5;
-            text-align: left;
-            padding: 5px;
-            border-left: 1px solid black;
-            border-right: 1px solid black;
-
-
-        }
-
-        .form-section-one>.input-group:nth-child(3) {
-            grid-column: span 3;
-            grid-row: span 2;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .form-section-one>.input-group:nth-child(3) .optional {
-            color: gray;
-            font-size: var(--font-size-three);
-            font-weight: normal;
-            font-style: italic;
-        }
-
-        .class-roll {
-            margin: 8px 0;
-        }
-
-        /* form section two */
-        .form-section-two {
-            margin-top: 10px;
-            border: 1px solid black;
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            justify-content: center;
-            align-items: center;
-            text-align: left;
-        }
-
-        .form-section-two .input-group {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-        }
-
-        .form-section-two .input-group .section-two-title {
-            grid-column: span 2;
-            text-align: left;
-            padding: 5px;
-            border-right: 1px solid black;
-            border-bottom: 1px solid black;
-        }
-
-        .form-section-two>.input-group:last-child .section-two-title,
-        .form-section-two>.input-group:last-child .section-two-write {
-            border-bottom: none;
-        }
-
-        .form-section-two .input-group .section-two-write {
-            grid-column: span 3;
-            padding: 5px;
-            border-bottom: 1px solid black;
-        }
-
-        .section-two-write-last {
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            justify-content: start;
-            align-items: center;
-            grid-column: span 3;
-            border-bottom: none;
-            text-align: left;
-        }
-
-        .section-two-write-last div {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            justify-content: start;
-            align-items: center;
-
-        }
-
-        .section-two-write-last>div:nth-child(1) {
-
-            padding: 5px;
-
-        }
-
-        .section-two-write-last>div:nth-child(2) {
-            padding: 5px;
-        }
-
-        /*form section three */
-        .form-section-three {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            border: 1px solid black;
-            margin-top: 5px;
-        }
-
-        .form-section-three>.input-group:nth-child(1) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(2) {
-            grid-column: span 2;
-        }
-
-
-        .form-section-three>.input-group:nth-child(3) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(4) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(5) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(6) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(6) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(7) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(8) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(9) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(10) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(11) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(12) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(13) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(14) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(15) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(16) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(17) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(18) {
-            grid-column: span 2;
-        }
-
-        .form-section-three>.input-group:nth-child(19) {
-            grid-column: span 2;
-
-
-        }
-
-        .form-section-three>.input-group:nth-child(20) {
-            grid-column: span 2;
-
-
-        }
-
-        .form-section-three>.input-group:nth-child(21) {
-            grid-column: span 2;
-        }
-
-
-        .form-section-three .input-group {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .form-section-three .input-group span {
-            padding: 5px;
-        }
-
-        .text_nowrap {
-            white-space: nowrap;
-        }
-
-        .border_right_bottom {
-            border-right: 1px solid black;
-            border-bottom: 1px solid black;
-        }
-
-        .border_left_bottom {
-            border-left: 1px solid black;
-            border-bottom: 1px solid black;
-        }
-
-        .border_bottom {
-            border-bottom: 1px solid black;
-        }
-
-        .border_left {
-            border-left: 1px solid black;
-
-        }
-
-        .border_right {
-            border-right: 1px solid black;
-
-        }
-
-        .grid_4 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr) !important;
-            align-items: center;
-            justify-content: start;
-            font-size: var(--font-size-three);
-        }
-        .grid_6 {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr) !important;
-            align-items: center;
-            justify-content: start;
-            font-size: var(--font-size-three);
-        }
-
-
-        .check_box {
-            width: 18px;
-            height: 18px;
-            fill: #333;
-
-        }
-
-
-        .grid_column_span_3 {
-            grid-column: span 3 !important;
-            text-align: left;
-        }
-
-        .grid_column_span_1 {
-            grid-column: span 1 !important;
-        }
-
-        .grid_column_span_4 {
-            grid-column: span 4;
-        }
-
-        .grid_column_span_2 {
-            grid-column: span 2;
-        }
-
-        .subject_table {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .subject_table li::before {
-            content: "";
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            margin-right: 8px;
-            border: 2px solid #333;
-            border-radius: 4px;
-            background: linear-gradient(180deg, #fff 70%, #f0f0f0 100%);
-            vertical-align: middle;
-            box-sizing: border-box;
-        }
-
-        .subject-table li {
-            margin: 5px 0;
-            padding-left: 10px;
-        }
-
-        .grid_column_span_3 {
-            grid-column: span 3;
-        }
-
-        .start-paragraph {
-            margin: 10px 0;
-            font-size: var(--font-size-three);
-
-        }
-
-        .text_aling_left {
-            text-align: left;
-        }
-
-
-        @media print {
-            @page {
-                size: A4 portrait;
-
-            }
-
-            body {
-                width: 100%;
-                margin: 0;
-                padding: 0;
-            }
-
-            .admission-pdf-form-container {
-                width: 100%;
-                margin: 0;
-                padding: 20;
-                border: none;
-            }
-
-            .pdf-btn-container {
-                display: none;
-            }
-        }
-
-
-
-/* CSS */
-.custom_btn {
-  align-items: center;
-  background-color: #0A66C2;
-  border: 0;
-  border-radius: 100px;
-  box-sizing: border-box;
-  color: #ffffff;
-  cursor: pointer;
-  display: inline-flex;
-  font-family: -apple-system, system-ui, system-ui, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  justify-content: center;
-  line-height: 20px;
-  max-width: 480px;
-  min-height: 40px;
-  min-width: 0px;
-  overflow: hidden;
-  padding: 0px;
-  padding-left: 20px;
-  padding-right: 20px;
-  text-align: center;
-  touch-action: manipulation;
-  transition: background-color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, box-shadow 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s;
-  user-select: none;
-  -webkit-user-select: none;
-  vertical-align: middle;
-}
-
-.custom_btn:hover,
-.custom_btn:focus {
-  background-color: #16437E;
-  color: #ffffff;
-}
-
-.custom_btn:active {
-  background: #09223b;
-  color: rgb(255, 255, 255, .7);
-}
-
-.custom_btn:disabled {
-  cursor: not-allowed;
-  background: rgba(0, 0, 0, .08);
-  color: rgba(0, 0, 0, .3);
-}
-    </style>
+<meta charset="utf-8" />
+<title>Admission Form – {{ student.add_name|default:"" }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  @page { size: A4; margin: 2mm; } /* আগে ছিল 4mm */
+
+  :root{ --ink:#111; --light-ink:#555; --brand:#c21a1a; --line:#444; --f:11px; --f-print:10px; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:#f5f6f8; color:var(--ink); font-family: Arial, Helvetica, sans-serif; }
+
+  .page{
+    width:210mm;
+    margin:4px auto;
+    background:#fff;
+    padding:5mm;             /* আগে ছিল 8–12mm → এখন 5mm */
+    overflow:visible;
+    transform-origin: top left;
+  }
+
+  .toolbar{ display:flex; gap:8px; justify-content:space-between; align-items:center; width:210mm; margin:6px auto 0; }
+  .btn{ background:#1a93c2; color:#fff; border:0; padding:6px 12px; font-size:12px; border-radius:4px; cursor:pointer; }
+  .btn.back{ background:#555; }
+  .btn a{ color:#fff; text-decoration:none; }
+  @media print{ .toolbar{ display:none !important; } }
+
+  .header{ display:grid; grid-template-columns:60px 1fr 105px; align-items:center; gap:10px; border-bottom:1.2px solid var(--line); padding-bottom:5px; margin-bottom:5px; }
+  .logo{ width:90px; height:85px; object-fit:contain; }
+  .inst{ text-align:center; }
+  .inst h1{ margin:0; font-size:27px; color:var(--brand); letter-spacing:.2px; }
+  .inst .meta{ margin-top:2px; font-size:13px; color:var(--light-ink); }
+  .photo-wrap{ justify-self:end; width:100px; height:120px; border:1px solid var(--line); padding:3px; }
+  .photo{ width:100%; height:100%; object-fit:cover; }
+
+  .titlebar{
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 3px 5px;
+    background:#fafafa;
+    border:1px solid var(--line);
+    margin:5px 0;
+    font-size:10px;
+  }
+  .titlebar .left{ justify-self:start; font-weight:700; }
+  .titlebar .center{ justify-self:center; font-weight:700; font-size:11px; }
+  .titlebar .right{ justify-self:end; color: var(--light-ink); }
+
+  table.kv{ width:100%; border-collapse:collapse; }
+  .kv th, .kv td{ border:1px solid var(--line); padding:3px 4.5px; vertical-align:top; font-size:11px; }
+  .kv th{ background:#f7f7f7; text-align:left; font-weight:700; }
+  .kv .label{ width:22%; color:#222; background:#fcfcfc; }
+  .kv .value{ width:28%; }
+
+  .section{ margin:5px 0 9px; }
+  .section h3{ margin:0 0 3px; font-size:12px; }
+
+  .sign-row{ display:flex; justify-content:space-between; margin-top:12px; }
+  .sign{ width:36%; text-align:center; }
+  .sign .line{ border-top:1px solid var(--line); margin-top:20px; padding-top:3px; font-size:11px; }
+
+  .footer-note{ margin-top:25px; text-align:center; font-size:11px; color:#555; }
+
+  @media print{
+    body{ background:#fff; }
+    .page{ padding:4mm; page-break-inside:avoid; break-inside:avoid; overflow:hidden; }
+    .kv th,.kv td{ padding:2.8px 4px; font-size: var(--f-print); }
+    .inst h1{ font-size:26px; }
+  }
+</style>
 </head>
-
 <body>
-    <div class="admission-pdf-form-container">
-        <div class="header">
-            <div class="header-logo-part">
-                {% comment %} <img src={{site_settings.logo.url}} class="logo" alt="Logo"> {% endcomment %}
-                <img src={% static 'cus/logo.jpg' %} class="logo" alt="Logo">
-                <div class="header-text">
-                    <h1>পিপলস্ কলেজ</h1>
-                    <h3>মথুরাপুর, দৌলতপুর, কুষ্টিয়া </h3>
-                    <h3>স্থাপিত ১৯৭০ খ্রি:</h3>
-                    <h3 class="badge_admission">ভর্তি আবেদন ফর্ম</h3>
-                    <h4 class="badge_admission2" style="margin-top:5px;">ডিগ্রি বিভাগ</h4>
-                    
-            
 
-                </div>
-                <div class="photo"><img src="{{ student.add_photo.url }}" alt=""></div>
-            </div>
+<!-- SCREEN-ONLY TOOLBAR -->
+<div class="toolbar">
+  {% if request.user.role == 'student' %}
+    <button class="btn back"><a href="{% url 'index' %}">← Back</a></button>
+  {% else %}
+    <button class="btn back"><a href="{% url 'admitted_students_list' %}">← Back</a></button>
+  {% endif %}
+  <div style="display:flex; gap:8px;">
+    <button class="btn" id="pdfBtn">⬇ Download PDF</button>
+    {% comment %} <button class="btn" id="printBtn">🖨️ Print</button> {% endcomment %}
+  </div>
+</div>
 
-        </div>
+<div class="page" id="a4-page">
+  <!-- HEADER -->
+  <div class="header">
+    <img src="{% static 'cus/logo.png' %}" class="logo" alt="Logo">
+    <div class="inst">
+      <h1>{{ institute_name|default:"নবাবগঞ্জ সিটি কলেজ" }}</h1>
+      {% comment %} <h1>{{ institute_name|default:"নবাবগঞ্জ সিটি কলেজ, চাপাইনবাবগঞ্জ" }}</h1> {% endcomment %}
+      <div class="meta">EIIN: {{ eiin|default:"124596" }} &nbsp;|&nbsp; কোড: 2626 &nbsp;|&nbsp; ফোন: {{ phone|default:"01309124596" }}</div>
+      <div style="margin-top:8px; padding:4px 10px; background-color:#f2f2f2;
+            border-radius:6px; font-weight:bold; font-size:14px; color:#222;
+            display:inline-block;">ডিগ্রী ভর্তি ফর্ম
+      </div>
+    </div>
+    <div class="photo-wrap">
+      {% if student.add_photo %}
+        <img class="photo" src="{{ student.add_photo.url }}" alt="Photo">
+      {% else %}
+        <div class="photo" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:#777;">Photo</div>
+      {% endif %}
+    </div>
+  </div>
 
-        <div class="form-section-one">
-            <div class="input-group" style="text-align: center;">
-                <span class="label">মোবাইল নং </span>
+  <!-- TITLE -->
+  <div class="titlebar">
+    <div class="left">Session: {{ student.add_session.ses_name }}</div>
+    <div class="center">GROUP OF {{ student.get_add_admission_group_display|default:""|upper }}</div>
+    <div class="right">Application Date: {{ student.created_at|date:"d / M / Y"|default:"" }}</div>
+  </div>
 
-            </div>
+  <!-- APPLICANT -->
+  <div class="section">
+    <h3>Applicant Information</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Student's Name (English)</td>
+        <td class="value">{{ student.add_name|default:"" }}</td>
+        <td class="label">Class Roll</td>
+        <td class="value">{{ student.add_class_roll|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Student's Name (Bangla)</td>
+        <td class="value">{{ student.add_name_bangla|default:"" }}</td>
+        <td class="label">Admission Roll</td>
+        <td class="value">{{ student.add_admission_roll }}</td>
+      </tr>
+      <tr>
+        <td class="label">Mobile</td>
+        <td class="value">{{ student.add_mobile|default:"" }}</td>
+        <td class="label">Class ID</td>
+        <td class="value">{{ student.add_class_id|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Birth Certificate / NID</td>
+        <td class="value">{{ student.add_birth_certificate_no|default:"" }}</td>
+        <td class="label">Date of Birth</td>
+        <td class="value">{{ student.add_birthdate|date:"d M Y"|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Marital Status</td>
+        <td class="value">{{ student.add_marital_status|default:"" }}</td>
+        <td class="label">Age</td>
+        <td class="value">{{ student.add_age|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Gender</td>
+        <td class="value">{{ student.add_gender|default:"" }}</td>
+        <td class="label">Religion</td>
+        <td class="value">{{ student.add_religion|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Blood Group</td>
+        <td class="value">{{ student.add_blood_group|default:"" }}</td>
+        <td class="label">Nationality</td>
+        <td class="value">{{ student.add_nationality|default:"" }}</td>
+      </tr>
+    </table>
+  </div>
 
-            <div class="input-group">
-                <span class="label">শিক্ষার্থীর: {{ student.add_mobile }}</span>
-                <span></span>
-            </div>
+  <!-- PARENT -->
+  <div class="section">
+    <h3>Parent/Guardian Information</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Father's Name</td>
+        <td class="value">{{ student.add_father|default:"" }}</td>
+        <td class="label">Father's Name (Bangla)</td>
+        <td class="value">{{ student.add_father_bn|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Father's Mobile</td>
+        <td class="value">{{ student.add_father_mobile|default:"" }}</td>
+        <td class="label">Father's NID</td>
+        <td class="value">{{ student.add_father_nid|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Father's Date of Birth</td>
+        <td class="value">{{ student.add_father_birthdate|date:"d M Y"|default:"" }}</td>
+        <td class="label">Grandfather's Name</td>
+        <td class="value">{{ student.add_grand|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Mother's Name</td>
+        <td class="value">{{ student.add_mother|default:"" }}</td>
+        <td class="label">Mother's Name (Bangla)</td>
+        <td class="value">{{ student.add_mother_bn|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Mother's Mobile</td>
+        <td class="value">{{ student.add_mother_mobile|default:"" }}</td>
+        <td class="label">Mother's NID</td>
+        <td class="value">{{ student.add_mother_nid|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Mother's Date of Birth</td>
+        <td class="value">{{ student.add_mother_birthdate|date:"d M Y"|default:"" }}</td>
+        <td class="label">Guardian (Name)</td>
+        <td class="value">{{ student.add_parent|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Guardian Mobile</td>
+        <td class="value">{{ student.add_parent_mobile|default:"" }}</td>
+        <td class="label">Guardian Relation</td>
+        <td class="value">{{ student.add_parent_relation|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Guardian Occupation</td>
+        <td class="value">{{ student.add_parent_service|default:"" }}</td>
+        <td class="label">Guardian Monthly Income</td>
+        <td class="value">{{ student.add_parent_income|default:"" }} ৳</td>
+      </tr>
+    </table>
+  </div>
 
-            <div class="input-group">
-                <span class="optional">(অফিস কর্তৃক পূরণীয় )</span>
-                <span class="class-roll">শ্রেণী রোল:{{ student.add_class_roll }}</span>
+  <!-- ADDRESS -->
+  <div class="section">
+    <h3>Present Address</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Village/Area</td><td class="value">{{ student.add_village|default:"" }}</td>
+        <td class="label">Post</td><td class="value">{{ student.add_post|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Police Station</td><td class="value">{{ student.add_police|default:"" }}</td>
+        <td class="label">District & Postal</td><td class="value">{{ student.add_distric|default:"" }} – {{ student.add_postal|default:"" }}</td>
+      </tr>
+    </table>
+  </div>
 
-            </div>
+  <div class="section">
+    <h3>Permanent Address</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Village/Area</td><td class="value">{{ student.add_village_per|default:"" }}</td>
+        <td class="label">Post</td><td class="value">{{ student.add_post_per|default:"" }}</td>
+      </tr>
+      <tr>
+        <td class="label">Police Station</td><td class="value">{{ student.add_police_per|default:"" }}</td>
+        <td class="label">District & Postal</td><td class="value">{{ student.add_distric_per|default:"" }} – {{ student.add_postal_per|default:"" }}</td>
+      </tr>
+    </table>
+  </div>
 
-            <div class="input-group">
-                <span class="label">অভিভাবকের:{{ student.add_parent_mobile }}</span>
-                <span></span>
-            </div>
-        </div>
+  <!-- QUOTA / COMMUNITY -->
+  <div class="section">
+    <h3>Special Quota / Community</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Special Quota</td>
+        <td class="value">{% if student.qouta %}Yes{% else %}No{% endif %} {% if student.qouta %},{{ student.qouta_name|default:"" }}{% endif %}</td>
+        <td class="label">Community</td>
+        <td class="value">{% if student.community %}Yes{% else %}No{% endif %} {% if student.community %},{{ student.community_name|default:"" }}{% endif %}</td>
+      </tr>
+    </table>
+  </div>
+
+    <!-- SSC -->
+    <div class="section">
+      <h3>Academic Information (SSC)</h3>
+      <table class="kv">
+        <tr>
+          <td class="label">Board</td><td class="value">{{ student.add_ssc_board|default:"" }}</td>
+          <td class="label">Passing Year</td><td class="value">{{ student.add_ssc_passyear|default:"" }}</td>
+        </tr>
+        <tr>
+          <td class="label">SSC Roll</td><td class="value">{{ student.add_ssc_roll|default:"" }}</td>
+          <td class="label">Registration</td><td class="value">{{ student.add_ssc_reg|default:"" }}</td>
+        </tr>
+        <tr>
+          <td class="label">Session</td><td class="value">{{ student.add_ssc_session|default:"" }}</td>
+          <td class="label">Group</td><td class="value">{{ student.get_add_ssc_group_display|default:"" }}</td>
+        </tr>
+        <tr>
+          <td class="label">Institute</td><td class="value">{{ student.add_ssc_institute|default:"" }}</td>
+          <td class="label">GPA</td><td class="value">{{ student.add_ssc_gpa|default:"" }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- HSC -->
+    <div class="section">
+      <h3>Academic Information (HSC)</h3>
+      <table class="kv">
+        <tr>
+          <td class="label">Board</td>
+          <td class="value">{{ student.add_hsc_board|default:"" }}</td>
+          <td class="label">Passing Year</td>
+          <td class="value">{{ student.add_hsc_passyear|default:"" }}</td>
+        </tr>
+        <tr>
+          <td class="label">HSC Roll</td>
+          <td class="value">{{ student.add_hsc_roll|default:"" }}</td>
+          <td class="label">Registration</td>
+          <td class="value">{{ student.add_hsc_reg|default:"" }}</td>
+        </tr>
+        <tr>
+          <td class="label">Session</td>
+          <td class="value">{{ student.add_hsc_session|default:"" }}</td>
+          <td class="label">Group</td>
+          <td class="value">{{ student.get_add_hsc_group_display|default:"" }}</td>
+        </tr>
+        <tr>
+          <td class="label">Institute</td>
+          <td class="value">{{ student.add_hsc_institute|default:"" }}</td>
+          <td class="label">GPA</td>
+          <td class="value">{{ student.add_hsc_gpa|default:"" }}</td>
+        </tr>
+      </table>
+    </div>
 
 
-        <p class="start-paragraph">জনাব,<br>
-            আমি আপনার কলেজে  {{ student.add_session.ses_name }} শিক্ষাবর্ষে ডিগ্রিতে, {{ student.add_admission_group|upper }}  শাখায় ভর্তি হতে
-            ইচ্ছুক।
-            নিচে আমার বিবরণ প্রদান করিলাম:
-        </p>
+  <!-- SUBJECTS -->
+  <div class="section">
+    <h3>Subject Choice Information</h3>
+    <table class="kv">
+      <tr>
+        <td class="label">Subject</td>
+        <td class="value">Bangla, English, ICT</td>
+        <td class="label">4th Subject</td>
+        <td class="value">{% if student.fourth_subject %}{{ student.fourth_subject.sub_name|default:"" }}{% else %}—{% endif %}</td>
+      </tr>
+      <tr>
+        <td class="label">Elective Subjects</td>
+        <td class="value" colspan="3">
+          {% if student.add_admission_group == 'commerce' %}
 
-        <div class="form-section-two">
-            <div class="input-group">
-                <span class="section-two-title">১. আবেদনকারীর নাম (বাংলায়):</span>
-                <span class="section-two-write text_aling_left"> {{ student.add_name_bangla }}</span>
-            </div>
-
-            <div class="input-group">
-                <span class="section-two-title">২. পিতার নাম (বাংলায়):</span>
-                <span class="section-two-write text_aling_left"> {{ student.add_father_bangla }}</span>
-            </div>
-
-            <div class="input-group">
-                <span class="section-two-title">৩. মাতার নাম (বাংলায়):</span>
-                <span class="section-two-write text_aling_left">{{ student.add_mother_bangla }}</span>
-            </div>
-
-            <div class="input-group">
-                <span class="section-two-title">৪. পিতার / অভিভাবকের নাম:</span>
-                <span class="section-two-write text_aling_left">{{ student.add_father }}</span>
-            </div>
-            <div class="input-group">
-                <span class="section-two-title">
-                    <div>
-                        <span>অভিভাবকের সম্পর্ক:</span>
-                        <span class="text_aling_left">{{ student.add_parent_relation }}</span>
-                    </div>
-                </span>
-                <span class=" section-two-write-last">
-
-                    <div class="grid_6">
-                        <span class="grid_column_span_2">অভিভাবকের মোবাইল নং:</span>
-                        <span class="text_aling_left grid_column_span_4">{{ student.add_parent_mobile }}</span>
-                    </div>
-                </span>
-            </div>
-        </div>
+          Accounting, Business Organization and Management, Production Management and Marketing
+          {% else %}
+            {% for s in student.subjects.all %}
+              {% if s.sub_name.lower not in 'bangla,english,ict' %}
+                {{ s.sub_name|default:"" }}{% if not forloop.last %}, {% endif %}
+              {% endif %}
+            {% empty %}{% endfor %}
+            {% if student.main_subject %} {{ student.main_subject.sub_name }}{% endif %}
+            {% if student.optional_subject or student.optional_subject_2 %}
+              , {{ student.optional_subject.sub_name }}
+              {% if student.optional_subject_2 %}, {{ student.optional_subject_2.sub_name }}{% endif %}
+            {% endif %}
+          {% endif %}
 
 
+        </td>
+      </tr>
+    </table>
+  </div>
 
-        <div class="form-section-three">
-
-
-            <div class="input-group border_right_bottom">
-                <span class="text_nowrap">৫. অভিভাবকের পেশা:</span>
-            </div>
-            <div class="input-group border_bottom">
-                <span class="grid_column_span_2">{{ student.add_parent_service }}</span>
-            </div>
-            <div class="input-group grid_6 border_left_bottom">
-                <span class="grid_column_span_2">বার্ষিক আয়:</span>
-                <span class="grid_column_span_4">{{ student.add_parent_income }}</span>
-            </div>
-
-            <div class="input-group border_right_bottom">
-                <span class="text_nowrap">৬. অভিভাবকের জমির পরিমান :</span>
-            </div>
-            <div class="grid_4 input-group border_bottom">
-                <span>কৃষি:</span>
-               <span class="text_aling_left"> {{ student.add_parent_land_agri }}</span>
-                <span>অকৃষি:</span>
-                <span class="text_aling_left"> {{ student.add_parent_land_nonagri }}</span>
-            </div>
-            <div class="input-group grid_4  border_left_bottom">
-                <span>মোট:</span>
-                <span class="grid_column_span_3"></span>
-            </div>
-
-            <div class="input-group border_right_bottom">
-                <span class="text_nowrap">৭. আবেদনকারীর বর্তমান ঠিকানা:</span>
-            </div>
-            <div class="grid_4 input-group  border_right_bottom">
-                <span>গ্রাম:</span>
-                <span class="grid_column_span_3">{{ student.add_village }}</span>
-            </div>
-            <div class="grid_4 input-group  border_bottom">
-                <span>ডাকঘর:</span>
-                <span class="grid_column_span_3">{{ student.add_post }}</span>
-            </div>
-            <div class="input-group border_right_bottom">
-                <span></span>
-            </div>
-            <div class="input-group grid_4 border_right_bottom">
-                <span>উপজেলা:</span>
-                <span class="grid_column_span_3"> {{ student.add_upojella }}</span>
-            </div>
-            <div class="input-group grid_4 border_bottom">
-                <span>জেলা:</span>
-                <span class="grid_column_span_3"> {{ student.add_distric }}</span>
-            </div>
-            <div class="input-group border_right_bottom">
-                <span class="text_nowrap">৭. আবেদনকারীর স্থায়ী ঠিকানা:</span>
-            </div>
-            <div class="input-group grid_4 border_right_bottom">
-                <span>গ্রাম:</span>
-                <span class="grid_column_span_3">{{ student.add_village_per }}</span>
-            </div>
-            <div class="input-group grid_4 border_bottom">
-                <span>ডাকঘর:</span>
-                <span class="grid_column_span_3">{{ student.add_post_per }} </span>
-            </div>
-            <div class="input-group border_right_bottom">
-                <span></span>
-            </div>
-            <div class="input-group grid_4 border_right_bottom">
-                <span>উপজেলা:</span>
-                <span class="grid_column_span_3">{{ student.add_upojella_per }}</span>
-            </div>
-            <div class="input-group grid_4 border_bottom">
-                <span>জেলা:</span>
-                <span class="grid_column_span_3">{{ student.add_distric_per }}</span>
-            </div>
-            <div class="input-group border_right">
-                <span class="text_nowrap">৯. জন্ম তারিখ(সনদ অনুযায়া):</span>
-            </div>
-            <div class="input-group border_right grid_column_span_1">
-                <span class="grid_column_span_2">{{ student.add_birthdate }}</span>
-                {% comment %} <span class="grid_column_span_2">{{ student.add_marital_status }}</span> {% endcomment %}
-            </div>
-            {% if student.add_marital_status == "Married" %}
-            <div class="input-group grid_column_span_3">
-                <span class="text_nowrap" style="display: flex; justify-content: start; align-items: center; gap: 5px;">
-                     বৈবাহিক অবস্থা :
-                   <svg class="check_box"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 448 512">
-                        <path
-                            d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-                    </svg> বিবাহিত
-
-                    <svg class="check_box"  style="margin-left: 5px;"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 448 512">
-                        <path
-                            d="M384 80c8.8 0 16 7.2 16 16l0 320c0 8.8-7.2 16-16 16L64 432c-8.8 0-16-7.2-16-16L48 96c0-8.8 7.2-16 16-16l320 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32z" />
-                    </svg>
-                    অবিবাহিত
-
-                </span>
-            </div>
+    <!-- PAYMENT -->
+    <div class="section">
+      <h3>Payment Information <span class="student_id">(Payment Student ID:
+        {% if request.user.role == 'student' %}
+          {{ request.user.id }}
         {% else %}
-            <div class="input-group grid_column_span_3">
-                <span class="text_nowrap"  style="display: flex; justify-content: start; align-items: center; gap: 5px;">
-                    বৈবাহিক অবস্থা :
-                    <svg class="check_box"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 448 512">
-                        <path
-                            d="M384 80c8.8 0 16 7.2 16 16l0 320c0 8.8-7.2 16-16 16L64 432c-8.8 0-16-7.2-16-16L48 96c0-8.8 7.2-16 16-16l320 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32z" />
-                    </svg> বিবাহিত
-
-
-                    <svg class="check_box"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 448 512">
-                        <path
-                            d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-                    </svg> অবিবাহিত
-
-                </span>
-            </div>
+          {{ student.created_by.id }}
         {% endif %}
-
-
-        </div>
-        <table class="education-table" style="margin-top: 10px; font-size: var(--font-size-three);">
-            <tr>
-                <th>পরীক্ষার নাম</th>
-                <th>রোল নম্বর</th>
-                <th>রেজি নম্বর</th>
-
-                <th>শিক্ষাবর্ষ</th>
-                <th>প্রাপ্ত গ্রেড</th>
-                <th>পাশের সাল</th>
-                <th>বোর্ডের নাম</th>
-            </tr>
-            <tr>
-                <td>এসএসসি</td>
-                <td>{{ student.add_ssc_roll }}</td>
-                <td>{{ student.add_ssc_reg }}</td>
-
-                <td>{{ student.add_ssc_session }}</td>
-                <td>{{ student.add_ssc_gpa }}</td>
-                <td>{{ student.add_ssc_passyear }}</td>
-                <td>{{ student.add_ssc_board }}</td>
-            </tr>
-
-        </table>
-
-
-
-        <table style="width:100%; border-collapse: collapse; margin-top: 10px; font-size: var(--font-size-three);">
-            <tr>
-                <td style="border: 1px solid black; width: 20%; font-weight: bold;">মূল বিষয়সমূহ:</td>
-                
-                <td style="border: 1px solid black; width: 30%;">
-                    {% for sub in student.subjects.all %}
-                        {{ sub.sub_name }}{% if not forloop.last %}, {% endif %}
-                    {% empty %}
-                        No subjects
-                    {% endfor %}
-                
-                </td>
-                {% comment %} <td style="border: 1px solid black; width: 20%;font-weight: bold;">৪র্থ বিষয়:</td>
-                <td style="border: 1px solid black; width: 30%;">{{student.fourth_subject.sub_name}}</td> {% endcomment %}
-            </tr>
-            {% comment %} <tr>
-                <td style="border: 1px solid black;font-weight: bold;">নির্বাচিত বিষয়সমূহ:</td>
-                <td style="border: 1px solid black;" >পদার্থবিজ্ঞান, রসায়ন</td>
-                 <td style="border: 1px solid black;font-weight: bold;">মেইন বিষয়:</td>
-                <td style="border: 1px solid black;">{{student.main_subject.sub_name}}</td>
-            </tr> {% endcomment %}
-        </table>
-        <p style="margin-top: 10px; font-size: var(--font-size-three);">
-            আমি এ মর্মে অঙ্গীকার করছি যে, ওপরে বর্ণিত তথ্যাবলি সম্পূর্ণ সত্য। কোন তথ্য অসত্য প্রমাণিত হলে আইনানুগ শাস্তি
-            ভোগ করতে
-            বাধ্য থাকব এবং অত্র কলেজের যাবতীয় আইন কানুন মানিয়া চলিতে বাধ্য থাকবো।
-        </p>
-
-        <div class="signatures">
-            <div>
-                <p>অভিভাবকের স্বাক্ষর ও সীল</p>
-                <p>তারিখ: ......................</p>
-            </div>
-            <div>
-                <p>আবেদনকারীর স্বাক্ষর</p>
-                <p>তারিখ: ......................</p>
-            </div>
-        </div>
-        <div style="text-align: center; margin-top: 20px; font-size: 14px; color: #555;">
-            &copy; 2025 Peoples College. All rights reserved. Design &amp; Development by JBD IT.
-        </div>
-    </div>
-    <!-- Buttons -->
-    <div style="text-align: center; margin-top: 30px;" class="pdf-btn-container">
-        <button class="custom_btn" onclick="printForm()">🖨️ প্রিন্ট করুন</button>
-        <button class="custom_btn" onclick="downloadPDF()">⬇️ পিডিএফ ডাউনলোড</button>
-        <button class="custom_btn"><a style="text-decoration:none;color:white;" href="{% url 'degree_admitted_students_list' %}">Student List</a></button>
+        )</span></h3>
+      <table class="kv">
+        <tr>
+          <td class="label">Payment Method</td>
+          <td class="value">{{ student.add_payment_method|default:""|title }}</td>
+          <td class="label">Payment From</td>
+          <td class="value">{{ student.add_slip|default:"" }}</td>
+        </tr>
+        <tr>
+          <td class="label">TrxID</td>
+          <td class="value">{{ student.add_trxid|default:"" }}</td>
+          <td class="label">Amount</td>
+          <td class="value">{{ student.add_amount|default:"" }} ৳ </td>
+        </tr>
+      </table>
     </div>
 
-    <!-- jsPDF + html2canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <script>
-        function printForm() {
-            window.print();
-        }
+  <!-- SIGNATURES -->
+  <div class="sign-row">
+    <div class="sign"><div class="line">Applicant's Signature</div></div>
+    <div class="sign"><div class="line">Principal's Signature</div></div>
+  </div>
 
-        async function downloadPDF() {
+  <!-- FOOTER -->
+  <div class="footer-note">
+    &copy; {% now "Y" %} Nawabganj city college. All rights reserved. Design &amp; Develop by JBD IT.
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  const PX_PER_MM = 96 / 25.4;
+  const A4_W_PT = 595.28, A4_H_PT = 841.89;
+
+  document.getElementById('pdfBtn')?.addEventListener('click', async () => {
+    const node = document.getElementById('a4-page');
+    if (!node) return;
+
+    // আগের স্টাইল সেভ
+    const prev = { w: node.style.width, h: node.style.height, t: node.style.transform };
+
+    // A4-প্রস্থে রেন্ডার, উচ্চতা auto
+    node.style.width  = `${210 * PX_PER_MM}px`;
+    node.style.height = '';
+    node.style.transform = '';
+
     const { jsPDF } = window.jspdf;
-    const element = document.querySelector('.admission-pdf-form-container');
-
-    if (!element) {
-        alert("Form content not found.");
-        return;
-    }
-
-    // Create canvas with scale
-    const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
+    const canvas = await html2canvas(node, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor:'#ffffff',
+      windowWidth: node.scrollWidth,
+      scrollY: -window.scrollY
     });
 
-    const imgData = canvas.toDataURL("image/png");
+    // স্টাইল রিস্টোর
+    node.style.width  = prev.w;
+    node.style.height = prev.h;
+    node.style.transform = prev.t;
 
-    // Setup A4 size in pt (1 inch = 72pt)
-    const margin = 36; // 0.5 inch
-    const pageWidth = 595.28;
-    const pageHeight = 841.89;
+    const imgData = canvas.toDataURL('image/png');
+    const imgW = canvas.width, imgH = canvas.height;
 
-    const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "pt",
-        format: [pageWidth, pageHeight],
-    });
+    const pdf = new jsPDF({ orientation:'p', unit:'pt', format:'a4' });
 
-    const imgProps = pdf.getImageProperties(imgData);
-    const imgWidth = pageWidth - 2 * margin;
-    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+    // পাতার চারপাশে ছোট মার্জিন (≈4mm)
+    const M = 12; // points
+    const maxW = A4_W_PT - M*2;
+    const maxH = A4_H_PT - M*2;
 
-    // Ensure it fits within 1 page. You can add pagination logic if needed.
-    pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
-    pdf.save("ভর্তি_ফর্ম.pdf");
-}
+    // ইমেজকে A4-এর ভেতরে স্কেল
+    const s = Math.min(maxW / imgW, maxH / imgH);
+    const renderW = imgW * s;
+    const renderH = imgH * s;
+    const offsetX = (A4_W_PT - renderW) / 2;
+    const offsetY = (A4_H_PT - renderH) / 2;
 
-    </script>
-
-
+    pdf.addImage(imgData, 'PNG', offsetX, offsetY, renderW, renderH);
+    pdf.save('ভর্তি_ফর্ম.pdf');
+  });
+</script>
 </body>
-
 </html>
