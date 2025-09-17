@@ -7,11 +7,11 @@ urlpatterns = [
     # path('admitted-students/<int:pk>/view/', views.HscAdmissionDetailView.as_view(), name='hsc_admission_view'),
 
     # payment confirmation
-    path(
-        "admitted-students-hsc/<int:pk>/payment/",
-        views.HscPaymentReviewUpdateView.as_view(),
-        name="hsc_payment_review",
-    ),
+    # path(
+    #     "admitted-students-hsc/<int:pk>/payment/",
+    #     views.HscPaymentReviewUpdateView.as_view(),
+    #     name="hsc_payment_review",
+    # ),
 
     # update mosal
     path(
@@ -50,9 +50,18 @@ urlpatterns = [
     path('admitted-students/degree/', views.DegreeAdmittedStudentListView.as_view(), name='degree_admitted_students_list'),
     path('admitted-students/degree/<int:pk>/view/', views.DegreeAdmissionDetailView.as_view(), name='degree_admission_view'),
 
-    # Ba update and delete
-    path('admitted-students/degree/<int:pk>/edit/ba/', views.BaAdmissionUpdateView.as_view(), name='ba_admission_edit'),
-    path('degree-admission/delete/<int:pk>/', views.BaAdmissionDeleteView.as_view(), name='degree_admission_delete'),
+    # Edit (group-wise রাখুন আগের মতো)
+    path('admitted-students/degree/<int:pk>/edit/ba/',  views.BaAdmissionUpdateView.as_view(),  name='ba_admission_edit'),
+    path('admitted-students/degree/<int:pk>/edit/bss/', views.BssAdmissionUpdateView.as_view(), name='bss_admission_edit'),
+    path('admitted-students/degree/<int:pk>/edit/bsc/', views.BscAdmissionUpdateView.as_view(), name='bsc_admission_edit'),
+    path('admitted-students/degree/<int:pk>/edit/bbs/', views.BbsAdmissionUpdateView.as_view(), name='bbs_admission_edit'),
+
+    # ✅ Delete (একটাই রুট, গ্রুপ প্যারাম সহ)
+    path(
+        'degree-admission/<str:group>/delete/<int:pk>/',
+        views.DegreeAdmissionDeleteView.as_view(),
+        name='degree_admission_delete'
+    ),
 
 
 

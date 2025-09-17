@@ -195,10 +195,11 @@ class SubjectsAdmin(admin.ModelAdmin):
 
 @admin.register(DegreeSubjects)
 class DegreeSubjectsAdmin(admin.ModelAdmin):
-    list_display = ('sub_name', 'group', 'code', 'sub_status')
-    list_filter = ('group', 'sub_status')
+    list_display = ('sub_name', 'group', 'code', 'sub_select', 'sub_status')
+    list_display_links = None  # কোনো ফিল্ড লিঙ্ক থাকবে না
+    list_editable = ('sub_name', 'group', 'code', 'sub_select', 'sub_status')
+    list_filter = ('group', 'sub_status', 'sub_select')
     search_fields = ('sub_name', 'code')
-    list_editable = ('sub_status',)
     ordering = ('sub_name',)
     list_per_page = 20
 

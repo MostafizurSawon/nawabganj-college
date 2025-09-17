@@ -34,6 +34,33 @@
       ]
     },
     {
+      "name": "Degree Admissions",
+      "icon": "menu-icon tf-icons ti ti-file-text",
+      "slug": "admission",
+      "submenu": [
+        {
+          "url": "ba_admission_create",
+          "name": "BA Form",
+          "slug": "ba_admission_create"
+        },
+        {
+          "url": "bss_admission_create",
+          "name": "BSS Form",
+          "slug": "bss_admission_create"
+        },
+        {
+          "url": "bsc_admission_create",
+          "name": "BSC Form",
+          "slug": "bsc_admission_create"
+        },
+        {
+          "url": "bbs_admission_create",
+          "name": "BBS Form",
+          "slug": "bbs_admission_create"
+        }
+      ]
+    },
+    {
       "name": "Fees and Payment",
       "icon": "menu-icon tf-icons ti ti-receipt-2",
       "slug": "academy",

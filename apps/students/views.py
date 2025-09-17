@@ -1,5 +1,5 @@
 from django.views.generic import ListView
-from apps.admissions.models import HscAdmissions
+from apps.admissions.models import HscAdmissions, Fee
 from django.db.models import Q
 from django.contrib import messages
 from apps.admissions.models import Session, Programs
@@ -321,19 +321,18 @@ class AdmittedStudentListView(ListView):
     # ========================
     def _export_csv_full(self, queryset):
         """
-        CSV export (full requirement):
-        Flat header order matches the form.
-        Subjects columns (order): All(M2M), Group A, Group B, Group C/Main, 4th.
-        'All Subjects (M2M)' ALWAYS starts with Bangla, English, ICT for everyone,
-        then remaining subjects (deduped, stable order).
+        CSV export:
+        - All Subjects (M2M) is ALWAYS 'Bangla; English; ICT'
+        - Group-A static by stream (science/commerce), arts keeps optional_subject
+        - Flat header order kept
         """
-
+        from django.http import HttpResponse
+        import csv
 
         resp = HttpResponse(content_type='text/csv')
         resp['Content-Disposition'] = 'attachment; filename="admitted_students_full.csv"'
         writer = csv.writer(resp)
 
-        # ----- HEADER -----
         writer.writerow([
             # Applicant
             "Student Name", "Class Roll", "Mobile", "Class ID",
@@ -359,8 +358,8 @@ class AdmittedStudentListView(ListView):
             "SSC Board", "SSC Year", "SSC Roll", "SSC Registration",
             "SSC Session", "SSC Group", "SSC Institute", "SSC GPA",
 
-            # Subjects
-            "All Subjects",
+            # Subjects (fixed order)
+            "Common Subjects",
             "Elective/Optional Subjects (Group: A)",
             "Elective/Optional Subjects (Group: B)",
             "Elective/Optional Subjects (Group: C)/ Main Subject",
@@ -370,78 +369,86 @@ class AdmittedStudentListView(ListView):
             "Payment Method", "Payment From", "TrxID", "Amount", "Payment Status", "Payment Note"
         ])
 
-        def ordered_unique(seq):
-            seen = set()
-            out = []
-            for x in seq:
-                if x and x not in seen:
-                    out.append(x)
-                    seen.add(x)
-            return out
+        def fmt_date(d):
+            return d.strftime("%d-%m-%Y") if d else ''
 
         for s in queryset:
-            fmt_mobile = self._fmt_excel_mobile
+            # ----- All Subjects (M2M): fixed for everyone -----
+            all_subjects_m2m = "Bangla; English; ICT"
 
-            # SSC bits
-            ssc_year = s.add_ssc_passyear or ''
-            ssc_gpa  = s.add_ssc_gpa or ''
+            # ----- Group A by stream -----
+            if s.add_admission_group == 'science':
+                group_a = "Physics; Chemistry"
+            elif s.add_admission_group == 'commerce':
+                group_a = "Accounting; Business Organization and Management; Production Management and Marketing"
+            else:  # arts
+                group_a = s.optional_subject.sub_name if s.optional_subject else ''
 
-            # ----- SUBJECTS -----
-            # Always start with Bangla, English, ICT
-            compulsory = ["Bangla", "English", "ICT"]
+            # Other subject slots
+            group_b     = s.optional_subject_2.sub_name if s.optional_subject_2 else ''
+            group_c_main= s.main_subject.sub_name       if s.main_subject       else ''
+            fourth_sub  = s.fourth_subject.sub_name     if s.fourth_subject     else ''
 
-            # M2M list (prefetched if available)
-            m2m_list = getattr(s, "_prefetched_subjects", s.subjects.all())
-            m2m_names = [sub.sub_name for sub in m2m_list if getattr(sub, "sub_name", None)]
-
-            # Build "All Subjects (M2M)" with compulsory first, then the rest, deduped
-            all_subjects_ordered = ordered_unique(compulsory + m2m_names)
-            all_subjects_m2m = "; ".join(all_subjects_ordered)
-
-            # Group A/B/C/4th
-            group_a     = s.optional_subject.sub_name     if s.optional_subject     else ''
-            group_b     = s.optional_subject_2.sub_name   if s.optional_subject_2   else ''
-            group_c_main= s.main_subject.sub_name         if s.main_subject         else ''
-            fourth_sub  = s.fourth_subject.sub_name       if s.fourth_subject       else ''
-
-            # ----- ROW -----
             writer.writerow([
                 # Applicant
-                s.add_name or '', s.add_class_roll or '', fmt_mobile(s.add_mobile),
-                s.add_class_id or '', s.add_birth_certificate_no or '',
-                s.add_birthdate.strftime("%d-%m-%Y") if s.add_birthdate else '',
-                s.add_marital_status or '', s.add_age or '', s.add_gender or '',
-                s.add_religion or '', s.add_blood_group or '', s.add_nationality or '',
+                s.add_name or '',
+                s.add_class_roll or '',
+                self._fmt_excel_mobile(s.add_mobile),
+                s.add_class_id or '',
+                s.add_birth_certificate_no or '',
+                fmt_date(s.add_birthdate),
+                s.add_marital_status or '',
+                s.add_age or '',
+                s.add_gender or '',
+                s.add_religion or '',
+                s.add_blood_group or '',
+                s.add_nationality or '',
 
                 # Parent/Guardian
-                s.add_father or '', fmt_mobile(s.add_father_mobile),
+                s.add_father or '',
+                self._fmt_excel_mobile(s.add_father_mobile),
                 s.add_father_nid or '',
-                s.add_father_birthdate.strftime("%d-%m-%Y") if s.add_father_birthdate else '',
-                s.add_mother or '', fmt_mobile(s.add_mother_mobile),
+                fmt_date(s.add_father_birthdate),
+                s.add_mother or '',
+                self._fmt_excel_mobile(s.add_mother_mobile),
                 s.add_mother_nid or '',
-                s.add_mother_birthdate.strftime("%d-%m-%Y") if s.add_mother_birthdate else '',
-                s.add_parent or '', fmt_mobile(s.add_parent_mobile),
-                s.add_parent_service or '', s.add_parent_income or '',
+                fmt_date(s.add_mother_birthdate),
+                s.add_parent or '',
+                self._fmt_excel_mobile(s.add_parent_mobile),
+                s.add_parent_service or '',
+                s.add_parent_income or '',
 
                 # Present Address
-                s.add_village or '', s.add_post or '', s.add_police or '',
-                s.add_distric or '', s.add_postal or '',
+                s.add_village or '',
+                s.add_post or '',
+                s.add_police or '',
+                s.add_distric or '',
+                s.add_postal or '',
 
                 # Permanent Address
-                s.add_village_per or '', s.add_post_per or '', s.add_police_per or '',
-                s.add_distric_per or '', s.add_postal_per or '',
+                s.add_village_per or '',
+                s.add_post_per or '',
+                s.add_police_per or '',
+                s.add_distric_per or '',
+                s.add_postal_per or '',
 
                 # Quota/Community
-                "Yes" if s.qouta else "No", s.qouta_name or '',
-                "Yes" if s.community else "No", s.community_name or '',
+                "Yes" if s.qouta else "No",
+                s.qouta_name or '',
+                "Yes" if s.community else "No",
+                s.community_name or '',
 
                 # SSC
-                s.add_ssc_board or '', ssc_year,
-                s.add_ssc_roll or '', s.add_ssc_reg or '',
-                s.add_ssc_session or '', s.get_add_ssc_group_display() or '',
-                s.add_ssc_institute or '', ssc_gpa,
+                s.add_ssc_board or '',
+                s.add_ssc_passyear or '',
+                s.add_ssc_roll or '',
+                s.add_ssc_reg or '',
+                s.add_ssc_session or '',
+                s.get_add_ssc_group_display() or '',
+                s.add_ssc_institute or '',
+                s.add_ssc_gpa or '',
 
-                # Subjects (ordered)
+                # Subjects
                 all_subjects_m2m,
                 group_a,
                 group_b,
@@ -450,12 +457,14 @@ class AdmittedStudentListView(ListView):
 
                 # Payment
                 s.get_add_payment_method_display() or '',
-                s.add_slip or '', s.add_trxid or '', s.add_amount or '',
-                s.add_payment_status or '', s.add_payment_note or '',
+                s.add_slip or '',
+                s.add_trxid or '',
+                s.add_amount or '',
+                s.add_payment_status or '',
+                s.add_payment_note or '',
             ])
 
         return resp
-
     # ========================
     # Queryset (list & export)
     # ========================
@@ -989,7 +998,7 @@ from django.shortcuts import redirect
 
 # 🗑️ Delete View
 
-@method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
+@method_decorator(role_required(['master_admin']), name='dispatch')
 class HscAdmissionDeleteView(DeleteView):
     model = HscAdmissions
     success_url = reverse_lazy('admitted_students_list')
@@ -1193,9 +1202,13 @@ def student_admission_invoice_view(request, pk):
 
 
 # Degree Section
-
+from django.utils.decorators import method_decorator
 from django.views.generic import ListView
+from django.db.models import Q
+import re
+
 from apps.admissions.models import DegreeAdmission, DegreePrograms
+
 
 @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
 class DegreeAdmittedStudentListView(ListView):
@@ -1204,45 +1217,79 @@ class DegreeAdmittedStudentListView(ListView):
     context_object_name = 'students'
     paginate_by = 25
 
-    def get_queryset(self):
-        queryset = super().get_queryset().select_related('add_session', 'add_program')
+    # --- helpers (same vibe as HSC) ---
+    def _normalize_mobile_digits(self, val: str) -> str:
+        if not val:
+            return ''
+        digits = re.sub(r'\D+', '', val)
+        if digits.startswith('880'):
+            digits = '0' + digits[3:]
+        return digits
 
-        # Filter values
+    def get_queryset(self):
+        qs = (
+            DegreeAdmission.objects
+            .select_related('add_session', 'add_program', 'created_by')
+        )
+
+        # filters
         session = self.request.GET.get('session') or self.request.session.get('active_session_id')
         program = self.request.GET.get('program')
-        group = self.request.GET.get('group')
+        group   = self.request.GET.get('group')
 
         if session:
-            queryset = queryset.filter(add_session_id=session)
+            qs = qs.filter(add_session_id=session)
         if program:
-            queryset = queryset.filter(add_program_id=program)
+            qs = qs.filter(add_program_id=program)
         if group:
-            queryset = queryset.filter(add_admission_group=group)
+            qs = qs.filter(add_admission_group=group)
 
+        # search (id/name/mobile/roll/class_id/admission_roll)
         search = self.request.GET.get('search')
         if search:
-            queryset = queryset.filter(
-                Q(add_name__icontains=search) |
-                Q(add_mobile__icontains=search) |
-                Q(add_class_roll__icontains=search)
-            )
+            norm = self._normalize_mobile_digits(search)
+            try:
+                sid = int(search)
+                qs = qs.filter(
+                    Q(created_by_id=sid) |
+                    Q(add_name__icontains=search) |
+                    Q(add_mobile__icontains=norm) |
+                    Q(add_class_roll__icontains=search) |
+                    Q(add_admission_roll__icontains=search) |
+                    Q(add_class_id__icontains=search)
+                )
+            except ValueError:
+                qs = qs.filter(
+                    Q(add_name__icontains=search) |
+                    Q(add_mobile__icontains=norm) |
+                    Q(add_class_roll__icontains=search) |
+                    Q(add_admission_roll__icontains=search) |
+                    Q(add_class_id__icontains=search)
+                )
 
-        return queryset
+        # order (default asc)
+        order = (self.request.GET.get('order') or 'asc').lower()
+        if order == 'desc':
+            qs = qs.order_by('-add_class_roll')
+        else:
+            qs = qs.order_by('add_class_roll')
 
+        return qs
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        ctx = super().get_context_data(**kwargs)
 
-        # Layout
-        context = TemplateLayout.init(self, context)
-        context["layout"] = "vertical"
-        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+        # Vuexy layout
+        ctx = TemplateLayout.init(self, ctx)
+        ctx["layout"] = "vertical"
+        ctx["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", ctx)
 
-        context['sessions'] = Session.objects.all()
-        context['programs'] = DegreePrograms.objects.all()
-        context['groups'] = ['Ba', 'Bss', 'Bbs', 'Bsc']
-        return context
+        # filter sources
+        ctx['sessions'] = Session.objects.all()
+        ctx['programs'] = DegreePrograms.objects.all()
+        ctx['groups']   = ['Ba', 'Bss', 'Bbs', 'Bsc']
 
+        return ctx
 
 
 @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
@@ -1261,57 +1308,131 @@ class DegreeAdmissionDetailView(DetailView):
 
         return context
 
+from collections import OrderedDict
+
+from django.db import transaction, IntegrityError
+from django.db.models import Q
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.generic.edit import UpdateView
 
 from apps.admissions.forms import DegreeAdmissionForm
-from apps.admissions.models import DegreeAdmission, DegreeSubjects
-from django.views.generic.edit import UpdateView
-from django.urls import reverse_lazy
+from apps.admissions.models import DegreeAdmission, DegreePrograms, DegreeSubjects
+# from apps.programs.models import Programs
+# from apps.fee.models import Fee
 
-# ✏️ BA Update View (Corrected)
 
-@method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
+
+@method_decorator(
+    role_required(['master_admin', 'admin', 'sub_admin', 'teacher']),
+    name='dispatch'
+)
 class BaAdmissionUpdateView(UpdateView):
     model = DegreeAdmission
     template_name = "admissions_others/admission_form_honours.html"
     form_class = DegreeAdmissionForm
     context_object_name = "student"
 
+    # ---- Form kwargs -> pass request/user + dynamic group config ----
+    def get_form_kwargs(self):
+        kw = super().get_form_kwargs()
+        student = self.get_object()
+        group = (student.add_admission_group or "Ba").strip()  # Ba/Bss/Bbs/Bsc
+        kw.update({
+            "request": self.request,
+            "user": getattr(self.request, "user", None),
+            "group": group,
+            "max_selectable": 3,   # প্রয়োজনে view প্রতি কাস্টমাইজ করুন
+        })
+        return kw
+
+    # ---- Context: layout + subject buckets (grid slots) ----
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context = TemplateLayout.init(self, context)
-        context["layout"] = "vertical"
-        context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+        ctx = super().get_context_data(**kwargs)
+        ctx = TemplateLayout.init(self, ctx)
+        ctx["layout"] = "vertical"
+        ctx["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", ctx)
 
         student = self.object
-        group = student.add_admission_group or "Ba"  # Ensure proper case
+        group = (student.add_admission_group or "Ba").strip()
 
-        # ✅ Correct model used here
-        context["subjects_all"] = DegreeSubjects.objects.filter(group=group, sub_status="active")
+        # Compulsory: All/All
+        compulsory_qs = DegreeSubjects.objects.filter(
+            sub_status="active",
+            group__contains="All",
+            sub_select__contains="all",
+        ).order_by("sub_name")
 
-        return context
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-
-        # ✅ Sync only selected subjects from POST data
-        selected_subject_ids = self.request.POST.getlist("subjects")
-        self.object.subjects.set(selected_subject_ids)
-
-        messages.success(
-            self.request,
-            f"✅ {self.object.add_name}'s data updated successfully."
+        # Selectable: group or All, but not All/All
+        selectable_qs = DegreeSubjects.objects.filter(
+            sub_status="active"
+        ).filter(
+            Q(group__contains=group) | Q(group__contains="All")
+        ).exclude(
+            Q(group__contains="All") & Q(sub_select__contains="all")
         )
-        return response
+
+        def slot_qs(tag):
+            return selectable_qs.filter(sub_select__contains=tag).order_by("sub_name")
+
+        # Template-এর নতুন ডিজাইনের জন্য op1..op4 আগে, main শেষে রাখছি
+        ctx["subjects_compulsory"] = compulsory_qs
+        ctx["subjects_by_slot"] = OrderedDict([
+            ("op1",  slot_qs("op1")),
+            ("op2",  slot_qs("op2")),
+            ("op3",  slot_qs("op3")),
+            ("op4",  slot_qs("op4")),
+            ("main", slot_qs("main")),   # main last
+        ])
+
+        ctx["group_name"] = group
+        ctx["max_selectable"] = 3
+        return ctx
+
+    # ---- Save: sync main + M2M + (optional) recalc fee if session/group changed ----
+    def form_valid(self, form):
+        # hidden field থেকে main subject (JS sync করে দেয়)
+        form.instance.main_subject_id = self.request.POST.get("main_subject") or None
+
+        # (ঐচ্ছিক কিন্তু ভালো) session বদলালে ফি resolve করে নিন — server authoritative
+        try:
+            session = form.cleaned_data.get("add_session") or form.instance.add_session
+            degree_program = Programs.objects.get(pro_name__iexact="degree")
+            group = (form.instance.add_admission_group or self.object.add_admission_group or "Ba").strip()
+            fee = Fee.objects.get(
+                fee_session=session,              # object বা id — model অনুযায়ী ঠিক করুন
+                fee_program=degree_program,
+                fee_group__group_name__iexact=group
+            )
+            form.instance.add_amount = fee.amount
+        except Programs.DoesNotExist:
+            form.instance.add_amount = form.instance.add_amount or 0
+        except Fee.DoesNotExist:
+            form.instance.add_amount = form.instance.add_amount or 0
+
+        # atomic save
+        try:
+            with transaction.atomic():
+                resp = super().form_valid(form)
+                # M2M subjects sync (compulsory আলাদা করে পাঠাই না; শুধু selectable ids)
+                selected_subject_ids = self.request.POST.getlist("subjects")
+                self.object.subjects.set(selected_subject_ids)
+        except IntegrityError:
+            form.add_error(None, "⚠️ আপডেট করার সময় একটি ত্রুটি হয়েছে।")
+            return super().form_invalid(form)
+
+        messages.success(self.request, f"✅ {self.object.add_name} — তথ্য আপডেট হয়েছে।")
+        return resp
 
     def get_success_url(self):
-        return reverse_lazy('degree_admitted_students_list')
+        return reverse_lazy("degree_admitted_students_list")
 
 
 from django.views.generic.edit import DeleteView
 from django.urls import reverse_lazy
 from apps.admissions.models import DegreeAdmission
 
-@method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
+@method_decorator(role_required(['master_admin']), name='dispatch')
 class BaAdmissionDeleteView(DeleteView):
     model = DegreeAdmission
     success_url = reverse_lazy('degree_admitted_students_list')
@@ -1327,4 +1448,376 @@ class BaAdmissionDeleteView(DeleteView):
                 messages.error(request, f"❌ Failed to delete degree admission: {str(e)}")
             return redirect(self.success_url)
 
+        return super().dispatch(request, *args, **kwargs)
+
+
+# ====== BSS ======
+@method_decorator(
+    role_required(['master_admin', 'admin', 'sub_admin', 'teacher']),
+    name='dispatch'
+)
+class BssAdmissionUpdateView(UpdateView):
+    model = DegreeAdmission
+    template_name = "admissions_others/admission_form_honours.html"
+    form_class = DegreeAdmissionForm
+    context_object_name = "student"
+
+    def get_form_kwargs(self):
+        kw = super().get_form_kwargs()
+        student = self.get_object()
+        group = (student.add_admission_group or "Bss").strip()
+        kw.update({
+            "request": self.request,
+            "user": getattr(self.request, "user", None),
+            "group": group,
+            "max_selectable": 3,
+        })
+        return kw
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx = TemplateLayout.init(self, ctx)
+        ctx["layout"] = "vertical"
+        ctx["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", ctx)
+
+        student = self.object
+        group = (student.add_admission_group or "Bss").strip()
+
+        compulsory_qs = DegreeSubjects.objects.filter(
+            sub_status="active",
+            group__contains="All",
+            sub_select__contains="all",
+        ).order_by("sub_name")
+
+        selectable_qs = DegreeSubjects.objects.filter(
+            sub_status="active"
+        ).filter(
+            Q(group__contains=group) | Q(group__contains="All")
+        ).exclude(
+            Q(group__contains="All") & Q(sub_select__contains="all")
+        )
+
+        def slot_qs(tag):
+            return selectable_qs.filter(sub_select__contains=tag).order_by("sub_name")
+
+        ctx["subjects_compulsory"] = compulsory_qs
+        ctx["subjects_by_slot"] = OrderedDict([
+            ("op1",  slot_qs("op1")),
+            ("op2",  slot_qs("op2")),
+            ("op3",  slot_qs("op3")),
+            ("op4",  slot_qs("op4")),
+            ("main", slot_qs("main")),
+        ])
+        ctx["group_name"] = group
+        ctx["max_selectable"] = 3
+        return ctx
+
+    def form_valid(self, form):
+        form.instance.main_subject_id = self.request.POST.get("main_subject") or None
+
+        try:
+            session = form.cleaned_data.get("add_session") or form.instance.add_session
+            degree_program = Programs.objects.get(pro_name__iexact="degree")
+            group = (form.instance.add_admission_group or self.object.add_admission_group or "Bss").strip()
+            fee = Fee.objects.get(
+                fee_session=session,
+                fee_program=degree_program,
+                fee_group__group_name__iexact=group
+            )
+            form.instance.add_amount = fee.amount
+        except Programs.DoesNotExist:
+            form.instance.add_amount = form.instance.add_amount or 0
+        except Fee.DoesNotExist:
+            form.instance.add_amount = form.instance.add_amount or 0
+
+        try:
+            with transaction.atomic():
+                resp = super().form_valid(form)
+                selected_subject_ids = self.request.POST.getlist("subjects")
+                self.object.subjects.set(selected_subject_ids)
+        except IntegrityError:
+            form.add_error(None, "⚠️ আপডেট করার সময় একটি ত্রুটি হয়েছে।")
+            return super().form_invalid(form)
+
+        messages.success(self.request, f"✅ {self.object.add_name} — তথ্য আপডেট হয়েছে।")
+        return resp
+
+    def get_success_url(self):
+        return reverse_lazy("degree_admitted_students_list")
+
+
+@method_decorator(role_required(['master_admin']), name='dispatch')
+class BssAdmissionDeleteView(DeleteView):
+    model = DegreeAdmission
+    success_url = reverse_lazy('degree_admitted_students_list')
+    context_object_name = "student"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == "GET":
+            try:
+                self.object = self.get_object()
+                self.object.delete()
+                messages.success(request, "✅ Degree admission record deleted successfully.")
+            except Exception as e:
+                messages.error(request, f"❌ Failed to delete degree admission: {str(e)}")
+            return redirect(self.success_url)
+        return super().dispatch(request, *args, **kwargs)
+
+
+# ====== BSC ======
+@method_decorator(
+    role_required(['master_admin', 'admin', 'sub_admin', 'teacher']),
+    name='dispatch'
+)
+class BscAdmissionUpdateView(UpdateView):
+    model = DegreeAdmission
+    template_name = "admissions_others/admission_form_honours.html"
+    form_class = DegreeAdmissionForm
+    context_object_name = "student"
+
+    def get_form_kwargs(self):
+        kw = super().get_form_kwargs()
+        student = self.get_object()
+        group = (student.add_admission_group or "Bsc").strip()
+        kw.update({
+            "request": self.request,
+            "user": getattr(self.request, "user", None),
+            "group": group,
+            "max_selectable": 3,
+        })
+        return kw
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx = TemplateLayout.init(self, ctx)
+        ctx["layout"] = "vertical"
+        ctx["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", ctx)
+
+        student = self.object
+        group = (student.add_admission_group or "Bsc").strip()
+
+        compulsory_qs = DegreeSubjects.objects.filter(
+            sub_status="active",
+            group__contains="All",
+            sub_select__contains="all",
+        ).order_by("sub_name")
+
+        selectable_qs = DegreeSubjects.objects.filter(
+            sub_status="active"
+        ).filter(
+            Q(group__contains=group) | Q(group__contains="All")
+        ).exclude(
+            Q(group__contains="All") & Q(sub_select__contains="all")
+        )
+
+        def slot_qs(tag):
+            return selectable_qs.filter(sub_select__contains=tag).order_by("sub_name")
+
+        ctx["subjects_compulsory"] = compulsory_qs
+        ctx["subjects_by_slot"] = OrderedDict([
+            ("op1",  slot_qs("op1")),
+            ("op2",  slot_qs("op2")),
+            ("op3",  slot_qs("op3")),
+            ("op4",  slot_qs("op4")),
+            ("main", slot_qs("main")),
+        ])
+        ctx["group_name"] = group
+        ctx["max_selectable"] = 3
+        return ctx
+
+    def form_valid(self, form):
+        form.instance.main_subject_id = self.request.POST.get("main_subject") or None
+
+        try:
+            session = form.cleaned_data.get("add_session") or form.instance.add_session
+            degree_program = Programs.objects.get(pro_name__iexact="degree")
+            group = (form.instance.add_admission_group or self.object.add_admission_group or "Bsc").strip()
+            fee = Fee.objects.get(
+                fee_session=session,
+                fee_program=degree_program,
+                fee_group__group_name__iexact=group
+            )
+            form.instance.add_amount = fee.amount
+        except Programs.DoesNotExist:
+            form.instance.add_amount = form.instance.add_amount or 0
+        except Fee.DoesNotExist:
+            form.instance.add_amount = form.instance.add_amount or 0
+
+        try:
+            with transaction.atomic():
+                resp = super().form_valid(form)
+                selected_subject_ids = self.request.POST.getlist("subjects")
+                self.object.subjects.set(selected_subject_ids)
+        except IntegrityError:
+            form.add_error(None, "⚠️ আপডেট করার সময় একটি ত্রুটি হয়েছে।")
+            return super().form_invalid(form)
+
+        messages.success(self.request, f"✅ {self.object.add_name} — তথ্য আপডেট হয়েছে।")
+        return resp
+
+    def get_success_url(self):
+        return reverse_lazy("degree_admitted_students_list")
+
+
+@method_decorator(role_required(['master_admin']), name='dispatch')
+class BscAdmissionDeleteView(DeleteView):
+    model = DegreeAdmission
+    success_url = reverse_lazy('degree_admitted_students_list')
+    context_object_name = "student"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == "GET":
+            try:
+                self.object = self.get_object()
+                self.object.delete()
+                messages.success(request, "✅ Degree admission record deleted successfully.")
+            except Exception as e:
+                messages.error(request, f"❌ Failed to delete degree admission: {str(e)}")
+            return redirect(self.success_url)
+        return super().dispatch(request, *args, **kwargs)
+
+
+# ====== BBS ======
+@method_decorator(
+    role_required(['master_admin', 'admin', 'sub_admin', 'teacher']),
+    name='dispatch'
+)
+class BbsAdmissionUpdateView(UpdateView):
+    model = DegreeAdmission
+    template_name = "admissions_others/admission_form_honours.html"
+    form_class = DegreeAdmissionForm
+    context_object_name = "student"
+
+    def get_form_kwargs(self):
+        kw = super().get_form_kwargs()
+        student = self.get_object()
+        group = (student.add_admission_group or "Bbs").strip()
+        kw.update({
+            "request": self.request,
+            "user": getattr(self.request, "user", None),
+            "group": group,
+            "max_selectable": 3,
+        })
+        return kw
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx = TemplateLayout.init(self, ctx)
+        ctx["layout"] = "vertical"
+        ctx["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", ctx)
+
+        student = self.object
+        group = (student.add_admission_group or "Bbs").strip()
+
+        compulsory_qs = DegreeSubjects.objects.filter(
+            sub_status="active",
+            group__contains="All",
+            sub_select__contains="all",
+        ).order_by("sub_name")
+
+        selectable_qs = DegreeSubjects.objects.filter(
+            sub_status="active"
+        ).filter(
+            Q(group__contains=group) | Q(group__contains="All")
+        ).exclude(
+            Q(group__contains="All") & Q(sub_select__contains="all")
+        )
+
+        def slot_qs(tag):
+            return selectable_qs.filter(sub_select__contains=tag).order_by("sub_name")
+
+        ctx["subjects_compulsory"] = compulsory_qs
+        ctx["subjects_by_slot"] = OrderedDict([
+            ("op1",  slot_qs("op1")),
+            ("op2",  slot_qs("op2")),
+            ("op3",  slot_qs("op3")),
+            ("op4",  slot_qs("op4")),
+            ("main", slot_qs("main")),
+        ])
+        ctx["group_name"] = group
+        ctx["max_selectable"] = 3
+        return ctx
+
+    def form_valid(self, form):
+        form.instance.main_subject_id = self.request.POST.get("main_subject") or None
+
+        try:
+            session = form.cleaned_data.get("add_session") or form.instance.add_session
+            degree_program = Programs.objects.get(pro_name__iexact="degree")
+            group = (form.instance.add_admission_group or self.object.add_admission_group or "Bbs").strip()
+            fee = Fee.objects.get(
+                fee_session=session,
+                fee_program=degree_program,
+                fee_group__group_name__iexact=group
+            )
+            form.instance.add_amount = fee.amount
+        except Programs.DoesNotExist:
+            form.instance.add_amount = form.instance.add_amount or 0
+        except Fee.DoesNotExist:
+            form.instance.add_amount = form.instance.add_amount or 0
+
+        try:
+            with transaction.atomic():
+                resp = super().form_valid(form)
+                selected_subject_ids = self.request.POST.getlist("subjects")
+                self.object.subjects.set(selected_subject_ids)
+        except IntegrityError:
+            form.add_error(None, "⚠️ আপডেট করার সময় একটি ত্রুটি হয়েছে।")
+            return super().form_invalid(form)
+
+        messages.success(self.request, f"✅ {self.object.add_name} — তথ্য আপডেট হয়েছে।")
+        return resp
+
+    def get_success_url(self):
+        return reverse_lazy("degree_admitted_students_list")
+
+
+@method_decorator(role_required(['master_admin']), name='dispatch')
+class BbsAdmissionDeleteView(DeleteView):
+    model = DegreeAdmission
+    success_url = reverse_lazy('degree_admitted_students_list')
+    context_object_name = "student"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == "GET":
+            try:
+                self.object = self.get_object()
+                self.object.delete()
+                messages.success(request, "✅ Degree admission record deleted successfully.")
+            except Exception as e:
+                messages.error(request, f"❌ Failed to delete degree admission: {str(e)}")
+            return redirect(self.success_url)
+        return super().dispatch(request, *args, **kwargs)
+
+
+
+
+
+# all degree delete
+
+@method_decorator(role_required(['master_admin']), name='dispatch')
+class DegreeAdmissionDeleteView(DeleteView):
+    model = DegreeAdmission
+    success_url = reverse_lazy('degree_admitted_students_list')
+    context_object_name = "student"
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        url_group = (self.kwargs.get('group') or '').strip().lower()
+        obj_group = (obj.add_admission_group or '').strip().lower()
+        if url_group and obj_group and url_group != obj_group:
+            # URL এ দেওয়া group আর রেকর্ডের group mismatch হলে 404
+            raise Http404("Group does not match.")
+        return obj
+
+    # GET-এও ডিলিট সাপোর্ট (আগের মতো এক-ক্লিক)
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == "GET":
+            try:
+                self.object = self.get_object()
+                self.object.delete()
+                messages.success(request, "✅ Degree admission record deleted successfully.")
+            except Exception as e:
+                messages.error(request, f"❌ Failed to delete degree admission: {e}")
+            return redirect(self.success_url)
         return super().dispatch(request, *args, **kwargs)

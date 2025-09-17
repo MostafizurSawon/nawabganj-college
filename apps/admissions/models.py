@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-  
+
 
 from django.core.exceptions import ValidationError
 
@@ -108,19 +108,42 @@ class Subjects(models.Model):
 
     def __str__(self):
         return f"{self.sub_name} ({self.code}) - {self.sub_select} - {self.group}"
-    
+
 
 
 # Honours/Degree subjects
+
+DEG_SUB_SELECT_CHOICES = [
+    ('main', 'Main'),
+    ('op1', 'op1'),
+    ('op2', 'op2'),
+    ('op3', 'op3'),
+    ('op4', 'op4'),
+    ('all', 'All'),
+]
+
+DEG_GROUP_SELECT_CHOICES = [
+    ('All', 'ALL'),
+    ('Ba', 'BA'),
+    ('Bss', 'BSS'),
+    ('Bbs', 'BBS'),
+    ('Bsc', 'BSC'),
+]
 class DegreeSubjects(models.Model):
-    sub_name = models.CharField(max_length=30, null=True, blank=True)
-    group = models.CharField(max_length=20, choices=[
-            ('Ba', 'BA'),
-            ('Bss', 'BSS'),
-            ('Bbs', 'BBS'),
-            ('Bsc', 'BSC'),
-        ], null=True, blank= True)
+    sub_name = models.CharField(max_length=50, null=True, blank=True)
+    group = MultiSelectField(
+        choices=DEG_GROUP_SELECT_CHOICES,
+        max_length=100,
+        blank=True,
+        null=True,
+    )
     code = models.CharField(max_length=20, null=True, blank= True)
+    sub_select = MultiSelectField(
+        choices=DEG_SUB_SELECT_CHOICES,
+        max_length=100,
+        blank=True,
+        null=True,
+    )
     sub_status = models.CharField(max_length=15, choices=[
         ('active', 'Active'),
         ('inactive', 'Inactive')
@@ -171,7 +194,7 @@ class HscAdmissions(models.Model):
             ('science', 'Science'),
             ('arts', 'Humanities'),
             ('commerce', 'Business Studies'),
-            
+
         ],
         null=True,
         blank=True
@@ -218,7 +241,7 @@ class HscAdmissions(models.Model):
     # Address
     add_village = models.CharField(max_length=30, null=True, blank=True)
     add_post = models.CharField(max_length=30, null=True, blank=True)
-    add_police = models.CharField(max_length=30, null=True, blank=True) 
+    add_police = models.CharField(max_length=30, null=True, blank=True)
     add_postal = models.IntegerField(null=True, blank=True)
     add_distric = models.CharField(max_length=30, null=True, blank=True)
 
@@ -291,7 +314,7 @@ class HscAdmissions(models.Model):
     add_trxid = models.CharField(max_length=50, null=True, blank=True, unique=True, db_index=True)
     add_slip = models.CharField(max_length=14, null=True, blank=True)
 
-    # Payment Confirm from Teacher 
+    # Payment Confirm from Teacher
     add_payment_status = models.CharField(
         max_length=10,
         choices=[
@@ -422,8 +445,8 @@ HSC_BOARDS = [
 
 
 class DegreeAdmission(models.Model):
-    # Common Info
     add_name = models.CharField(max_length=100, null=True, blank=True)
+    add_email = models.CharField(max_length=100, null=True, blank=True)
     add_name_bangla = models.CharField(max_length=100, null=True, blank=True)
     add_mobile = models.CharField(max_length=15, null=True, blank=True)
     add_photo = models.ImageField(upload_to='degree/student_photos/', null=True, blank=True)
@@ -468,8 +491,9 @@ class DegreeAdmission(models.Model):
     )
 
     add_age = models.CharField(max_length=20, null=True, blank=True)
+    # Student Class ID
+    add_class_id = models.CharField(max_length=20, null=True, blank=True)
 
-    
 
     # SSC Info
     add_ssc_roll = models.CharField(max_length=20, null=True, blank=True)
@@ -492,14 +516,18 @@ class DegreeAdmission(models.Model):
 
     # Parent - conditional
     add_father = models.CharField(max_length=100, null=True, blank=True)
+    add_father_bn = models.CharField(max_length=100, null=True, blank=True)
     add_father_mobile = models.CharField(max_length=11, null=True, blank=True)
     add_father_nid = models.CharField(max_length=20, null=True, blank=True)
     add_father_birthdate = models.DateField(null=True, blank=True)
 
     add_mother = models.CharField(max_length=100, null=True, blank=True)
-    add_mother_mobile = models.CharField(max_length=11, null=True, blank=True)    # Form theke baddibo
+    add_mother_bn = models.CharField(max_length=100, null=True, blank=True)
+    add_mother_mobile = models.CharField(max_length=11, null=True, blank=True)
     add_mother_nid = models.CharField(max_length=20, null=True, blank=True)
     add_mother_birthdate = models.DateField(null=True, blank=True)
+
+    add_grand = models.CharField(max_length=100, null=True, blank=True)
 
     add_parent_select = models.CharField(
         max_length=10,
@@ -542,7 +570,7 @@ class DegreeAdmission(models.Model):
     # Address
     add_village = models.CharField(max_length=30, null=True, blank=True)
     add_post = models.CharField(max_length=30, null=True, blank=True)
-    add_police = models.CharField(max_length=30, null=True, blank=True) 
+    add_police = models.CharField(max_length=30, null=True, blank=True)
     add_postal = models.IntegerField(null=True, blank=True)
     add_distric = models.CharField(max_length=30, null=True, blank=True)
 
@@ -579,8 +607,13 @@ class DegreeAdmission(models.Model):
     add_session = models.ForeignKey('Session', on_delete=models.SET_NULL, null=True, blank=True)
     subjects = models.ManyToManyField('DegreeSubjects', blank=True)
     main_subject = models.ForeignKey('DegreeSubjects', on_delete=models.SET_NULL, null=True, blank=True, related_name='degree_main_subject')
+    op1 = models.ForeignKey('DegreeSubjects', on_delete=models.SET_NULL, null=True, blank=True, related_name='degree_op1')
+    op2 = models.ForeignKey('DegreeSubjects', on_delete=models.SET_NULL, null=True, blank=True, related_name='degree_op2')
+    op3 = models.ForeignKey('DegreeSubjects', on_delete=models.SET_NULL, null=True, blank=True, related_name='degree_op3')
+    op4 = models.ForeignKey('DegreeSubjects', on_delete=models.SET_NULL, null=True, blank=True, related_name='degree_op4')
 
     add_class_roll = models.CharField(max_length=20, null=True, blank=True)
+    add_admission_roll = models.CharField(max_length=20, null=True, blank=True)
     merit_position = models.CharField(max_length=10, null=True, blank=True)
 
     add_amount = models.DecimalField(max_digits=8, decimal_places=2, default=0, null=True, blank=True)
@@ -594,9 +627,9 @@ class DegreeAdmission(models.Model):
         blank=True
     )
     add_trxid = models.CharField(max_length=50, null=True, blank=True, unique=True, db_index=True)
-    add_slip = models.TextField(null=True, blank=True)
+    add_slip = models.CharField(null=True, blank=True)
 
-     # qouta / community
+    # qouta / community
     qouta = models.BooleanField(default=False, null=True, blank=True)
     qouta_name = models.CharField(max_length=150, null=True, blank=True)
 
@@ -618,6 +651,20 @@ class DegreeAdmission(models.Model):
         default='student_self',
         blank=True
     )
+
+    # Payment Confirm from Teacher
+    add_payment_status = models.CharField(
+        max_length=10,
+        choices=[
+            ('pending', 'Pending'),
+            ('paid', 'Paid'),
+            ('unpaid', 'Unpaid'),
+        ],
+        default='pending',
+        blank=True,
+        db_index=True,
+    )
+    add_payment_note = models.TextField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)

@@ -94,9 +94,9 @@
                 <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
               </button>
             {% endif %}
-              
+
               </div>
-              
+
 
               {% if not admission_paid %}
                 <div class="small text-dark mt-2">
@@ -105,7 +105,7 @@
               {% endif %}
             {% else %}
               <div class="alert alert-info mb-0" role="alert">
-                <strong>আপনি এখনো কোনো ফর্ম পূরণ করেননি</strong> 
+                <strong>আপনি এখনো কোনো ফর্ম পূরণ করেননি</strong>
               </div>
             {% endif %}
           </div>
@@ -156,7 +156,7 @@
     </div>
   </div>
 
-      
+
 
   </div>
 
@@ -372,28 +372,28 @@
                   <i class="ti ti-info-circle fs-5 text-primary"></i>
                   <h6 class="mb-0">Note:</h6>
                 </div>
-              
+
                 <ol class="mb-3 ps-3">
                   {% comment %} <li>সঠিক <strong>ট্রানজ্যাকশন আইডি</strong> দিন।</li> {% endcomment %}
                   <li>পেমেন্টের পর স্ট্যাটাস আপডেট হতে কিছু সময় লাগতে পারে ।</li>
                   <li>কোনো তথ্য <strong>ভুল থাকলে কলেজ আইটি শাখা থেকে ঠিক করে নিতে হবে।</strong>। </li>
                   <li>পেমেন্ট নিশ্চিত হলে <strong>ইনভয়েস ডাউনলোড</strong> করে সংরক্ষণ করুন।</li>
                 </ol>
-              
+
                 {% if payment_deadline %}
                   <div class="alert alert-warning py-2 small mb-3">
                     <i class="ti ti-alert-triangle me-1"></i>
                     ডেডলাইন: {{ payment_deadline|date:"d M Y, h:i A" }}
                   </div>
                 {% endif %}
-              
+
                 {% comment %} <div class="small text-dark">
                   সহায়তার জন্য যোগাযোগ করুন —
                   {% if support_phone %}<span class="fw-semibold">{{ support_phone }}</span>{% endif %}
                   {% if support_email %} {% if support_phone %}|{% endif %} <a href="mailto:{{ support_email }}">{{ support_email }}</a>{% endif %}
                 </div> {% endcomment %}
               </div>
-              
+
 
               <!-- FAQ -->
               <div class="accordion mt-3" id="payFaq">
@@ -503,34 +503,38 @@
 
           <div class="col-12">
             <div class="p-3 border border-success rounded-3 position-relative">
-          
-          
+
+
               <div class="row g-3 align-items-center">
                 <!-- Left: Student ID (50%) -->
                 <div class="col-4">
                   <div class="small text-dark">
                     Payment Student ID : <span class="fw-semibold text-success">{{ request.user.id }}</span>
                   </div>
-                  
+
                 </div>
-          
+
                 <!-- Right: Class Roll (50%) -->
+                 {% if admission.add_class_roll %}
                 <div class="col-3">
-                  <div class="small text-dark">Class Roll : 
+                  <div class="small text-dark">Class Roll :
                     <span class="fw-semibold text-success">
                       {{ admission.add_class_roll|default:"" }}
                     </span>
                   </div>
                 </div>
+                {% endif %}
 
+                {% if admission.add_class_id %}
                 <div class="col-5">
                   <div class="small text-dark">
-                    Class ID : 
+                    Class ID :
                     <span class="fw-semibold text-success">
                       {{ admission.add_class_id|default:"" }}
                     </span>
                   </div>
                 </div>
+                {% endif %}
 
               </div>
             </div>
@@ -550,6 +554,7 @@
             </div>
           </div>
 
+          {% if admission.add_name %}
           <div class="col-12">
             <div class="p-3 border rounded-3 bg-white">
               <div class="text-dark small mb-1">Student Name: </div>
@@ -561,13 +566,14 @@
               </div>
             </div>
           </div>
+          {% endif %}
         </div>
 
         <div class="mt-4 d-flex flex-wrap gap-2">
           {% comment %} <a href="{% url 'hsc_admission_create' %}" class="btn btn-success">
             <i class="ti ti-edit me-1"></i> ফর্ম পূরণ করুন
           </a> {% endcomment %}
-        
+
           {% comment %} {% if admission_pk %}
             <a href="{% url 'hsc_admission_view' pk=admission_pk %}" class="btn btn-outline-secondary">
               <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
@@ -578,7 +584,7 @@
             </button>
           {% endif %} {% endcomment %}
         </div>
-        
+
 
         <div class="mt-3 small text-dark">
           🔒 কোন তথ‍্য ভুল থাকলে কলেজ আইটি শাখা থেকে ঠিক করে নিতে হবে।
@@ -696,7 +702,7 @@
               আপনি এখনো কোনো ফর্ম পূরণ করেননি
             </div>
             <div class="small text-success">
-              নিচের মেনু থেকে আপনার গ্রুপ অনুযায়ী ফর্ম পূরণ করুন। 
+              নিচের মেনু থেকে আপনার গ্রুপ অনুযায়ী ফর্ম পূরণ করুন।
               ফর্ম সাবমিটের পর প্রিন্ট নিয়ে কলেজে জমা দিন।
             </div>
 
@@ -716,7 +722,7 @@
       {% endif %}
 
 
-      
+
       {% comment %} ১.নবাবগঞ্জ সিটি কলেজের ওয়েব লিংক থেকে অনলাইন পোর্টালে এ প্রবেশ করুন।
       ২. আবেদন লিংকে ক্লিক করে অ‍্যাকাউন্ট তৈরি  করে ফরম পূরণ করুন। {% endcomment %}
       {% comment %} ৩. ভর্তি ফি :৩০০০/- রকেট বিলার আইডি 4132 এ পরিশোধ করুন।
@@ -729,14 +735,14 @@
       ঘ) ছাত্র/ছাত্রীর জন্ম সনদের ফটোকপি ১টি।
       ঙ)শিক্ষার্থীর ছবি:  ২ কপি (পাসপোর্ট সাইজ)।
       চ)পিতা ও মাতার জাতীয় পরিচয় পত্রের ফটোকপি ১টি । {% endcomment %}
-        
-      
+       
+
 
       {% comment %} <div class="mb-2">
         <ul class="list-group list-group-flush rounded-3 overflow-hidden">
           <li class="list-group-item d-flex align-items-start">
             <span class="badge bg-label-primary me-2">১.</span>
-            নবাবগঞ্জ সিটি কলেজের ওয়েব লিংক থেকে 
+            নবাবগঞ্জ সিটি কলেজের ওয়েব লিংক থেকে
             <span class="fw-semibold mx-1">অনলাইন পোর্টালে</span> এ প্রবেশ করুন।
           </li>
           <li class="list-group-item d-flex align-items-start">
@@ -753,10 +759,10 @@
           </li>
           <li class="list-group-item d-flex align-items-start">
             <span class="badge bg-label-primary me-2">৫.</span>
-            প্রিন্ট কপি জমার তারিখ: 
+            প্রিন্ট কপি জমার তারিখ:
             <span class="fw-semibold">৭ থেকে ১৪ সেপ্টেম্বর ২০২৫ খ্রি.</span>
           </li>
-          
+
           <h4 class="card-title mt-5">প্রয়োজনীয় কাগজপত্র:</h4>
           <!-- Extra items -->
           <li class="list-group-item d-flex align-items-start">
@@ -785,7 +791,7 @@
           </li>
         </ul>
       </div> {% endcomment %}
-      
+
 
         <div class="mb-2">
           <div class="kicker text-dark mb-2">এইচ. এস. সি ভর্তির আবেদন ফরমের সাথে যেসব কাগজপত্র জমা দিতে হবে:</div>
@@ -816,7 +822,7 @@
             </li>
             <li class="list-group-item d-flex align-items-start">
               <span class="badge bg-label-primary me-2">৭.</span>
-              পিতা ও মাতার <span class="fw-semibold ms-1">জাতীয় পরিচয়পত্রের ফটোকপি ১টি করে।</span> 
+              পিতা ও মাতার <span class="fw-semibold ms-1">জাতীয় পরিচয়পত্রের ফটোকপি ১টি করে।</span>
             </li>
           </ul>
         </div>
