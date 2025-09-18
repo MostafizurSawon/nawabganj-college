@@ -1439,16 +1439,16 @@ class BaAdmissionUpdateView(UpdateView):
 
     # ---- Save: sync main + M2M + (optional) recalc fee if session/group changed ----
     def form_valid(self, form):
-        # hidden field থেকে main subject (JS sync করে দেয়)
+        # hidden থেকে main subject id (থাকলে)
         form.instance.main_subject_id = self.request.POST.get("main_subject") or None
 
-        # (ঐচ্ছিক কিন্তু ভালো) session বদলালে ফি resolve করে নিন — server authoritative
+        # (ঐচ্ছিক) fee re-resolve (session/group পাল্টালে)
         try:
             session = form.cleaned_data.get("add_session") or form.instance.add_session
             degree_program = Programs.objects.get(pro_name__iexact="degree")
             group = (form.instance.add_admission_group or self.object.add_admission_group or "Ba").strip()
             fee = Fee.objects.get(
-                fee_session=session,              # object বা id — model অনুযায়ী ঠিক করুন
+                fee_session=session,
                 fee_program=degree_program,
                 fee_group__group_name__iexact=group
             )
@@ -1458,13 +1458,52 @@ class BaAdmissionUpdateView(UpdateView):
         except Fee.DoesNotExist:
             form.instance.add_amount = form.instance.add_amount or 0
 
-        # atomic save
         try:
             with transaction.atomic():
                 resp = super().form_valid(form)
-                # M2M subjects sync (compulsory আলাদা করে পাঠাই না; শুধু selectable ids)
-                selected_subject_ids = self.request.POST.getlist("subjects")
-                self.object.subjects.set(selected_subject_ids)
+
+                group = (self.object.add_admission_group or "Ba").strip()
+                # ✅ posted selectable ids
+                posted_ids = [int(x) for x in self.request.POST.getlist("subjects") if str(x).isdigit()]
+
+                # ✅ compulsory (All/All) সবসময় যোগ হবে
+                compulsory_ids = list(
+                    DegreeSubjects.objects.filter(
+                        sub_status="active",
+                        group__contains="All",
+                        sub_select__contains="all",
+                    ).values_list("id", flat=True)
+                )
+
+                # ✅ selectable queryset (group|All) কিন্তু All/All বাদ
+                posted_qs = DegreeSubjects.objects.filter(
+                    id__in=posted_ids, sub_status="active"
+                ).filter(
+                    Q(group__contains=group) | Q(group__contains="All")
+                ).exclude(
+                    Q(group__contains="All") & Q(sub_select__contains="all")
+                ).distinct()
+
+                # ✅ authoritative set: compulsory ∪ posted
+                final_ids = sorted(set(compulsory_ids) | set(posted_qs.values_list("id", flat=True)))
+                self.object.subjects.set(final_ids, clear=True)
+
+                # ✅ slot FK assign (posted থেকে—compulsory নয়)
+                slot_tags = ("main", "op1", "op2", "op3", "op4")
+                slot_first = {}
+                for s in posted_qs:
+                    tags = set(s.sub_select or [])
+                    for t in slot_tags:
+                        if t in tags and t not in slot_first:
+                            slot_first[t] = s
+
+                self.object.main_subject = slot_first.get("main")
+                self.object.op1 = slot_first.get("op1")
+                self.object.op2 = slot_first.get("op2")
+                self.object.op3 = slot_first.get("op3")
+                self.object.op4 = slot_first.get("op4")
+                self.object.save()
+
         except IntegrityError:
             form.add_error(None, "⚠️ আপডেট করার সময় একটি ত্রুটি হয়েছে।")
             return super().form_invalid(form)
@@ -1474,29 +1513,6 @@ class BaAdmissionUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("degree_admitted_students_list")
-
-
-from django.views.generic.edit import DeleteView
-from django.urls import reverse_lazy
-from apps.admissions.models import DegreeAdmission
-
-@method_decorator(role_required(['master_admin']), name='dispatch')
-class BaAdmissionDeleteView(DeleteView):
-    model = DegreeAdmission
-    success_url = reverse_lazy('degree_admitted_students_list')
-    context_object_name = "student"
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.method == "GET":
-            try:
-                self.object = self.get_object()
-                self.object.delete()
-                messages.success(request, "✅ Degree admission record deleted successfully.")
-            except Exception as e:
-                messages.error(request, f"❌ Failed to delete degree admission: {str(e)}")
-            return redirect(self.success_url)
-
-        return super().dispatch(request, *args, **kwargs)
 
 
 # ====== BSS ======
@@ -1567,10 +1583,8 @@ class BssAdmissionUpdateView(UpdateView):
             session = form.cleaned_data.get("add_session") or form.instance.add_session
             degree_program = Programs.objects.get(pro_name__iexact="degree")
             group = (form.instance.add_admission_group or self.object.add_admission_group or "Bss").strip()
-            fee = Fee.objects.get(
-                fee_session=session,
-                fee_program=degree_program,
-                fee_group__group_name__iexact=group
+            fee = Fee.get(
+                fee_session=session, fee_program=degree_program, fee_group__group_name__iexact=group
             )
             form.instance.add_amount = fee.amount
         except Programs.DoesNotExist:
@@ -1581,8 +1595,42 @@ class BssAdmissionUpdateView(UpdateView):
         try:
             with transaction.atomic():
                 resp = super().form_valid(form)
-                selected_subject_ids = self.request.POST.getlist("subjects")
-                self.object.subjects.set(selected_subject_ids)
+
+                group = (self.object.add_admission_group or "Bss").strip()
+                posted_ids = [int(x) for x in self.request.POST.getlist("subjects") if str(x).isdigit()]
+
+                compulsory_ids = list(
+                    DegreeSubjects.objects.filter(
+                        sub_status="active", group__contains="All", sub_select__contains="all"
+                    ).values_list("id", flat=True)
+                )
+
+                posted_qs = DegreeSubjects.objects.filter(
+                    id__in=posted_ids, sub_status="active"
+                ).filter(
+                    Q(group__contains=group) | Q(group__contains="All")
+                ).exclude(
+                    Q(group__contains="All") & Q(sub_select__contains="all")
+                ).distinct()
+
+                final_ids = sorted(set(compulsory_ids) | set(posted_qs.values_list("id", flat=True)))
+                self.object.subjects.set(final_ids, clear=True)
+
+                slot_tags = ("main", "op1", "op2", "op3", "op4")
+                slot_first = {}
+                for s in posted_qs:
+                    tags = set(s.sub_select or [])
+                    for t in slot_tags:
+                        if t in tags and t not in slot_first:
+                            slot_first[t] = s
+
+                self.object.main_subject = slot_first.get("main")
+                self.object.op1 = slot_first.get("op1")
+                self.object.op2 = slot_first.get("op2")
+                self.object.op3 = slot_first.get("op3")
+                self.object.op4 = slot_first.get("op4")
+                self.object.save()
+
         except IntegrityError:
             form.add_error(None, "⚠️ আপডেট করার সময় একটি ত্রুটি হয়েছে।")
             return super().form_invalid(form)
@@ -1593,23 +1641,6 @@ class BssAdmissionUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy("degree_admitted_students_list")
 
-
-@method_decorator(role_required(['master_admin']), name='dispatch')
-class BssAdmissionDeleteView(DeleteView):
-    model = DegreeAdmission
-    success_url = reverse_lazy('degree_admitted_students_list')
-    context_object_name = "student"
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.method == "GET":
-            try:
-                self.object = self.get_object()
-                self.object.delete()
-                messages.success(request, "✅ Degree admission record deleted successfully.")
-            except Exception as e:
-                messages.error(request, f"❌ Failed to delete degree admission: {str(e)}")
-            return redirect(self.success_url)
-        return super().dispatch(request, *args, **kwargs)
 
 
 # ====== BSC ======
@@ -1680,10 +1711,8 @@ class BscAdmissionUpdateView(UpdateView):
             session = form.cleaned_data.get("add_session") or form.instance.add_session
             degree_program = Programs.objects.get(pro_name__iexact="degree")
             group = (form.instance.add_admission_group or self.object.add_admission_group or "Bsc").strip()
-            fee = Fee.objects.get(
-                fee_session=session,
-                fee_program=degree_program,
-                fee_group__group_name__iexact=group
+            fee = Fee.get(
+                fee_session=session, fee_program=degree_program, fee_group__group_name__iexact=group
             )
             form.instance.add_amount = fee.amount
         except Programs.DoesNotExist:
@@ -1694,8 +1723,42 @@ class BscAdmissionUpdateView(UpdateView):
         try:
             with transaction.atomic():
                 resp = super().form_valid(form)
-                selected_subject_ids = self.request.POST.getlist("subjects")
-                self.object.subjects.set(selected_subject_ids)
+
+                group = (self.object.add_admission_group or "Bsc").strip()
+                posted_ids = [int(x) for x in self.request.POST.getlist("subjects") if str(x).isdigit()]
+
+                compulsory_ids = list(
+                    DegreeSubjects.objects.filter(
+                        sub_status="active", group__contains="All", sub_select__contains="all"
+                    ).values_list("id", flat=True)
+                )
+
+                posted_qs = DegreeSubjects.objects.filter(
+                    id__in=posted_ids, sub_status="active"
+                ).filter(
+                    Q(group__contains=group) | Q(group__contains="All")
+                ).exclude(
+                    Q(group__contains="All") & Q(sub_select__contains="all")
+                ).distinct()
+
+                final_ids = sorted(set(compulsory_ids) | set(posted_qs.values_list("id", flat=True)))
+                self.object.subjects.set(final_ids, clear=True)
+
+                slot_tags = ("main", "op1", "op2", "op3", "op4")
+                slot_first = {}
+                for s in posted_qs:
+                    tags = set(s.sub_select or [])
+                    for t in slot_tags:
+                        if t in tags and t not in slot_first:
+                            slot_first[t] = s
+
+                self.object.main_subject = slot_first.get("main")
+                self.object.op1 = slot_first.get("op1")
+                self.object.op2 = slot_first.get("op2")
+                self.object.op3 = slot_first.get("op3")
+                self.object.op4 = slot_first.get("op4")
+                self.object.save()
+
         except IntegrityError:
             form.add_error(None, "⚠️ আপডেট করার সময় একটি ত্রুটি হয়েছে।")
             return super().form_invalid(form)
@@ -1706,23 +1769,6 @@ class BscAdmissionUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy("degree_admitted_students_list")
 
-
-@method_decorator(role_required(['master_admin']), name='dispatch')
-class BscAdmissionDeleteView(DeleteView):
-    model = DegreeAdmission
-    success_url = reverse_lazy('degree_admitted_students_list')
-    context_object_name = "student"
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.method == "GET":
-            try:
-                self.object = self.get_object()
-                self.object.delete()
-                messages.success(request, "✅ Degree admission record deleted successfully.")
-            except Exception as e:
-                messages.error(request, f"❌ Failed to delete degree admission: {str(e)}")
-            return redirect(self.success_url)
-        return super().dispatch(request, *args, **kwargs)
 
 
 # ====== BBS ======
@@ -1793,10 +1839,8 @@ class BbsAdmissionUpdateView(UpdateView):
             session = form.cleaned_data.get("add_session") or form.instance.add_session
             degree_program = Programs.objects.get(pro_name__iexact="degree")
             group = (form.instance.add_admission_group or self.object.add_admission_group or "Bbs").strip()
-            fee = Fee.objects.get(
-                fee_session=session,
-                fee_program=degree_program,
-                fee_group__group_name__iexact=group
+            fee = Fee.get(
+                fee_session=session, fee_program=degree_program, fee_group__group_name__iexact=group
             )
             form.instance.add_amount = fee.amount
         except Programs.DoesNotExist:
@@ -1807,8 +1851,42 @@ class BbsAdmissionUpdateView(UpdateView):
         try:
             with transaction.atomic():
                 resp = super().form_valid(form)
-                selected_subject_ids = self.request.POST.getlist("subjects")
-                self.object.subjects.set(selected_subject_ids)
+
+                group = (self.object.add_admission_group or "Bbs").strip()
+                posted_ids = [int(x) for x in self.request.POST.getlist("subjects") if str(x).isdigit()]
+
+                compulsory_ids = list(
+                    DegreeSubjects.objects.filter(
+                        sub_status="active", group__contains="All", sub_select__contains="all"
+                    ).values_list("id", flat=True)
+                )
+
+                posted_qs = DegreeSubjects.objects.filter(
+                    id__in=posted_ids, sub_status="active"
+                ).filter(
+                    Q(group__contains=group) | Q(group__contains="All")
+                ).exclude(
+                    Q(group__contains="All") & Q(sub_select__contains="all")
+                ).distinct()
+
+                final_ids = sorted(set(compulsory_ids) | set(posted_qs.values_list("id", flat=True)))
+                self.object.subjects.set(final_ids, clear=True)
+
+                slot_tags = ("main", "op1", "op2", "op3", "op4")
+                slot_first = {}
+                for s in posted_qs:
+                    tags = set(s.sub_select or [])
+                    for t in slot_tags:
+                        if t in tags and t not in slot_first:
+                            slot_first[t] = s
+
+                self.object.main_subject = slot_first.get("main")
+                self.object.op1 = slot_first.get("op1")
+                self.object.op2 = slot_first.get("op2")
+                self.object.op3 = slot_first.get("op3")
+                self.object.op4 = slot_first.get("op4")
+                self.object.save()
+
         except IntegrityError:
             form.add_error(None, "⚠️ আপডেট করার সময় একটি ত্রুটি হয়েছে।")
             return super().form_invalid(form)
@@ -1820,22 +1898,6 @@ class BbsAdmissionUpdateView(UpdateView):
         return reverse_lazy("degree_admitted_students_list")
 
 
-@method_decorator(role_required(['master_admin']), name='dispatch')
-class BbsAdmissionDeleteView(DeleteView):
-    model = DegreeAdmission
-    success_url = reverse_lazy('degree_admitted_students_list')
-    context_object_name = "student"
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.method == "GET":
-            try:
-                self.object = self.get_object()
-                self.object.delete()
-                messages.success(request, "✅ Degree admission record deleted successfully.")
-            except Exception as e:
-                messages.error(request, f"❌ Failed to delete degree admission: {str(e)}")
-            return redirect(self.success_url)
-        return super().dispatch(request, *args, **kwargs)
 
 
 

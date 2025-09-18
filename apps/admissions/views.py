@@ -608,17 +608,21 @@ class AdmissionBaCreateView(DegreeSingleApplicationGuardMixin, FormView):
             form.add_error(None, f"{self.DEG_NAME} program not found.")
             return self.form_invalid(form)
 
-        form.instance.add_program = prog
-        form.instance.add_admission_group = self.GROUP
+        # 🚩 IMPORTANT: commit=False
+        obj = form.save(commit=False)
 
-        # ---- Session (ফর্মের clean থেকে locked session আসবে) ----
+        # Program & group
+        obj.add_program = prog
+        obj.add_admission_group = self.GROUP
+
+        # Session (required)
         session = form.cleaned_data.get("add_session")
         if not session:
             form.add_error("add_session", "Session is required.")
             return self.form_invalid(form)
-        form.instance.add_session = session
+        obj.add_session = session
 
-        # ---- Fee resolve (server-side authoritative) ----
+        # Fee resolve
         try:
             degree_program = Programs.objects.get(pro_name__iexact="degree")
             fee = Fee.objects.get(
@@ -626,23 +630,25 @@ class AdmissionBaCreateView(DegreeSingleApplicationGuardMixin, FormView):
                 fee_program=degree_program,
                 fee_group__group_name__iexact=self.GROUP
             )
-            form.instance.add_amount = fee.amount
+            obj.add_amount = fee.amount
         except (Programs.DoesNotExist, Fee.DoesNotExist):
-            form.instance.add_amount = 0
+            obj.add_amount = 0
 
-        # ---- Audit trail ----
+        # Audit
         u = self.request.user
         if getattr(u, "is_authenticated", False):
-            form.instance.created_by = u
-            form.instance.submitted_via = "student_self" if getattr(u, "role", None) == "student" else "staff"
+            obj.created_by = u
+            obj.submitted_via = "student_self" if getattr(u, "role", None) == "student" else "staff"
         else:
-            form.instance.created_by = None
-            form.instance.submitted_via = "api"
+            obj.created_by = None
+            obj.submitted_via = "api"
 
-        # ---- Save + Subject handling ----
+        # প্রথমে parent অবজেক্ট সেভ করে নিই (PK লাগবে)
+        obj.save()
+
+        # ---- Subjects building ----
         posted_ids = [int(x) for x in self.request.POST.getlist("subjects") if str(x).isdigit()]
 
-        # Compulsory IDs (All/All) — সবসময় যোগ হবে
         compulsory_ids = list(
             DegreeSubjects.objects.filter(
                 sub_status="active",
@@ -651,7 +657,6 @@ class AdmissionBaCreateView(DegreeSingleApplicationGuardMixin, FormView):
             ).values_list("id", flat=True)
         )
 
-        # Posted selectable (Ba|All) থেকে, কিন্তু All/All বাদ
         posted_qs = DegreeSubjects.objects.filter(
             id__in=posted_ids,
             sub_status="active",
@@ -659,11 +664,10 @@ class AdmissionBaCreateView(DegreeSingleApplicationGuardMixin, FormView):
             Q(group__contains=self.GROUP) | Q(group__contains="All")
         ).exclude(
             Q(group__contains="All") & Q(sub_select__contains="all")
-        )
+        ).distinct()
 
-        # ---- Server-side validation: প্রতি slot ≤ 1 এবং মোট ঠিক ৩টি ----
+        # ---- Server-side validation (unchanged) ----
         slot_tags = ("main", "op1", "op2", "op3", "op4")
-        # প্রতি স্লটে কয়টা করে আছে
         slot_counts = {t: 0 for t in slot_tags}
         for s in posted_qs:
             tags = set(s.sub_select or [])
@@ -676,42 +680,33 @@ class AdmissionBaCreateView(DegreeSingleApplicationGuardMixin, FormView):
             if c > 1:
                 errs.append(f"‘{t.upper()}’ থেকে একটির বেশি নির্বাচন করা যাবে না।")
 
-        total_selected = posted_qs.count()  # compulsory বাদে ক’টি নেয়া হয়েছে
+        total_selected = posted_qs.count()  # compulsory বাদে
         if total_selected != self.MAX_SELECTABLE:
             errs.append(f"compulsory বাদে ঠিক {self.MAX_SELECTABLE}টি বিষয় নির্বাচন করতে হবে।")
 
         if errs:
-            for e in errs:
-                form.add_error(None, e)
+            for e in errs: form.add_error(None, e)
             return self.form_invalid(form)
 
-        # ---- সব ঠিক থাকলে সেভ ----
-        try:
-            with transaction.atomic():
-                obj = form.save()
+        # ---- M2M save (authoritative) ----
+        final_ids = sorted(set(compulsory_ids) | set(posted_qs.values_list("id", flat=True)))
+        # কোনো জায়গায় যদি form.save_m2m() কল হয়ে থাকে/হবে—তবু নিচের set পুরো লিস্টকে authoritative ভাবে সেট করবে
+        obj.subjects.set(final_ids, clear=True)
 
-                # M2M set: compulsory + posted
-                final_ids = compulsory_ids + list(posted_qs.values_list("id", flat=True))
-                obj.subjects.set(final_ids)
+        # ---- FK slots auto-assign ----
+        slot_first = {}
+        for s in posted_qs:
+            tags = set(s.sub_select or [])
+            for t in slot_tags:
+                if t in tags and t not in slot_first:
+                    slot_first[t] = s
 
-                # FK auto-assign: posted থেকে স্লট অনুযায়ী প্রথমটিকে বসানো
-                slot_first = {}
-                for s in posted_qs:
-                    tags = set(s.sub_select or [])
-                    for t in slot_tags:
-                        if t in tags and t not in slot_first:
-                            slot_first[t] = s
-
-                obj.main_subject = slot_first.get("main")
-                obj.op1 = slot_first.get("op1")
-                obj.op2 = slot_first.get("op2")
-                obj.op3 = slot_first.get("op3")
-                obj.op4 = slot_first.get("op4")
-                obj.save()
-
-        except IntegrityError:
-            form.add_error("add_class_roll", "এই গ্রুপে এই রোল নম্বর ইতিমধ্যেই আছে।")
-            return self.form_invalid(form)
+        obj.main_subject = slot_first.get("main")
+        obj.op1 = slot_first.get("op1")
+        obj.op2 = slot_first.get("op2")
+        obj.op3 = slot_first.get("op3")
+        obj.op4 = slot_first.get("op4")
+        obj.save()
 
         messages.success(self.request, "✅ BA admission submitted successfully.")
         return redirect(self.success_url)
@@ -791,17 +786,19 @@ class AdmissionBssCreateView(DegreeSingleApplicationGuardMixin, FormView):
             form.add_error(None, f"{self.DEG_NAME} program not found.")
             return self.form_invalid(form)
 
-        form.instance.add_program = prog
-        form.instance.add_admission_group = self.GROUP
+        # 🚩 commit=False
+        obj = form.save(commit=False)
+        obj.add_program = prog
+        obj.add_admission_group = self.GROUP
 
-        # ---- Session (locked in form.clean) ----
+        # ---- Session ----
         session = form.cleaned_data.get("add_session")
         if not session:
             form.add_error("add_session", "Session is required.")
             return self.form_invalid(form)
-        form.instance.add_session = session
+        obj.add_session = session
 
-        # ---- Fee resolve ----
+        # ---- Fee ----
         try:
             degree_program = Programs.objects.get(pro_name__iexact="degree")
             fee = Fee.objects.get(
@@ -809,20 +806,23 @@ class AdmissionBssCreateView(DegreeSingleApplicationGuardMixin, FormView):
                 fee_program=degree_program,
                 fee_group__group_name__iexact=self.GROUP
             )
-            form.instance.add_amount = fee.amount
+            obj.add_amount = fee.amount
         except (Programs.DoesNotExist, Fee.DoesNotExist):
-            form.instance.add_amount = 0
+            obj.add_amount = 0
 
         # ---- Audit ----
         u = self.request.user
         if getattr(u, "is_authenticated", False):
-            form.instance.created_by = u
-            form.instance.submitted_via = "student_self" if getattr(u, "role", None) == "student" else "staff"
+            obj.created_by = u
+            obj.submitted_via = "student_self" if getattr(u, "role", None) == "student" else "staff"
         else:
-            form.instance.created_by = None
-            form.instance.submitted_via = "api"
+            obj.created_by = None
+            obj.submitted_via = "api"
 
-        # ---- Subjects (posted) ----
+        # PK দরকার, আগে সেভ
+        obj.save()
+
+        # ---- Posted subjects ----
         posted_ids = [int(x) for x in self.request.POST.getlist("subjects") if str(x).isdigit()]
 
         compulsory_ids = list(
@@ -839,12 +839,12 @@ class AdmissionBssCreateView(DegreeSingleApplicationGuardMixin, FormView):
             Q(group__contains=self.GROUP) | Q(group__contains="All")
         ).exclude(
             Q(group__contains="All") & Q(sub_select__contains="all")
-        )
+        ).distinct()
 
-        # ---- Server-side validation ----
+        # ---- Validation (BSS: A,C multi; others single) ----
         slot_tags = ("main", "op1", "op2", "op3", "op4")
-        MULTI_SLOTS = {"op1", "op3"}        # A, C multi
-        SINGLE_SLOTS = set(slot_tags) - MULTI_SLOTS  # main, op2, op4
+        MULTI_SLOTS = {"op1", "op3"}
+        SINGLE_SLOTS = set(slot_tags) - MULTI_SLOTS
 
         slot_counts = {t: 0 for t in slot_tags}
         for s in posted_qs:
@@ -858,40 +858,32 @@ class AdmissionBssCreateView(DegreeSingleApplicationGuardMixin, FormView):
             if slot_counts[t] > 1:
                 errs.append(f"‘{t.upper()}’ থেকে একটির বেশি নির্বাচন করা যাবে না।")
 
-        total_selected = posted_qs.count()
+        total_selected = posted_qs.count()  # compulsory বাদে
         if total_selected != self.MAX_SELECTABLE:
             errs.append(f"compulsory বাদে ঠিক {self.MAX_SELECTABLE}টি বিষয় নির্বাচন করতে হবে।")
 
         if errs:
-            for e in errs:
-                form.add_error(None, e)
+            for e in errs: form.add_error(None, e)
             return self.form_invalid(form)
 
-        # ---- Save ----
-        try:
-            with transaction.atomic():
-                obj = form.save()
+        # ---- Authoritative M2M set ----
+        final_ids = sorted(set(compulsory_ids) | set(posted_qs.values_list("id", flat=True)))
+        obj.subjects.set(final_ids, clear=True)
 
-                final_ids = compulsory_ids + list(posted_qs.values_list("id", flat=True))
-                obj.subjects.set(final_ids)
+        # ---- Slot FK assign ----
+        slot_first = {}
+        for s in posted_qs:
+            tags = set(s.sub_select or [])
+            for t in slot_tags:
+                if t in tags and t not in slot_first:
+                    slot_first[t] = s
 
-                slot_first = {}
-                for s in posted_qs:
-                    tags = set(s.sub_select or [])
-                    for t in slot_tags:
-                        if t in tags and t not in slot_first:
-                            slot_first[t] = s
-
-                obj.main_subject = slot_first.get("main")
-                obj.op1 = slot_first.get("op1")
-                obj.op2 = slot_first.get("op2")
-                obj.op3 = slot_first.get("op3")
-                obj.op4 = slot_first.get("op4")
-                obj.save()
-
-        except IntegrityError:
-            form.add_error("add_class_roll", "এই গ্রুপে এই রোল নম্বর ইতিমধ্যেই আছে।")
-            return self.form_invalid(form)
+        obj.main_subject = slot_first.get("main")
+        obj.op1 = slot_first.get("op1")
+        obj.op2 = slot_first.get("op2")
+        obj.op3 = slot_first.get("op3")
+        obj.op4 = slot_first.get("op4")
+        obj.save()
 
         messages.success(self.request, "✅ BSS admission submitted successfully.")
         return redirect(self.success_url)
@@ -966,14 +958,16 @@ class AdmissionBscCreateView(DegreeSingleApplicationGuardMixin, FormView):
             form.add_error(None, f"{self.DEG_NAME} program not found.")
             return self.form_invalid(form)
 
-        form.instance.add_program = prog
-        form.instance.add_admission_group = self.GROUP
+        # 🚩 commit=False
+        obj = form.save(commit=False)
+        obj.add_program = prog
+        obj.add_admission_group = self.GROUP
 
         session = form.cleaned_data.get("add_session")
         if not session:
             form.add_error("add_session", "Session is required.")
             return self.form_invalid(form)
-        form.instance.add_session = session
+        obj.add_session = session
 
         try:
             degree_program = Programs.objects.get(pro_name__iexact="degree")
@@ -982,17 +976,19 @@ class AdmissionBscCreateView(DegreeSingleApplicationGuardMixin, FormView):
                 fee_program=degree_program,
                 fee_group__group_name__iexact=self.GROUP
             )
-            form.instance.add_amount = fee.amount
+            obj.add_amount = fee.amount
         except (Programs.DoesNotExist, Fee.DoesNotExist):
-            form.instance.add_amount = 0
+            obj.add_amount = 0
 
         u = self.request.user
         if getattr(u, "is_authenticated", False):
-            form.instance.created_by = u
-            form.instance.submitted_via = "student_self" if getattr(u, "role", None) == "student" else "staff"
+            obj.created_by = u
+            obj.submitted_via = "student_self" if getattr(u, "role", None) == "student" else "staff"
         else:
-            form.instance.created_by = None
-            form.instance.submitted_via = "api"
+            obj.created_by = None
+            obj.submitted_via = "api"
+
+        obj.save()  # PK first
 
         posted_ids = [int(x) for x in self.request.POST.getlist("subjects") if str(x).isdigit()]
 
@@ -1008,8 +1004,9 @@ class AdmissionBscCreateView(DegreeSingleApplicationGuardMixin, FormView):
             Q(group__contains=self.GROUP) | Q(group__contains="All")
         ).exclude(
             Q(group__contains="All") & Q(sub_select__contains="all")
-        )
+        ).distinct()
 
+        # Validation (BSC: A,C multi; others single)
         slot_tags = ("main", "op1", "op2", "op3", "op4")
         MULTI_SLOTS = {"op1", "op3"}
         SINGLE_SLOTS = set(slot_tags) - MULTI_SLOTS
@@ -1031,33 +1028,27 @@ class AdmissionBscCreateView(DegreeSingleApplicationGuardMixin, FormView):
             errs.append(f"compulsory বাদে ঠিক {self.MAX_SELECTABLE}টি বিষয় নির্বাচন করতে হবে।")
 
         if errs:
-            for e in errs:
-                form.add_error(None, e)
+            for e in errs: form.add_error(None, e)
             return self.form_invalid(form)
 
-        try:
-            with transaction.atomic():
-                obj = form.save()
-                final_ids = compulsory_ids + list(posted_qs.values_list("id", flat=True))
-                obj.subjects.set(final_ids)
+        # Authoritative set
+        final_ids = sorted(set(compulsory_ids) | set(posted_qs.values_list("id", flat=True)))
+        obj.subjects.set(final_ids, clear=True)
 
-                slot_first = {}
-                for s in posted_qs:
-                    tags = set(s.sub_select or [])
-                    for t in slot_tags:
-                        if t in tags and t not in slot_first:
-                            slot_first[t] = s
+        # Slot FK
+        slot_first = {}
+        for s in posted_qs:
+            tags = set(s.sub_select or [])
+            for t in slot_tags:
+                if t in tags and t not in slot_first:
+                    slot_first[t] = s
 
-                obj.main_subject = slot_first.get("main")
-                obj.op1 = slot_first.get("op1")
-                obj.op2 = slot_first.get("op2")
-                obj.op3 = slot_first.get("op3")
-                obj.op4 = slot_first.get("op4")
-                obj.save()
-
-        except IntegrityError:
-            form.add_error("add_class_roll", "এই গ্রুপে এই রোল নম্বর ইতিমধ্যেই আছে।")
-            return self.form_invalid(form)
+        obj.main_subject = slot_first.get("main")
+        obj.op1 = slot_first.get("op1")
+        obj.op2 = slot_first.get("op2")
+        obj.op3 = slot_first.get("op3")
+        obj.op4 = slot_first.get("op4")
+        obj.save()
 
         messages.success(self.request, "✅ BSc admission submitted successfully.")
         return redirect(self.success_url)
@@ -1132,14 +1123,16 @@ class AdmissionBbsCreateView(DegreeSingleApplicationGuardMixin, FormView):
             form.add_error(None, f"{self.DEG_NAME} program not found.")
             return self.form_invalid(form)
 
-        form.instance.add_program = prog
-        form.instance.add_admission_group = self.GROUP
+        # 🚩 commit=False
+        obj = form.save(commit=False)
+        obj.add_program = prog
+        obj.add_admission_group = self.GROUP
 
         session = form.cleaned_data.get("add_session")
         if not session:
             form.add_error("add_session", "Session is required.")
             return self.form_invalid(form)
-        form.instance.add_session = session
+        obj.add_session = session
 
         try:
             degree_program = Programs.objects.get(pro_name__iexact="degree")
@@ -1148,17 +1141,19 @@ class AdmissionBbsCreateView(DegreeSingleApplicationGuardMixin, FormView):
                 fee_program=degree_program,
                 fee_group__group_name__iexact=self.GROUP
             )
-            form.instance.add_amount = fee.amount
+            obj.add_amount = fee.amount
         except (Programs.DoesNotExist, Fee.DoesNotExist):
-            form.instance.add_amount = 0
+            obj.add_amount = 0
 
         u = self.request.user
         if getattr(u, "is_authenticated", False):
-            form.instance.created_by = u
-            form.instance.submitted_via = "student_self" if getattr(u, "role", None) == "student" else "staff"
+            obj.created_by = u
+            obj.submitted_via = "student_self" if getattr(u, "role", None) == "student" else "staff"
         else:
-            form.instance.created_by = None
-            form.instance.submitted_via = "api"
+            obj.created_by = None
+            obj.submitted_via = "api"
+
+        obj.save()  # ensure PK
 
         posted_ids = [int(x) for x in self.request.POST.getlist("subjects") if str(x).isdigit()]
 
@@ -1174,8 +1169,9 @@ class AdmissionBbsCreateView(DegreeSingleApplicationGuardMixin, FormView):
             Q(group__contains=self.GROUP) | Q(group__contains="All")
         ).exclude(
             Q(group__contains="All") & Q(sub_select__contains="all")
-        )
+        ).distinct()
 
+        # Validation (BBS: A,C multi; others single)
         slot_tags = ("main", "op1", "op2", "op3", "op4")
         MULTI_SLOTS = {"op1", "op3"}
         SINGLE_SLOTS = set(slot_tags) - MULTI_SLOTS
@@ -1197,33 +1193,27 @@ class AdmissionBbsCreateView(DegreeSingleApplicationGuardMixin, FormView):
             errs.append(f"compulsory বাদে ঠিক {self.MAX_SELECTABLE}টি বিষয় নির্বাচন করতে হবে।")
 
         if errs:
-            for e in errs:
-                form.add_error(None, e)
+            for e in errs: form.add_error(None, e)
             return self.form_invalid(form)
 
-        try:
-            with transaction.atomic():
-                obj = form.save()
-                final_ids = compulsory_ids + list(posted_qs.values_list("id", flat=True))
-                obj.subjects.set(final_ids)
+        # Authoritative set
+        final_ids = sorted(set(compulsory_ids) | set(posted_qs.values_list("id", flat=True)))
+        obj.subjects.set(final_ids, clear=True)
 
-                slot_first = {}
-                for s in posted_qs:
-                    tags = set(s.sub_select or [])
-                    for t in slot_tags:
-                        if t in tags and t not in slot_first:
-                            slot_first[t] = s
+        # Slot FK
+        slot_first = {}
+        for s in posted_qs:
+            tags = set(s.sub_select or [])
+            for t in slot_tags:
+                if t in tags and t not in slot_first:
+                    slot_first[t] = s
 
-                obj.main_subject = slot_first.get("main")
-                obj.op1 = slot_first.get("op1")
-                obj.op2 = slot_first.get("op2")
-                obj.op3 = slot_first.get("op3")
-                obj.op4 = slot_first.get("op4")
-                obj.save()
-
-        except IntegrityError:
-            form.add_error("add_class_roll", "এই গ্রুপে এই রোল নম্বর ইতিমধ্যেই আছে।")
-            return self.form_invalid(form)
+        obj.main_subject = slot_first.get("main")
+        obj.op1 = slot_first.get("op1")
+        obj.op2 = slot_first.get("op2")
+        obj.op3 = slot_first.get("op3")
+        obj.op4 = slot_first.get("op4")
+        obj.save()
 
         messages.success(self.request, "✅ BBS admission submitted successfully.")
         return redirect(self.success_url)
@@ -1231,187 +1221,6 @@ class AdmissionBbsCreateView(DegreeSingleApplicationGuardMixin, FormView):
     def form_invalid(self, form):
         print("Form invalid:", form.errors)
         return super().form_invalid(form)
-
-
-# BSS
-# @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher', 'student']), name='dispatch')
-# class AdmissionBssCreateView(FormView):
-#     template_name = "admissions_others/admission_form_honours.html"
-#     form_class = DegreeAdmissionForm
-#     success_url = reverse_lazy("bss_admission_create")
-
-#     def get_form_kwargs(self):
-#         kw = super().get_form_kwargs()
-#         kw["request"] = self.request
-#         return kw
-
-#     def get_initial(self):
-#         return {"add_admission_group": "Bss"}
-
-#     def get_context_data(self, **kwargs):
-#         ctx = super().get_context_data(**kwargs)
-#         ctx = TemplateLayout.init(self, ctx)
-#         ctx["layout"] = "vertical"
-#         ctx["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", ctx)
-#         ctx["subjects_all"] = DegreeSubjects.objects.filter(group="Bss", sub_status="active")
-#         return ctx
-
-#     def form_valid(self, form):
-#         try:
-#             prog = DegreePrograms.objects.get(deg_name__iexact="Bss")
-#             form.instance.add_program = prog
-#             form.instance.add_admission_group = "Bss"
-#         except DegreePrograms.DoesNotExist:
-#             form.add_error(None, "BSS program not found.")
-#             return self.form_invalid(form)
-
-#         session_id = self.request.POST.get("add_session")
-#         try:
-#             degree_program = Programs.objects.get(pro_name__iexact="degree")
-#             fee = Fee.objects.get(fee_session_id=session_id, fee_program=degree_program, fee_group__group_name__iexact="Bss")
-#             form.instance.add_amount = fee.amount
-#         except Exception:
-#             form.instance.add_amount = 0
-
-#         u = self.request.user
-#         form.instance.created_by = u if getattr(u, "is_authenticated", False) else None
-#         form.instance.submitted_via = 'student_self' if getattr(u, 'role', None) == 'student' else 'staff'
-
-#         form.instance.main_subject_id = self.request.POST.get("main_subject") or None
-
-#         self.object = form.save()
-
-#         selected_subjects = self.request.POST.getlist("subjects")
-#         if selected_subjects:
-#             self.object.subjects.set(selected_subjects)
-
-#         messages.success(self.request, "✅ BSS admission submitted successfully.")
-#         return redirect(self.success_url)
-
-#     def form_invalid(self, form):
-#         print("Form invalid:", form.errors)
-#         return super().form_invalid(form)
-
-
-# # BSC
-# @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher', 'student']), name='dispatch')
-# class AdmissionBscCreateView(FormView):
-#     template_name = "admissions_others/admission_form_honours.html"
-#     form_class = DegreeAdmissionForm
-#     success_url = reverse_lazy("bsc_admission_create")
-
-#     def get_form_kwargs(self):
-#         kw = super().get_form_kwargs()
-#         kw["request"] = self.request
-#         return kw
-
-#     def get_initial(self):
-#         return {"add_admission_group": "Bsc"}
-
-#     def get_context_data(self, **kwargs):
-#         ctx = super().get_context_data(**kwargs)
-#         ctx = TemplateLayout.init(self, ctx)
-#         ctx["layout"] = "vertical"
-#         ctx["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", ctx)
-#         ctx["subjects_all"] = DegreeSubjects.objects.filter(group="Bsc", sub_status="active")
-#         return ctx
-
-#     def form_valid(self, form):
-#         try:
-#             prog = DegreePrograms.objects.get(deg_name__iexact="Bsc")
-#             form.instance.add_program = prog
-#             form.instance.add_admission_group = "Bsc"
-#         except DegreePrograms.DoesNotExist:
-#             form.add_error(None, "BSc program not found.")
-#             return self.form_invalid(form)
-
-#         session_id = self.request.POST.get("add_session")
-#         try:
-#             degree_program = Programs.objects.get(pro_name__iexact="degree")
-#             fee = Fee.objects.get(fee_session_id=session_id, fee_program=degree_program, fee_group__group_name__iexact="Bsc")
-#             form.instance.add_amount = fee.amount
-#         except Exception:
-#             form.instance.add_amount = 0
-
-#         u = self.request.user
-#         form.instance.created_by = u if getattr(u, "is_authenticated", False) else None
-#         form.instance.submitted_via = 'student_self' if getattr(u, 'role', None) == 'student' else 'staff'
-
-#         form.instance.main_subject_id = self.request.POST.get("main_subject") or None
-
-#         self.object = form.save()
-
-#         selected_subjects = self.request.POST.getlist("subjects")
-#         if selected_subjects:
-#             self.object.subjects.set(selected_subjects)
-
-#         messages.success(self.request, "✅ BSc admission submitted successfully.")
-#         return redirect(self.success_url)
-
-#     def form_invalid(self, form):
-#         print("⛔ Form INVALID", form.errors)
-#         return super().form_invalid(form)
-
-
-# # BBS
-# @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher', 'student']), name='dispatch')
-# class AdmissionBbsCreateView(FormView):
-#     template_name = "admissions_others/admission_form_honours.html"
-#     form_class = DegreeAdmissionForm
-#     success_url = reverse_lazy("bbs_admission_create")
-
-#     def get_form_kwargs(self):
-#         kw = super().get_form_kwargs()
-#         kw["request"] = self.request
-#         return kw
-
-#     def get_initial(self):
-#         return {"add_admission_group": "Bbs"}
-
-#     def get_context_data(self, **kwargs):
-#         ctx = super().get_context_data(**kwargs)
-#         ctx = TemplateLayout.init(self, ctx)
-#         ctx["layout"] = "vertical"
-#         ctx["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", ctx)
-#         ctx["subjects_all"] = DegreeSubjects.objects.filter(group="Bbs", sub_status="active")
-#         return ctx
-
-#     def form_valid(self, form):
-#         try:
-#             prog = DegreePrograms.objects.get(deg_name__iexact="Bbs")
-#             form.instance.add_program = prog
-#             form.instance.add_admission_group = "Bbs"
-#         except DegreePrograms.DoesNotExist:
-#             form.add_error(None, "BBS program not found.")
-#             return self.form_invalid(form)
-
-#         session_id = self.request.POST.get("add_session")
-#         try:
-#             degree_program = Programs.objects.get(pro_name__iexact="degree")
-#             fee = Fee.objects.get(fee_session_id=session_id, fee_program=degree_program, fee_group__group_name__iexact="Bbs")
-#             form.instance.add_amount = fee.amount
-#         except Exception:
-#             form.instance.add_amount = 0
-
-#         u = self.request.user
-#         form.instance.created_by = u if getattr(u, "is_authenticated", False) else None
-#         form.instance.submitted_via = 'student_self' if getattr(u, 'role', None) == 'student' else 'staff'
-
-#         form.instance.main_subject_id = self.request.POST.get("main_subject") or None
-
-#         self.object = form.save()
-
-#         selected_subjects = self.request.POST.getlist("subjects")
-#         if selected_subjects:
-#             self.object.subjects.set(selected_subjects)
-
-#         messages.success(self.request, "✅ BBS admission submitted successfully.")
-#         return redirect(self.success_url)
-
-#     def form_invalid(self, form):
-#         print("⛔ Form INVALID", form.errors)
-#         return super().form_invalid(form)
-
 
 
 
