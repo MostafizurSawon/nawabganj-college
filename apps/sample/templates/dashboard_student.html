@@ -120,7 +120,7 @@
           <h5 class="card-title mb-1">
             <a href="{% url 'hsc_admission_create' %}">HSC Science Admission Form</a>
           </h5>
-          <p class="text-dark small mb-0">ভর্তি যোগ্যতা ও প্রয়োজনীয় তথ্য আগে দেখে নিন।</p>
+          {% comment %} <p class="text-dark small mb-0">ভর্তি যোগ্যতা ও প্রয়োজনীয় তথ্য আগে দেখে নিন।</p> {% endcomment %}
         </div>
       </div>
     </div>
@@ -134,7 +134,7 @@
           <h5 class="card-title mb-1">
             <a href="{% url 'hsc_admission_create_arts' %}">HSC Humanities Admission Form</a>
           </h5>
-          <p class="text-dark small mb-0">বিষয়সমূহ ও সিট সংক্রান্ত আপডেট দেখুন।</p>
+          {% comment %} <p class="text-dark small mb-0">বিষয়সমূহ ও সিট সংক্রান্ত আপডেট দেখুন।</p> {% endcomment %}
         </div>
       </div>
     </div>
@@ -148,12 +148,15 @@
           <h5 class="card-title mb-1">
             <a href="{% url 'hsc_admission_create_commerce' %}">HSC Business Studies Admission Form</a>
           </h5>
-          <p class="text-dark small mb-0">আবেদনের পূর্বে ডকুমেন্ট প্রস্তুত রাখুন।</p>
+          {% comment %} <p class="text-dark small mb-0">আবেদনের পূর্বে ডকুমেন্ট প্রস্তুত রাখুন।</p> {% endcomment %}
         </div>
       </div>
     </div>
 
   </div>
+
+
+{% elif mode == "degree" %}
 
       <!-- ================= DEGREE (Same style as HSC) ================= -->
     <div class="row g-4 mt-1">
@@ -215,7 +218,7 @@
             <h5 class="card-title mb-1">
               <a href="{% url 'ba_admission_create' %}">BA Admission Form</a>
             </h5>
-            <p class="text-dark small mb-0">ভর্তি যোগ্যতা ও তথ্য দেখে নিন।</p>
+            {% comment %} <p class="text-dark small mb-0">ভর্তি যোগ্যতা ও তথ্য দেখে নিন।</p> {% endcomment %}
           </div>
         </div>
       </div>
@@ -229,7 +232,7 @@
             <h5 class="card-title mb-1">
               <a href="{% url 'bss_admission_create' %}">BSS Admission Form</a>
             </h5>
-            <p class="text-dark small mb-0">বিষয়সমূহ ও সিট আপডেট দেখুন।</p>
+            {% comment %} <p class="text-dark small mb-0">বিষয়সমূহ ও সিট আপডেট দেখুন।</p> {% endcomment %}
           </div>
         </div>
       </div>
@@ -243,27 +246,11 @@
             <h5 class="card-title mb-1">
               <a href="{% url 'bsc_admission_create' %}">BSC Admission Form</a>
             </h5>
-            <p class="text-dark small mb-0">ডকুমেন্ট রেডি রাখুন।</p>
+            {% comment %} <p class="text-dark small mb-0">ডকুমেন্ট রেডি রাখুন।</p> {% endcomment %}
           </div>
         </div>
       </div>
 
-      {% comment %} <div class="col-xxl-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm rounded-4">
-          <div class="card-body">
-            <div class="badge p-2 bg-label-success mb-3 rounded">
-              <i class="ti ti-credit-card ti-28px"></i>
-            </div>
-            <h5 class="card-title mb-1">
-              <a href="{% url 'bbs_admission_create' %}">BBS Admission Form</a>
-            </h5>
-            <p class="text-dark small mb-0">আবেদনের পূর্বে নির্দেশনা পড়ুন।</p>
-          </div>
-        </div>
-      </div> {% endcomment %}
-
-    </div>
-    <!-- =============== /DEGREE =============== -->
 
 {% elif mode == "sp" %}
 
@@ -954,13 +941,13 @@
 
             <div class="mt-3 d-flex flex-wrap gap-2">
               <a href="{% url 'hsc_admission_create' %}" class="btn btn-sm btn-primary">
-                <i class="ti ti-edit me-1"></i> Science ফর্ম পূরণ করুন
+                <i class="ti ti-edit me-1"></i> Science ফর্ম
               </a>
               <a href="{% url 'hsc_admission_create_arts' %}" class="btn btn-sm btn-primary">
-                <i class="ti ti-edit me-1"></i> Humanities ফর্ম পূরণ করুন
+                <i class="ti ti-edit me-1"></i> Humanities ফর্ম
               </a>
               <a href="{% url 'hsc_admission_create_commerce' %}" class="btn btn-sm btn-primary">
-                <i class="ti ti-edit me-1"></i> Business Studies ফর্ম পূরণ করুন
+                <i class="ti ti-edit me-1"></i> Business Studies ফর্ম
               </a>
             </div>
           </div>
@@ -1022,23 +1009,23 @@
             role="alert" style="border-left-width:.5rem;">
           <div class="fs-3 lh-1">🎓</div>
           <div>
-            <div class="fw-semibold mb-1">আপনার প্রোগ্রাম অনুযায়ী ফর্ম পূরণ করুন</div>
+            <div class="fw-semibold mb-1 text-danger">আপনি এখনো কোনো ফর্ম পূরণ করেননি</div>
             <div class="small text-dark">
-              অনলাইন ফর্ম সাবমিটের পর প্রিন্ট কপি প্রয়োজনীয় কাগজপত্রসহ কলেজে জমা দিন।
+              নিচের মেনু থেকে আপনার গ্রুপ অনুযায়ী ফর্ম পূরণ করুন। ফর্ম সাবমিটের পর প্রিন্ট নিয়ে কলেজে জমা দিন।
             </div>
 
             <div class="mt-3 d-flex flex-wrap gap-2">
               <a href="{% url 'ba_admission_create' %}" class="btn btn-sm btn-primary">
-                <i class="ti ti-edit me-1"></i> BA ফর্ম পূরণ করুন
+                <i class="ti ti-edit me-1"></i> BA ফর্ম
               </a>
               <a href="{% url 'bss_admission_create' %}" class="btn btn-sm btn-primary">
-                <i class="ti ti-edit me-1"></i> BSS ফর্ম পূরণ করুন
+                <i class="ti ti-edit me-1"></i> BSS ফর্ম
               </a>
               <a href="{% url 'bsc_admission_create' %}" class="btn btn-sm btn-primary">
-                <i class="ti ti-edit me-1"></i> BSC ফর্ম পূরণ করুন
+                <i class="ti ti-edit me-1"></i> BSC ফর্ম
               </a>
               {% comment %} <a href="{% url 'bbs_admission_create' %}" class="btn btn-sm btn-primary">
-                <i class="ti ti-edit me-1"></i> BBS ফর্ম পূরণ করুন
+                <i class="ti ti-edit me-1"></i> BBS ফর্ম
               </a> {% endcomment %}
             </div>
           </div>
@@ -1046,7 +1033,7 @@
         {% endif %}
 
         <div class="mb-2">
-          <div class="kicker text-dark mb-2">ডিগ্রী আবেদনের সাথে যেসব কাগজপত্র জমা দিতে হবে:</div>
+          <div class="kicker text-dark mb-2">ডিগ্রী ভর্তির আবেদনের সাথে যেসব কাগজপত্র জমা দিতে হবে:</div>
           <ul class="list-group list-group-flush rounded-3 overflow-hidden">
             <li class="list-group-item d-flex align-items-start">
               <span class="badge bg-label-primary me-2">১.</span>
@@ -1080,7 +1067,7 @@
         </div>
 
         <div class="small text-dark mt-3">
-          ℹ️ সকল তথ্য যাচাই করে প্রিন্ট কপি সিগনেচার করে জমা দিন।
+         ℹ️ সকল কাগজপত্রে তথ্য মিল আছে কি না একবার যাচাই করে নেবেন। প্রিন্ট কপি সিগনেচার করে জমা দিন।
         </div>
       </div>
     </div>

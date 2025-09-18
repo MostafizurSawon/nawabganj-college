@@ -39,6 +39,11 @@
       "slug": "admission",
       "submenu": [
         {
+          "url": "my_degree_form",
+          "name": "My Degree Form",
+          "slug": "my_degree_form"
+        },
+        {
           "url": "ba_admission_create",
           "name": "BA Form",
           "slug": "ba_admission_create"
