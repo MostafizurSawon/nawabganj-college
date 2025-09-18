@@ -220,23 +220,24 @@ class SampleView(LoginRequiredMixin, TemplateView):
             'bsc': make_deg_url('Bsc'),
         }
 
-        # -------- Student SELF admission (HSC only now) --------
+        # -------- Student SELF admission (HSC + Degree) --------
         if user.is_authenticated:
             norm = self._normalize_phone(getattr(user, 'phone_number', ''))
             last11 = norm[-11:] if norm else None
 
+            # HSC admission detect
             admission = hsc_qs.filter(
                 Q(created_by=user) |
                 Q(add_mobile=norm) |
                 (Q(add_mobile__endswith=last11) if last11 else Q(pk__isnull=True))
             ).order_by('-id').first()
 
-            invoice_url = None
+            hsc_invoice_url = None
             if admission and getattr(admission, 'add_payment_status', '') == 'paid':
                 try:
-                    invoice_url = reverse('student_invoice', kwargs={'pk': admission.pk})
+                    hsc_invoice_url = reverse('student_invoice', kwargs={'pk': admission.pk})
                 except Exception:
-                    invoice_url = reverse('hsc_admission_view', kwargs={'pk': admission.pk})
+                    hsc_invoice_url = reverse('hsc_admission_view', kwargs={'pk': admission.pk})
 
             context.update({
                 'admission': admission,
@@ -244,7 +245,30 @@ class SampleView(LoginRequiredMixin, TemplateView):
                 'admission_group': getattr(admission, 'add_admission_group', None) if admission else None,
                 'admission_status': getattr(admission, 'add_payment_status', None) if admission else None,
                 'admission_paid': (getattr(admission, 'add_payment_status', '') == 'paid') if admission else False,
-                'invoice_url': invoice_url,
+                'invoice_url': hsc_invoice_url,
+            })
+
+            # Degree admission detect
+            deg_admission = deg_qs.filter(
+                Q(created_by=user) |
+                Q(add_mobile=norm) |
+                (Q(add_mobile__endswith=last11) if last11 else Q(pk__isnull=True))
+            ).order_by('-id').first()
+
+            deg_invoice_url = None
+            if deg_admission and getattr(deg_admission, 'add_payment_status', '') == 'paid':
+                try:
+                    deg_invoice_url = reverse('degree_student_invoice', kwargs={'pk': deg_admission.pk})
+                except Exception:
+                    deg_invoice_url = reverse('degree_student_invoice', kwargs={'pk': deg_admission.pk})
+
+            context.update({
+                'deg_admission': deg_admission,
+                'deg_admission_pk': deg_admission.pk if deg_admission else None,
+                'deg_admission_group': getattr(deg_admission, 'add_admission_group', None) if deg_admission else None,
+                'deg_admission_status': getattr(deg_admission, 'add_payment_status', None) if deg_admission else None,
+                'deg_admission_paid': (getattr(deg_admission, 'add_payment_status', '') == 'paid') if deg_admission else False,
+                'deg_invoice_url': deg_invoice_url,
             })
 
         context = TemplateLayout.init(self, context)

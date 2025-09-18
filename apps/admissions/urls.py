@@ -22,7 +22,7 @@ urlpatterns = [
     path('apply/commerce/', HscAdmissionCreateCommerceView.as_view(), name='hsc_admission_create_commerce'),
     path('apply/arts/', HscAdmissionCreateArtsView.as_view(), name='hsc_admission_create_arts'),
 
-    # Honours Apply
+    # Degree Apply
     path('apply/ba/', views.AdmissionBaCreateView.as_view(), name='ba_admission_create'),
     path('apply/bss/', views.AdmissionBssCreateView.as_view(), name='bss_admission_create'),
     path('apply/bsc/', views.AdmissionBscCreateView.as_view(), name='bsc_admission_create'),

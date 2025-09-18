@@ -52,11 +52,6 @@
           "url": "bsc_admission_create",
           "name": "BSC Form",
           "slug": "bsc_admission_create"
-        },
-        {
-          "url": "bbs_admission_create",
-          "name": "BBS Form",
-          "slug": "bbs_admission_create"
         }
       ]
     },

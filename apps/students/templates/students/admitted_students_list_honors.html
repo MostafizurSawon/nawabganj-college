@@ -220,7 +220,7 @@
 
                   <!-- 3) Invoice button -->
                   {% if student.add_payment_status == 'paid' %}
-                    <a href="{% url 'degree_admission_view' student.id %}"
+                    <a href="{% url 'degree_admission_invoice' student.id %}"
                       class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
                       title="View/Download invoice">
                       <i class="ti ti-file-invoice me-1"></i> Invoice

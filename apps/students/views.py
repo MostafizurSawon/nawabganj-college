@@ -1,8 +1,7 @@
 from django.views.generic import ListView
-from apps.admissions.models import HscAdmissions, Fee
 from django.db.models import Q
 from django.contrib import messages
-from apps.admissions.models import Session, Programs
+from django.http import Http404
 
 from apps.accounts.utils import role_required
 from django.utils.decorators import method_decorator
@@ -16,10 +15,6 @@ GROUP_CHOICES_MAP = {
     'science': 'Science',
     'arts': 'Humanities',
     'commerce': 'Business Studies',
-    # 'Ba': 'BA',
-    # 'Bss': 'BSS',
-    # 'Bbs': 'BBS',
-    # 'Bsc': 'BSC',
 }
 
 
@@ -28,7 +23,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import ListView
 from django.http import HttpResponse
 from apps.accounts.utils import role_required
-from apps.admissions.models import HscAdmissions, Programs, Session
+from apps.admissions.models import HscAdmissions, Programs, Session,Fee
 
 import csv
 import re
@@ -654,6 +649,7 @@ def update_degree_admission_payment(request, pk):
 
 
 from django.views.generic.detail import DetailView
+from django.http import Http404
 
 @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher', 'student']), name='dispatch')
 class HscAdmissionDetailView2(DetailView):
@@ -661,14 +657,45 @@ class HscAdmissionDetailView2(DetailView):
     template_name = "students/admitted_student_details2.html"  # create this template
     context_object_name = "student"
 
+    # same normalizer used elsewhere to compare phone numbers safely
+    @staticmethod
+    def _normalize_phone(s: str) -> str:
+        s = (s or '').strip()
+        if s.startswith('+880'):
+            s = s[4:]
+        elif s.startswith('880'):
+            s = s[3:]
+        if s and not s.startswith('0') and s[0] == '1':
+            s = '0' + s
+        return s
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        user = self.request.user
+
+        # If student, enforce ownership
+        if getattr(user, 'role', None) == 'student':
+            norm = self._normalize_phone(getattr(user, 'phone_number', ''))
+            last11 = norm[-11:] if norm else None
+
+            allowed = (
+                (obj.created_by_id == user.id) or
+                (obj.add_mobile and obj.add_mobile.strip() == norm) or
+                (last11 and obj.add_mobile and obj.add_mobile.strip().endswith(last11))
+            )
+
+            if not allowed:
+                # Hide existence of other records
+                raise Http404("You are not allowed to view this record.")
+
+        return obj
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         # Optional Vuexy layout integration
         context = TemplateLayout.init(self, context)
         context["layout"] = "vertical"
         context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
-
         return context
 
 @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher', 'student']), name='dispatch')
@@ -1107,7 +1134,7 @@ from django.utils.timezone import localtime
 from django.conf import settings
 
 from apps.accounts.utils import role_required
-from apps.admissions.models import HscAdmissions
+from apps.admissions.models import HscAdmissions, DegreeAdmission
 
 from apps.accounts.models import User
 
@@ -1177,22 +1204,6 @@ def _build_invoice_context(obj: HscAdmissions):
 
 
 # ---------- STAFF / ADMIN ----------
-# @role_required(['master_admin', 'admin', 'sub_admin', 'teacher'])
-# def admission_invoice_view(request, pk):
-#     obj = get_object_or_404(
-#         HscAdmissions.objects.select_related("add_session", "add_program"),
-#         pk=pk,
-#     )
-
-#     # পেমেন্ট না হলে দেখাবো না
-#     if obj.add_payment_status != "paid":
-#         messages.warning(request, "এই ছাত্রের পেমেন্ট এখনো Paid নয়—Invoice দেখা যাবে না।")
-#         return redirect(request.META.get("HTTP_REFERER", "admitted_students_list"))
-
-#     context = _build_invoice_context(obj)
-#     # স্টাফদের জন্য back_url
-#     context["back_url"] = request.META.get("HTTP_REFERER", None) or "/dashboard/students/admitted/"
-#     return render(request, "students/invoice_preview.html", context)
 
 @role_required(['master_admin', 'admin', 'sub_admin', 'teacher'])
 def admission_invoice_view(request, pk):
@@ -1238,6 +1249,93 @@ def student_admission_invoice_view(request, pk):
     context = _build_invoice_context(obj)
     # স্টুডেন্টের জন্য back_url
     context["back_url"] = "/dashboard/"
+    return render(request, "students/invoice_preview.html", context)
+
+
+# Degree Invoice
+
+# ===== Degree: Common invoice context =====
+def _build_degree_invoice_context(obj: DegreeAdmission):
+    """Degree ইনভয়েস কনটেক্সট—HSC-এর মতোই, শুধু line_description আলাদা"""
+    org_name_bn = getattr(settings, "ORG_NAME_BN", "নবাবগঞ্জ সিটি কলেজ")
+    org_name_en = getattr(settings, "ORG_NAME_EN", "Nawabganj City College")
+    org_address_bn = getattr(settings, "ORG_ADDRESS_BN", "চাঁপাইনবাবগঞ্জ")
+
+    # গ্রুপ/প্রোগ্রাম লেবেল (থাকলে)
+    try:
+        group_label = obj.get_add_admission_group_display()
+    except Exception:
+        group_label = getattr(obj, "add_admission_group", "") or ""
+
+    ctx = {
+        "student": obj,
+        "invoice_no": _make_invoice_number(obj),  # HSC-এর ফাংশনটাই reuse করুন
+        "invoice_date": localtime(obj.created_at) if getattr(obj, "created_at", None) else None,
+        "payment_date": localtime(obj.updated_at) if getattr(obj, "updated_at", None) else None,
+        "line_description": f"Degree Admission Fee{f' ({group_label})' if group_label else ''}",
+        "org_name_bn": org_name_bn,
+        "org_name_en": org_name_en,
+        "org_address_bn": org_address_bn,
+    }
+    return ctx
+
+
+# ===== Degree: STAFF / ADMIN =====
+@role_required(['master_admin', 'admin', 'sub_admin', 'teacher'])
+def degree_admission_invoice_view(request, pk):
+    obj = get_object_or_404(
+        DegreeAdmission.objects.select_related("add_session", "add_program"),
+        pk=pk,
+    )
+
+    if obj.add_payment_status != "paid":
+        messages.warning(request, "এই ছাত্রের পেমেন্ট এখনো Paid নয়—Invoice দেখা যাবে না।")
+        # HSC-র মতোই রেফারার বা ডিফল্ট লিস্ট-ভিউতে ফেরত
+        return redirect(request.META.get("HTTP_REFERER", "degree_admitted_students_list"))
+
+    context = _build_degree_invoice_context(obj)
+
+    # ✅ স্টুডেন্টের cus_id যোগ করা (HSC-এর মতোই)
+    try:
+        # যদি আগে থেকেই এই হেল্পার থাকে এবং ফোন/creator দিয়ে ইউজার খুঁজে আনে
+        student_user = _resolve_student_user_from_admission(obj)
+    except NameError:
+        # ফলোব্যাক: created_by না থাকলে মোবাইল দিয়ে ইউজার ধরার ছোট্ট হেল্পার
+        student_user = getattr(obj, "created_by", None)
+        if not student_user:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            student_user = User.objects.filter(phone_number=obj.add_mobile).first()
+
+    context["student_cus_id"] = getattr(student_user, "cus_id", None)
+
+    context["back_url"] = request.META.get("HTTP_REFERER", None) or "/dashboard/students/degree/admitted/"
+    return render(request, "students/invoice_preview.html", context)
+
+# ---------- STUDENT (Degree) ----------
+@role_required(['student'])
+def student_degree_admission_invoice_view(request, pk):
+    obj = get_object_or_404(DegreeAdmission, pk=pk)
+
+    # নিজের রেকর্ড না হলে 403 (ফোন মিলিয়ে দেখা)
+    user_phone = _normalize_phone(getattr(request.user, "phone_number", ""))
+    obj_phone  = (obj.add_mobile or "").strip()
+    # চাইলে last11 মেলাতে পারেন (কমেন্ট খুললেই হবে)
+    # last11 = user_phone[-11:] if user_phone else None
+    # if not (obj_phone == user_phone or (last11 and obj_phone.endswith(last11))):
+
+    if user_phone != obj_phone:
+        return HttpResponseForbidden("You are not allowed to view this invoice.")
+
+    # paid না হলে ড্যাশবোর্ডে ফেরত
+    if obj.add_payment_status != "paid":
+        messages.warning(request, "Invoice is available only after payment confirmation.")
+        return redirect("/dashboard/")  # তোমার student dashboard URL
+
+    context = _build_degree_invoice_context(obj)
+    context["back_url"] = "/dashboard/"  # স্টুডেন্টের জন্য back_url
+    # একই টেমপ্লেট ব্যবহার করলে নিচের লাইনই থাকুক,
+    # আলাদা টেমপ্লেট চাইলে 'students/invoice_preview_degree.html' দিন।
     return render(request, "students/invoice_preview.html", context)
 
 
@@ -1340,21 +1438,71 @@ class DegreeAdmittedStudentListView(ListView):
         return ctx
 
 
-@method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
+# @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher', 'student']), name='dispatch')
+# class DegreeAdmissionDetailView(DetailView):
+#     model = DegreeAdmission
+#     template_name = "students/admitted_student_details_honours.html"
+#     context_object_name = "student"
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+
+#         # Layout
+#         context = TemplateLayout.init(self, context)
+#         context["layout"] = "vertical"
+#         context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+
+#         return context
+
+from django.http import Http404
+
+@method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher', 'student']), name='dispatch')
 class DegreeAdmissionDetailView(DetailView):
     model = DegreeAdmission
     template_name = "students/admitted_student_details_honours.html"
     context_object_name = "student"
 
+    @staticmethod
+    def _normalize_phone(s: str) -> str:
+        s = (s or '').strip()
+        if s.startswith('+880'):
+            s = s[4:]
+        elif s.startswith('880'):
+            s = s[3:]
+        if s and not s.startswith('0') and s[0] == '1':
+            s = '0' + s
+        return s
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        user = self.request.user
+
+        if getattr(user, 'role', None) == 'student':
+            norm = self._normalize_phone(getattr(user, 'phone_number', ''))
+            last11 = norm[-11:] if norm else None
+
+            allowed = (
+                (obj.created_by_id == user.id) or
+                (obj.add_mobile and obj.add_mobile.strip() == norm) or
+                (last11 and obj.add_mobile and obj.add_mobile.strip().endswith(last11))
+            )
+
+            if not allowed:
+                raise Http404("You are not allowed to view this record.")
+
+        return obj
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Layout
         context = TemplateLayout.init(self, context)
         context["layout"] = "vertical"
         context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
-
         return context
+
+
+
+
+
 
 from collections import OrderedDict
 

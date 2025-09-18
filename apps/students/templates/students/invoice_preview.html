@@ -112,7 +112,7 @@
       <span class="badge bg-primary copy-badge">COLLEGE COPY</span>
       <div class="text-center fw-semibold">{{ org_name_bn|default:"" }}, {{ org_address_bn|default:"" }}</div>
       <div class="inv-rule"></div>
-      <h5 class="title text-center mb-2">MANUAL INVOICE</h5> 
+      <h5 class="title text-center mb-2">MANUAL INVOICE</h5>
       <div class="text-center mb-2">
         <span class="status-badge
           {% if student.add_payment_status == 'paid' %}status-paid
@@ -133,7 +133,7 @@
       <tbody>
         <tr>
           <th>Name:</th><td>{{ student.add_name }} </td>
-          <th>Payment Student ID:</th><td> 
+          <th>Payment Student ID:</th><td>
             {% if request.user.role == 'student' %}
               {{ request.user.id }}
             {% else %}
@@ -148,7 +148,7 @@
         <tr>
           <th>Payment Method:</th><td>{{ student.get_add_payment_method_display|default:"—" }}</td>
           <th>Transaction ID:</th><td>{{ student.add_trxid|default:"—" }}</td>
-          
+
         </tr>
         <tr>
           <th>Mobile:</th><td>{{ student.add_mobile }}</td>
@@ -167,7 +167,9 @@
       <tbody>
         <tr>
           <td>
-            Hsc Admission Fee ({{ student.get_add_admission_group_display }}) | Invoice Number: {{ invoice_no }}
+            {% if student.add_program.pro_name %}
+            {{ student.add_program.pro_name }}
+            {% else %} Degree {% endif %} Admission Fee ({{ student.get_add_admission_group_display }}) | Invoice Number: {{ invoice_no }}
             {% comment %} {{ student.add_payment_note|default:"" }} {% endcomment %}
             {% comment %} {{ line_description|default:"HSC Admission Fee" }} {% endcomment %}
         </td>
@@ -217,7 +219,7 @@
       <tbody>
         <tr>
           <th>Name:</th><td>{{ student.add_name }} </td>
-          <th>Payment Student ID:</th><td> 
+          <th>Payment Student ID:</th><td>
             {% if request.user.role == 'student' %}
               {{ request.user.id }}
             {% else %}
@@ -232,7 +234,7 @@
         <tr>
           <th>Payment Method:</th><td>{{ student.get_add_payment_method_display|default:"—" }}</td>
           <th>Transaction ID:</th><td>{{ student.add_trxid|default:"—" }}</td>
-          
+
         </tr>
         <tr>
           <th>Mobile:</th><td>{{ student.add_mobile }}</td>
@@ -255,7 +257,7 @@
             {% comment %} {{ student.add_payment_note|default:"" }} {% endcomment %}
             {% comment %} {{ line_description|default:"HSC Admission Fee" }} {% endcomment %}
           </td>
-          
+
           <td class="text-end">{{ student.add_amount|default:0 }} BDT</td>
         </tr>
       </tbody>

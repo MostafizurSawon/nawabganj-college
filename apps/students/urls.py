@@ -38,19 +38,16 @@ urlpatterns = [
     # hsc invoice
     path("student/<int:pk>/invoice/", views.admission_invoice_view, name="hsc_admission_invoice"),
 
-    # srudent acount theke invoice
-    # path(
-    #     "dashboard/student/<int:pk>/invoice/",
-    #     views.StudentInvoiceView.as_view(),
-    #     name="student_invoice",
-    # ),
-
-
-    # স্টাফ/অ্যাডমিন
-    # path("students/<int:pk>/invoice/", admission_invoice_view, name="admission_invoice"),
-
     # স্টুডেন্ট (নিজের ইনভয়েস)
     path("student/<int:pk>/my-invoice/", views.student_admission_invoice_view, name="student_invoice"),
+
+    # ---------- Degree Invoice URLs ----------
+
+    # Staff/Admin: যেকোনো Degree ছাত্রের ইনভয়েস দেখতে পারবে (paid হলে)
+    path("degree/<int:pk>/invoice/", views.degree_admission_invoice_view, name="degree_admission_invoice"),
+
+    # Student: শুধু নিজের Degree ইনভয়েস দেখতে পারবে (paid হলে)
+    path("degree/<int:pk>/my-invoice/", views.student_degree_admission_invoice_view, name="degree_student_invoice"),
 
 
     # Degree Admitted Students

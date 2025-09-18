@@ -53,426 +53,740 @@
   {% endfor %}
 {% endif %}
 
+{# ======================= MODE SWITCH START ======================= #}
 {% if mode == "list" %}
 
-    <div class="row g-4">
+  <div class="row g-4">
 
-      <!-- Your Admission -->
+    <!-- Your Admission -->
+    <div class="col-lg-12 col-md-12">
+      <div class="card h-100 p-0 border-0 shadow-sm rounded-4">
+        <div class="card-header bg-white pb-2 d-flex justify-content-between align-items-center rounded-top-4">
+          <h5 class="card-title mb-0">আপনার ভর্তি তথ‍্য</h5>
+          {% if admission_status %}
+            <span class="badge text-uppercase
+              {% if admission_status == 'paid' %} bg-success
+              {% elif admission_status == 'pending' %} bg-warning text-dark
+              {% elif admission_status == 'unpaid' %} bg-danger
+              {% else %} bg-secondary
+              {% endif %}">
+              {% if admission_status == 'paid' %}PAID
+              {% elif admission_status == 'pending' %}PENDING
+              {% elif admission_status == 'unpaid' %}UNPAID
+              {% else %}N/A{% endif %}
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="card-body p-4">
+          {% if admission_group and admission_pk %}
+            <h6 class="mb-2">
+              আপনি ফর্ম পূরণ করেছেন: HSC <strong>{{ admission.get_add_admission_group_display }}</strong> গ্রুপ
+            </h6>
+
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              {% if admission_pk %}
+                <a href="{% url 'hsc_admission_view' pk=admission_pk %}" class="btn btn-success">
+                  <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
+                </a>
+              {% else %}
+                <button class="btn btn-secondary" disabled>
+                  <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
+                </button>
+              {% endif %}
+            </div>
+
+            {% if not admission_paid %}
+              <div class="small text-dark mt-2">
+                পেমেন্ট নিশ্চিতকরণের পরে ইনভয়েস পাওয়া যাবে।
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="alert alert-info mb-0" role="alert">
+              <strong>আপনি এখনো কোনো ফর্ম পূরণ করেননি</strong>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Admission Form Links -->
+    <div class="col-xxl-4 col-md-4">
+      <div class="card h-100 border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <div class="badge p-2 bg-label-success mb-3 rounded">
+            <i class="ti ti-credit-card ti-28px"></i>
+          </div>
+          <h5 class="card-title mb-1">
+            <a href="{% url 'hsc_admission_create' %}">HSC Science Admission Form</a>
+          </h5>
+          <p class="text-dark small mb-0">ভর্তি যোগ্যতা ও প্রয়োজনীয় তথ্য আগে দেখে নিন।</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xxl-4 col-md-4">
+      <div class="card h-100 border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <div class="badge p-2 bg-label-success mb-3 rounded">
+            <i class="ti ti-credit-card ti-28px"></i>
+          </div>
+          <h5 class="card-title mb-1">
+            <a href="{% url 'hsc_admission_create_arts' %}">HSC Humanities Admission Form</a>
+          </h5>
+          <p class="text-dark small mb-0">বিষয়সমূহ ও সিট সংক্রান্ত আপডেট দেখুন।</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xxl-4 col-md-4">
+      <div class="card h-100 border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <div class="badge p-2 bg-label-success mb-3 rounded">
+            <i class="ti ti-credit-card ti-28px"></i>
+          </div>
+          <h5 class="card-title mb-1">
+            <a href="{% url 'hsc_admission_create_commerce' %}">HSC Business Studies Admission Form</a>
+          </h5>
+          <p class="text-dark small mb-0">আবেদনের পূর্বে ডকুমেন্ট প্রস্তুত রাখুন।</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+      <!-- ================= DEGREE (Same style as HSC) ================= -->
+    <div class="row g-4 mt-1">
+
+      <!-- Your Degree Admission -->
       <div class="col-lg-12 col-md-12">
         <div class="card h-100 p-0 border-0 shadow-sm rounded-4">
           <div class="card-header bg-white pb-2 d-flex justify-content-between align-items-center rounded-top-4">
-            <h5 class="card-title mb-0">আপনার ভর্তি তথ‍্য</h5>
-            {% if admission_status %}
+            <h5 class="card-title mb-0">আপনার ডিগ্রী ভর্তি তথ‍্য</h5>
+            {% if deg_admission_status %}
               <span class="badge text-uppercase
-                {% if admission_status == 'paid' %} bg-success
-                {% elif admission_status == 'pending' %} bg-warning text-dark
-                {% elif admission_status == 'unpaid' %} bg-danger
+                {% if deg_admission_status == 'paid' %} bg-success
+                {% elif deg_admission_status == 'pending' %} bg-warning text-dark
+                {% elif deg_admission_status == 'unpaid' %} bg-danger
                 {% else %} bg-secondary
                 {% endif %}">
-                {% if admission_status == 'paid' %}PAID
-                {% elif admission_status == 'pending' %}PENDING
-                {% elif admission_status == 'unpaid' %}UNPAID
+                {% if deg_admission_status == 'paid' %}PAID
+                {% elif deg_admission_status == 'pending' %}PENDING
+                {% elif deg_admission_status == 'unpaid' %}UNPAID
                 {% else %}N/A{% endif %}
               </span>
             {% endif %}
           </div>
 
           <div class="card-body p-4">
-            {% if admission_group and admission_pk %}
+            {% if deg_admission_group and deg_admission_pk %}
               <h6 class="mb-2">
-                আপনি ফর্ম পূরণ করেছেন: HSC <strong>{{ admission.get_add_admission_group_display }}</strong> গ্রুপ
+                আপনি ফর্ম পূরণ করেছেন: Degree
+                <strong>{{ deg_admission.get_add_admission_group_display }}</strong>
               </h6>
 
               <div class="d-flex flex-wrap gap-2 mt-2">
-
-                {% if admission_pk %}
-              <a href="{% url 'hsc_admission_view' pk=admission_pk %}" class="btn btn-success">
-                <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
-              </a>
-            {% else %}
-              <button class="btn btn-secondary" disabled>
-                <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
-              </button>
-            {% endif %}
-
+                <a href="{% url 'degree_admission_view' pk=deg_admission_pk %}" class="btn btn-success">
+                  <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
+                </a>
               </div>
 
-
-              {% if not admission_paid %}
+              {% if not deg_admission_paid %}
                 <div class="small text-dark mt-2">
                   পেমেন্ট নিশ্চিতকরণের পরে ইনভয়েস পাওয়া যাবে।
                 </div>
               {% endif %}
             {% else %}
               <div class="alert alert-info mb-0" role="alert">
-                <strong>আপনি এখনো কোনো ফর্ম পূরণ করেননি</strong>
+                <strong>আপনি এখনো কোনো ডিগ্রী ফর্ম পূরণ করেননি</strong>
               </div>
             {% endif %}
           </div>
         </div>
       </div>
 
-
-      <!-- Admission Form Links -->
-  <div class="col-xxl-4 col-md-4">
-    <div class="card h-100 border-0 shadow-sm rounded-4">
-      <div class="card-body">
-        <div class="badge p-2 bg-label-success mb-3 rounded">
-          <i class="ti ti-credit-card ti-28px"></i>
+      <!-- Degree Admission Form Links -->
+      <div class="col-xxl-4 col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4">
+          <div class="card-body">
+            <div class="badge p-2 bg-label-success mb-3 rounded">
+              <i class="ti ti-credit-card ti-28px"></i>
+            </div>
+            <h5 class="card-title mb-1">
+              <a href="{% url 'ba_admission_create' %}">BA Admission Form</a>
+            </h5>
+            <p class="text-dark small mb-0">ভর্তি যোগ্যতা ও তথ্য দেখে নিন।</p>
+          </div>
         </div>
-        <h5 class="card-title mb-1">
-          <a href="{% url 'hsc_admission_create' %}">HSC Science Admission Form</a>
-        </h5>
-        <p class="text-dark small mb-0">ভর্তি যোগ্যতা ও প্রয়োজনীয় তথ্য আগে দেখে নিন।</p>
       </div>
-    </div>
-  </div>
 
-  <div class="col-xxl-4 col-md-4">
-    <div class="card h-100 border-0 shadow-sm rounded-4">
-      <div class="card-body">
-        <div class="badge p-2 bg-label-success mb-3 rounded">
-          <i class="ti ti-credit-card ti-28px"></i>
+      <div class="col-xxl-4 col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4">
+          <div class="card-body">
+            <div class="badge p-2 bg-label-success mb-3 rounded">
+              <i class="ti ti-credit-card ti-28px"></i>
+            </div>
+            <h5 class="card-title mb-1">
+              <a href="{% url 'bss_admission_create' %}">BSS Admission Form</a>
+            </h5>
+            <p class="text-dark small mb-0">বিষয়সমূহ ও সিট আপডেট দেখুন।</p>
+          </div>
         </div>
-        <h5 class="card-title mb-1">
-          <a href="{% url 'hsc_admission_create_arts' %}">HSC Humanities Admission Form</a>
-        </h5>
-        <p class="text-dark small mb-0">বিষয়সমূহ ও সিট সংক্রান্ত আপডেট দেখুন।</p>
       </div>
-    </div>
-  </div>
 
-  <div class="col-xxl-4 col-md-4">
-    <div class="card h-100 border-0 shadow-sm rounded-4">
-      <div class="card-body">
-        <div class="badge p-2 bg-label-success mb-3 rounded">
-          <i class="ti ti-credit-card ti-28px"></i>
+      <div class="col-xxl-4 col-md-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4">
+          <div class="card-body">
+            <div class="badge p-2 bg-label-success mb-3 rounded">
+              <i class="ti ti-credit-card ti-28px"></i>
+            </div>
+            <h5 class="card-title mb-1">
+              <a href="{% url 'bsc_admission_create' %}">BSC Admission Form</a>
+            </h5>
+            <p class="text-dark small mb-0">ডকুমেন্ট রেডি রাখুন।</p>
+          </div>
         </div>
-        <h5 class="card-title mb-1">
-          <a href="{% url 'hsc_admission_create_commerce' %}">HSC Business Studies Admission Form</a>
-        </h5>
-        <p class="text-dark small mb-0">আবেদনের পূর্বে ডকুমেন্ট প্রস্তুত রাখুন।</p>
       </div>
+
+      {% comment %} <div class="col-xxl-3 col-md-6">
+        <div class="card h-100 border-0 shadow-sm rounded-4">
+          <div class="card-body">
+            <div class="badge p-2 bg-label-success mb-3 rounded">
+              <i class="ti ti-credit-card ti-28px"></i>
+            </div>
+            <h5 class="card-title mb-1">
+              <a href="{% url 'bbs_admission_create' %}">BBS Admission Form</a>
+            </h5>
+            <p class="text-dark small mb-0">আবেদনের পূর্বে নির্দেশনা পড়ুন।</p>
+          </div>
+        </div>
+      </div> {% endcomment %}
+
     </div>
-  </div>
-
-
-
-  </div>
+    <!-- =============== /DEGREE =============== -->
 
 {% elif mode == "sp" %}
 
-<div class="row g-4">
+  <div class="row g-4">
 
-  <!-- Your Admission / Payment -->
-  <div class="col-lg-12 col-md-12">
-    <div class="card h-100 p-0 border-0 shadow-sm rounded-4">
-
-      <!-- Header -->
-      <div class="card-header bg-white pb-2 d-flex justify-content-between align-items-center rounded-top-4">
-        <div class="d-flex align-items-center gap-2">
-          <span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#f1f5ff;">
-            <i class="ti ti-file-invoice fs-5 text-primary"></i>
-          </span>
-          <div>
-            <h5 class="card-title mb-0">আপনার এডমিশন পেমেন্ট তথ্য</h5>
-            <small class="text-dark">এখানেই আপনার পেমেন্ট-সংক্রান্ত সকল তথ্য ও ইনভয়েস পাবেন</small>
+    <!-- Your Admission / Payment (HSC) -->
+    <div class="col-lg-12 col-md-12">
+      <div class="card h-100 p-0 border-0 shadow-sm rounded-4">
+        <div class="card-header bg-white pb-2 d-flex justify-content-between align-items-center rounded-top-4">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#f1f5ff;">
+              <i class="ti ti-file-invoice fs-5 text-primary"></i>
+            </span>
+            <div>
+              <h5 class="card-title mb-0">HSC এডমিশন পেমেন্ট তথ্য</h5>
+              <small class="text-dark">এখানেই আপনার পেমেন্ট-সংক্রান্ত সকল তথ্য ও ইনভয়েস পাবেন</small>
+            </div>
           </div>
+
+          {% if admission_status %}
+            <span class="badge text-uppercase px-3 py-2 rounded-pill
+              {% if admission_status == 'paid' %} bg-success
+              {% elif admission_status == 'pending' %} bg-warning text-dark
+              {% elif admission_status == 'unpaid' %} bg-danger
+              {% else %} bg-secondary
+              {% endif %}">
+              {% if admission_status == 'paid' %}পেইড
+              {% elif admission_status == 'pending' %}পেন্ডিং
+              {% elif admission_status == 'unpaid' %}আনপেইড
+              {% else %}N/A{% endif %}
+            </span>
+          {% endif %}
         </div>
 
-        {% if admission_status %}
-          <span class="badge text-uppercase px-3 py-2 rounded-pill
-            {% if admission_status == 'paid' %} bg-success
-            {% elif admission_status == 'pending' %} bg-warning text-dark
-            {% elif admission_status == 'unpaid' %} bg-danger
-            {% else %} bg-secondary
-            {% endif %}">
-            {% if admission_status == 'paid' %}পেইড
-            {% elif admission_status == 'pending' %}পেন্ডিং
-            {% elif admission_status == 'unpaid' %}আনপেইড
-            {% else %}N/A{% endif %}
-          </span>
-        {% endif %}
-      </div>
+        <div class="card-body p-4">
 
-      <!-- Body -->
-      <div class="card-body p-4">
-
-        {% if admission_group and admission_pk %}
-          <!-- Brief -->
-          <div class="mb-3">
-            <h6 class="mb-1">
-              আপনি ফর্ম পূরণ করেছেন: <strong>HSC {{ admission.get_add_admission_group_display }}</strong> গ্রুপ
-            </h6>
-            {% comment %} <small class="text-dark">আবেদন আইডি: #{{ admission_pk }}</small> {% endcomment %}
-          </div>
-
-          <!-- Actions -->
-          <div class="d-flex flex-wrap gap-2 mt-2 mb-4">
-            {% if admission_status == 'paid' and invoice_url %}
-              <a href="{{ invoice_url }}" target="_blank" class="btn btn-success">
-                <i class="ti ti-download me-1"></i> ইনভয়েস ডাউনলোড করুন
-              </a>
-            {% else %}
-              <button class="btn btn-secondary" disabled>
-                <i class="ti ti-file-invoice me-1"></i> ইনভয়েস (Pending)
-              </button>
-            {% endif %}
-
-            {% if admission_status == 'unpaid' and pay_url %}
-              <a href="{{ pay_url }}" class="btn btn-primary">
-                <i class="ti ti-credit-card me-1"></i> এখনই পেমেন্ট করুন
-              </a>
-            {% endif %}
-
-            {% if admission_status == 'pending' and verify_url %}
-              <a href="{{ verify_url }}" class="btn btn-warning text-dark">
-                <i class="ti ti-zoom-check me-1"></i> পেমেন্ট ভেরিফাই করুন
-              </a>
-            {% endif %}
-
-            {% if support_url %}
-              <a href="{{ support_url }}" class="btn btn-outline-secondary">
-                <i class="ti ti-headset me-1"></i> সহায়তা সেন্টার
-              </a>
-            {% endif %}
-          </div>
-
-          {% if not admission_paid %}
-            <div class="small text-dark mt-n2 mb-4">
-              <i class="ti ti-info-circle me-1"></i>
-              পেমেন্ট নিশ্চিত হওয়ার পর ইনভয়েস ডাউনলোড অপশন সক্রিয় হবে।
+          {% if admission_group and admission_pk %}
+            <div class="mb-3">
+              <h6 class="mb-1">
+                আপনি ফর্ম পূরণ করেছেন: <strong>HSC ( {{ admission.get_add_admission_group_display }} )</strong>
+              </h6>
             </div>
-          {% endif %}
 
-          <!-- Summary Grid -->
-          <div class="row g-3">
-            <div class="col-lg-8">
+            <div class="d-flex flex-wrap gap-2 mt-2 mb-4">
+              {% if admission_status == 'paid' and invoice_url %}
+                <a href="{{ invoice_url }}" target="_blank" class="btn btn-success">
+                  <i class="ti ti-download me-1"></i> ইনভয়েস ডাউনলোড করুন
+                </a>
+              {% else %}
+                <button class="btn btn-secondary" disabled>
+                  <i class="ti ti-file-invoice me-1"></i> ইনভয়েস (Pending)
+                </button>
+              {% endif %}
 
-              <div class="p-3 rounded-3 border bg-light">
-                <div class="row g-3">
-                  <div class="col-6">
-                    <div class="small text-dark">সেশন</div>
-                    <div class="fw-semibold">{{ admission.add_session|default:"" }}</div>
-                  </div>
-                  <div class="col-6">
-                    <div class="small text-dark">স্টুডেন্ট আইডি</div>
-                    <div class="fw-semibold">{{ request.user.id|default:"" }}</div>
-                  </div>
-                  <div class="col-6">
-                    <div class="small text-dark">এডমিশন ফি</div>
-                    <div class="fw-bold">
-                      ৳ {{ admission.add_amount|default:0 }}
-                      {% if admission_due %}<span class="badge bg-danger-subtle text-danger ms-1">বকেয়া: ৳ {{ admission_due }}</span>{% endif %}
+              {% if admission_status == 'unpaid' and pay_url %}
+                <a href="{{ pay_url }}" class="btn btn-primary">
+                  <i class="ti ti-credit-card me-1"></i> এখনই পেমেন্ট করুন
+                </a>
+              {% endif %}
+
+              {% if admission_status == 'pending' and verify_url %}
+                <a href="{{ verify_url }}" class="btn btn-warning text-dark">
+                  <i class="ti ti-zoom-check me-1"></i> পেমেন্ট ভেরিফাই করুন
+                </a>
+              {% endif %}
+
+              {% if support_url %}
+                <a href="{{ support_url }}" class="btn btn-outline-secondary">
+                  <i class="ti ti-headset me-1"></i> সহায়তা সেন্টার
+                </a>
+              {% endif %}
+            </div>
+
+            <div class="row g-3">
+              <div class="col-lg-8">
+                <div class="p-3 rounded-3 border bg-light">
+                  <div class="row g-3">
+                    <div class="col-6">
+                      <div class="small text-dark">সেশন</div>
+                      <div class="fw-semibold">{{ admission.add_session|default:"" }}</div>
                     </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="small text-dark">পেমেন্ট মেথড</div>
-                    <div class="fw-semibold">{{ admission.get_add_payment_method_display|default:"" }}</div>
-                  </div>
-                  <div class="col-6">
-                    <div class="small text-dark">ট্রানজ্যাকশন আইডি</div>
-                    <div class="d-flex align-items-center gap-2">
-                      <span id="trxText" class="fw-semibold">{{ admission.add_trxid|default:"" }}</span>
-                      {% if admission.add_trxid %}
-                      <button type="button" class="btn btn-sm btn-outline-secondary" id="copyTrx">
-                        <i class="ti ti-copy"></i>
-                      </button>
-                      {% endif %}
+                    <div class="col-6">
+                      <div class="small text-dark">স্টুডেন্ট আইডি</div>
+                      <div class="fw-semibold">{{ request.user.id|default:"" }}</div>
                     </div>
+                    <div class="col-6">
+                      <div class="small text-dark">এডমিশন ফি</div>
+                      <div class="fw-bold">
+                        ৳ {{ admission.add_amount|default:0 }}
+                        {% if admission_due %}<span class="badge bg-danger-subtle text-danger ms-1">বকেয়া: ৳ {{ admission_due }}</span>{% endif %}
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">পেমেন্ট মেথড</div>
+                      <div class="fw-semibold">{{ admission.get_add_payment_method_display|default:"" }}</div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">ট্রানজ্যাকশন আইডি</div>
+                      <div class="d-flex align-items-center gap-2">
+                        <span id="trxText" class="fw-semibold">{{ admission.add_trxid|default:"" }}</span>
+                        {% if admission.add_trxid %}
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="copyTrx">
+                          <i class="ti ti-copy"></i>
+                        </button>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">পেমেন্ট সোর্স</div>
+                      <div class="fw-semibold">{{ admission.add_slip|default:"" }}</div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">আবেদন তারিখ</div>
+                      <div class="fw-semibold">{{ admission.created_at|date:"d M Y, h:i A"|default:"" }}</div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">সর্বশেষ আপডেট</div>
+                      <div class="fw-semibold">{{ admission.updated_at|date:"d M Y, h:i A"|default:"" }}</div>
+                    </div>
+
+                    {% if admission.add_slip and admission.add_slip.url %}
+                    <div class="col-12">
+                      <a href="{{ admission.add_slip.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="ti ti-link me-1"></i> সংযুক্ত স্লিপ/ডকুমেন্ট দেখুন
+                      </a>
+                    </div>
+                    {% endif %}
                   </div>
-                  <div class="col-6">
-                    <div class="small text-dark">পেমেন্ট সোর্স</div>
-                    <div class="fw-semibold">{{ admission.add_slip|default:"" }}</div>
-                  </div>
-                  <div class="col-6">
-                    <div class="small text-dark">আবেদন তারিখ</div>
-                    <div class="fw-semibold">{{ admission.created_at|date:"d M Y, h:i A"|default:"" }}</div>
-                  </div>
-                  <div class="col-6">
-                    <div class="small text-dark">সর্বশেষ আপডেট</div>
-                    <div class="fw-semibold">{{ admission.updated_at|date:"d M Y, h:i A"|default:"" }}</div>
+                </div>
+
+                <div class="mt-4">
+                  <div class="small text-dark mb-2">স্ট্যাটাস টাইমলাইন</div>
+                  <ul class="list-unstyled d-flex flex-wrap align-items-center gap-3 mb-0">
+                    <li class="d-flex align-items-center gap-2">
+                      <span class="badge rounded-pill bg-success-subtle text-success"><i class="ti ti-check"></i></span>
+                      <span class="fw-semibold">ফর্ম সাবমিটেড</span>
+                    </li>
+
+                    <li><i class="ti ti-dots"></i></li>
+
+                    <li class="d-flex align-items-center gap-2">
+                      <span class="badge rounded-pill
+                        {% if admission_status == 'pending' or admission_status == 'paid' %}
+                          bg-success-subtle text-success
+                        {% else %}
+                          bg-secondary-subtle text-secondary
+                        {% endif %}">
+                        <i class="ti ti-zoom-check"></i>
+                      </span>
+                      <span class="fw-semibold">রিভিউ</span>
+                    </li>
+
+                    <li><i class="ti ti-dots"></i></li>
+
+                    <li class="d-flex align-items-center gap-2">
+                      <span class="badge rounded-pill
+                        {% if admission_status == 'paid' %}
+                          bg-success
+                        {% elif admission_status == 'pending' %}
+                          bg-warning text-dark
+                        {% else %}
+                          bg-secondary
+                        {% endif %}">
+                        <i class="ti ti-credit-card"></i>
+                      </span>
+                      <span class="fw-semibold">
+                        {% if admission_status == 'paid' %}পেমেন্ট সম্পন্ন & এডমিশন কনফার্ম
+                        {% elif admission_status == 'pending' %}পেমেন্ট যাচাই হচ্ছে
+                        {% else %}পেমেন্ট বাকি{% endif %}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+
+              </div>
+
+              <div class="col-lg-4">
+                <div class="p-3 border rounded-3">
+                  <div class="d-flex align-items-start gap-2 mb-2">
+                    <i class="ti ti-info-circle fs-5 text-primary"></i>
+                    <h6 class="mb-0">Note:</h6>
                   </div>
 
-                  {% if admission.add_slip and admission.add_slip.url %}
-                  <div class="col-12">
-                    <a href="{{ admission.add_slip.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                      <i class="ti ti-link me-1"></i> সংযুক্ত স্লিপ/ডকুমেন্ট দেখুন
-                    </a>
-                  </div>
+                  <ol class="mb-3 ps-3">
+                    <li>পেমেন্টের পর স্ট্যাটাস আপডেট হতে কিছু সময় লাগতে পারে ।</li>
+                    <li>কোনো তথ্য <strong>ভুল থাকলে কলেজ আইটি শাখা থেকে ঠিক করে নিতে হবে।</strong>। </li>
+                    <li>পেমেন্ট নিশ্চিত হলে <strong>ইনভয়েস ডাউনলোড</strong> করে সংরক্ষণ করুন।</li>
+                  </ol>
+
+                  {% if payment_deadline %}
+                    <div class="alert alert-warning py-2 small mb-3">
+                      <i class="ti ti-alert-triangle me-1"></i>
+                      ডেডলাইন: {{ payment_deadline|date:"d M Y, h:i A" }}
+                    </div>
                   {% endif %}
                 </div>
-              </div>
 
-              <!-- Status Timeline -->
-              <div class="mt-4">
-                <div class="small text-dark mb-2">স্ট্যাটাস টাইমলাইন</div>
-                <ul class="list-unstyled d-flex flex-wrap align-items-center gap-3 mb-0">
-                  <li class="d-flex align-items-center gap-2">
-                    <span class="badge rounded-pill bg-success-subtle text-success"><i class="ti ti-check"></i></span>
-                    <span class="fw-semibold">ফর্ম সাবমিটেড</span>
-                  </li>
-
-                  <li><i class="ti ti-dots"></i></li>
-
-                  <li class="d-flex align-items-center gap-2">
-                    <span class="badge rounded-pill
-                      {% if admission_status == 'pending' or admission_status == 'paid' %}
-                        bg-success-subtle text-success
-                      {% else %}
-                        bg-secondary-subtle text-secondary
-                      {% endif %}">
-                      <i class="ti ti-zoom-check"></i>
-                    </span>
-                    <span class="fw-semibold">রিভিউ</span>
-                  </li>
-
-                  <li><i class="ti ti-dots"></i></li>
-
-                  <li class="d-flex align-items-center gap-2">
-                    <span class="badge rounded-pill
-                      {% if admission_status == 'paid' %}
-                        bg-success
-                      {% elif admission_status == 'pending' %}
-                        bg-warning text-dark
-                      {% else %}
-                        bg-secondary
-                      {% endif %}">
-                      <i class="ti ti-credit-card"></i>
-                    </span>
-                    <span class="fw-semibold">
-                      {% if admission_status == 'paid' %}পেমেন্ট সম্পন্ন & এডমিশন কনফার্ম
-                      {% elif admission_status == 'pending' %}পেমেন্ট যাচাই হচ্ছে
-                      {% else %}পেমেন্ট বাকি{% endif %}
-                    </span>
-                  </li>
-
-                  {% comment %} <li><i class="ti ti-dots"></i></li> {% endcomment %}
-
-                  {% comment %} <li class="d-flex align-items-center gap-2">
-                    <span class="badge rounded-pill
-                      {% if admission_status == 'paid' %}
-                        bg-success-subtle text-success
-                      {% else %}
-                        bg-secondary-subtle text-secondary
-                      {% endif %}">
-                      <i class="ti ti-badge-check"></i>
-                    </span>
-                    <span class="fw-semibold">এডমিশন কনফার্ম</span>
-                  </li> {% endcomment %}
-                </ul>
-              </div>
-
-            </div>
-
-            <!-- Right: Tips / Help -->
-            <div class="col-lg-4">
-              <div class="p-3 border rounded-3">
-                <div class="d-flex align-items-start gap-2 mb-2">
-                  <i class="ti ti-info-circle fs-5 text-primary"></i>
-                  <h6 class="mb-0">Note:</h6>
-                </div>
-
-                <ol class="mb-3 ps-3">
-                  {% comment %} <li>সঠিক <strong>ট্রানজ্যাকশন আইডি</strong> দিন।</li> {% endcomment %}
-                  <li>পেমেন্টের পর স্ট্যাটাস আপডেট হতে কিছু সময় লাগতে পারে ।</li>
-                  <li>কোনো তথ্য <strong>ভুল থাকলে কলেজ আইটি শাখা থেকে ঠিক করে নিতে হবে।</strong>। </li>
-                  <li>পেমেন্ট নিশ্চিত হলে <strong>ইনভয়েস ডাউনলোড</strong> করে সংরক্ষণ করুন।</li>
-                </ol>
-
-                {% if payment_deadline %}
-                  <div class="alert alert-warning py-2 small mb-3">
-                    <i class="ti ti-alert-triangle me-1"></i>
-                    ডেডলাইন: {{ payment_deadline|date:"d M Y, h:i A" }}
+                <div class="accordion mt-3" id="payFaq">
+                  <div class="accordion-item">
+                    <h2 class="accordion-header" id="q1h">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
+                        পেমেন্ট পেন্ডিং থাকলে কী করব?
+                      </button>
+                    </h2>
+                    <div id="q1" class="accordion-collapse collapse" data-bs-parent="#payFaq">
+                      <div class="accordion-body small">
+                        কলেজে ভর্তি ফর্ম জমা দেওয়ার সময় পেমেন্টের তথ্য সঠিক থাকলে কলেজ কর্তৃপক্ষ পেমেন্টটি অনুমোদন করবে।
+                      </div>
+                    </div>
                   </div>
-                {% endif %}
-
-                {% comment %} <div class="small text-dark">
-                  সহায়তার জন্য যোগাযোগ করুন —
-                  {% if support_phone %}<span class="fw-semibold">{{ support_phone }}</span>{% endif %}
-                  {% if support_email %} {% if support_phone %}|{% endif %} <a href="mailto:{{ support_email }}">{{ support_email }}</a>{% endif %}
-                </div> {% endcomment %}
-              </div>
-
-
-              <!-- FAQ -->
-              <div class="accordion mt-3" id="payFaq">
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="q1h">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
-                      পেমেন্ট পেন্ডিং থাকলে কী করব?
-                    </button>
-                  </h2>
-                  <div id="q1" class="accordion-collapse collapse" data-bs-parent="#payFaq">
-                    <div class="accordion-body small">
-                      কলেজে ভর্তি ফর্ম জমা দেওয়ার সময় পেমেন্টের তথ্য সঠিক থাকলে কলেজ কর্তৃপক্ষ পেমেন্টটি অনুমোদন করবে।
+                  <div class="accordion-item">
+                    <h2 class="accordion-header" id="q2h">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
+                        ইনভয়েস কোথায় পাব?
+                      </button>
+                    </h2>
+                    <div id="q2" class="accordion-collapse collapse" data-bs-parent="#payFaq">
+                      <div class="accordion-body small">
+                        পেমেন্ট সফলভাবে সম্পন্ন হলে “ইনভয়েস ডাউনলোড” বাটন সক্রিয় হবে। সেখান থেকে PDF ডাউনলোড করতে পারবেন।
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="q2h">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
-                      ইনভয়েস কোথায় পাব?
-                    </button>
-                  </h2>
-                  <div id="q2" class="accordion-collapse collapse" data-bs-parent="#payFaq">
-                    <div class="accordion-body small">
-                      পেমেন্ট সফলভাবে সম্পন্ন হলে “ইনভয়েস ডাউনলোড” বাটন সক্রিয় হবে। সেখান থেকে PDF ডাউনলোড করতে পারবেন।
-                    </div>
-                  </div>
-                </div>
-              </div>
 
+              </div>
             </div>
-          </div>
-        {% else %}
-          <div class="alert alert-info mb-0">
-            <i class="ti ti-info-circle me-1"></i>
-            এখনো কোনো এডমিশন ফর্ম পাওয়া যায়নি। প্রথমে এডমিশন ফর্ম পূরণ করুন।
-          </div>
-        {% endif %}
+
+          {% else %}
+            <div class="alert alert-info mb-0">
+              <i class="ti ti-info-circle me-1"></i>
+              এখনো কোনো এডমিশন ফর্ম পাওয়া যায়নি। প্রথমে এডমিশন ফর্ম পূরণ করুন।
+            </div>
+          {% endif %}
+        </div>
       </div>
     </div>
+
+    <!-- ================= DEGREE: Same style & logic ================= -->
+    <div class="col-lg-12 col-md-12">
+      <div class="card h-100 p-0 border-0 shadow-sm rounded-4 mt-3">
+        <div class="card-header bg-white pb-2 d-flex justify-content-between align-items-center rounded-top-4">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge rounded-circle d-inline-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#f1f5ff;">
+              <i class="ti ti-file-invoice fs-5 text-success"></i>
+            </span>
+            <div>
+              <h5 class="card-title mb-0">Degree এডমিশন পেমেন্ট তথ্য</h5>
+              <small class="text-dark">Degree প্রোগ্রামের পেমেন্ট স্ট্যাটাস ও ইনভয়েস</small>
+            </div>
+          </div>
+
+          {% if deg_admission_status %}
+            <span class="badge text-uppercase px-3 py-2 rounded-pill
+              {% if deg_admission_status == 'paid' %} bg-success
+              {% elif deg_admission_status == 'pending' %} bg-warning text-dark
+              {% elif deg_admission_status == 'unpaid' %} bg-danger
+              {% else %} bg-secondary
+              {% endif %}">
+              {% if deg_admission_status == 'paid' %}পেইড
+              {% elif deg_admission_status == 'pending' %}পেন্ডিং
+              {% elif deg_admission_status == 'unpaid' %}আনপেইড
+              {% else %}N/A{% endif %}
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="card-body p-4">
+          {% if deg_admission_group and deg_admission_pk %}
+            <div class="mb-3">
+              <h6 class="mb-1">
+                আপনি ফর্ম পূরণ করেছেন: <strong>Degree ( {{ deg_admission.get_add_admission_group_display|upper }} )</strong>
+              </h6>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-2 mb-4">
+              {% if deg_admission_status == 'paid' and deg_invoice_url %}
+                <a href="{{ deg_invoice_url }}" target="_blank" class="btn btn-success">
+                  <i class="ti ti-download me-1"></i> ইনভয়েস ডাউনলোড করুন
+                </a>
+              {% else %}
+                <button class="btn btn-secondary" disabled>
+                  <i class="ti ti-file-invoice me-1"></i> ইনভয়েস (Pending)
+                </button>
+              {% endif %}
+
+              {% if deg_admission_status == 'unpaid' and deg_pay_url %}
+                <a href="{{ deg_pay_url }}" class="btn btn-primary">
+                  <i class="ti ti-credit-card me-1"></i> এখনই পেমেন্ট করুন
+                </a>
+              {% endif %}
+
+              {% if deg_admission_status == 'pending' and deg_verify_url %}
+                <a href="{{ deg_verify_url }}" class="btn btn-warning text-dark">
+                  <i class="ti ti-zoom-check me-1"></i> পেমেন্ট ভেরিফাই করুন
+                </a>
+              {% endif %}
+
+              {% if support_url %}
+                <a href="{{ support_url }}" class="btn btn-outline-secondary">
+                  <i class="ti ti-headset me-1"></i> সহায়তা সেন্টার
+                </a>
+              {% endif %}
+            </div>
+
+            {% if not deg_admission_paid %}
+              <div class="small text-dark mt-n2 mb-4">
+                <i class="ti ti-info-circle me-1"></i>
+                পেমেন্ট নিশ্চিত হওয়ার পর ইনভয়েস ডাউনলোড অপশন সক্রিয় হবে।
+              </div>
+            {% endif %}
+
+            <div class="row g-3">
+              <div class="col-lg-8">
+                <div class="p-3 rounded-3 border bg-light">
+                  <div class="row g-3">
+                    <div class="col-6">
+                      <div class="small text-dark">সেশন</div>
+                      <div class="fw-semibold">{{ deg_admission.add_session|default:"" }}</div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">স্টুডেন্ট আইডি</div>
+                      <div class="fw-semibold">{{ request.user.id|default:"" }}</div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">এডমিশন ফি</div>
+                      <div class="fw-bold">
+                        ৳ {{ deg_admission.add_amount|default:0 }}
+                        {% if deg_admission_due %}<span class="badge bg-danger-subtle text-danger ms-1">বকেয়া: ৳ {{ deg_admission_due }}</span>{% endif %}
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">পেমেন্ট মেথড</div>
+                      <div class="fw-semibold">{{ deg_admission.get_add_payment_method_display|default:"" }}</div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">ট্রানজ্যাকশন আইডি</div>
+                      <div class="d-flex align-items-center gap-2">
+                        <span id="degTrxText" class="fw-semibold">{{ deg_admission.add_trxid|default:"" }}</span>
+                        {% if deg_admission.add_trxid %}
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="copyDegTrx">
+                          <i class="ti ti-copy"></i>
+                        </button>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">পেমেন্ট সোর্স</div>
+                      <div class="fw-semibold">{{ deg_admission.add_slip|default:"" }}</div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">আবেদন তারিখ</div>
+                      <div class="fw-semibold">{{ deg_admission.created_at|date:"d M Y, h:i A"|default:"" }}</div>
+                    </div>
+                    <div class="col-6">
+                      <div class="small text-dark">সর্বশেষ আপডেট</div>
+                      <div class="fw-semibold">{{ deg_admission.updated_at|date:"d M Y, h:i A"|default:"" }}</div>
+                    </div>
+
+                    {% if deg_admission.add_slip and deg_admission.add_slip.url %}
+                    <div class="col-12">
+                      <a href="{{ deg_admission.add_slip.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                        <i class="ti ti-link me-1"></i> সংযুক্ত স্লিপ/ডকুমেন্ট দেখুন
+                      </a>
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="mt-4">
+                  <div class="small text-dark mb-2">স্ট্যাটাস টাইমলাইন</div>
+                  <ul class="list-unstyled d-flex flex-wrap align-items-center gap-3 mb-0">
+                    <li class="d-flex align-items-center gap-2">
+                      <span class="badge rounded-pill bg-success-subtle text-success"><i class="ti ti-check"></i></span>
+                      <span class="fw-semibold">ফর্ম সাবমিটেড</span>
+                    </li>
+
+                    <li><i class="ti ti-dots"></i></li>
+
+                    <li class="d-flex align-items-center gap-2">
+                      <span class="badge rounded-pill
+                        {% if deg_admission_status == 'pending' or deg_admission_status == 'paid' %}
+                          bg-success-subtle text-success
+                        {% else %}
+                          bg-secondary-subtle text-secondary
+                        {% endif %}">
+                        <i class="ti ti-zoom-check"></i>
+                      </span>
+                      <span class="fw-semibold">রিভিউ</span>
+                    </li>
+
+                    <li><i class="ti ti-dots"></i></li>
+
+                    <li class="d-flex align-items-center gap-2">
+                      <span class="badge rounded-pill
+                        {% if deg_admission_status == 'paid' %}
+                          bg-success
+                        {% elif deg_admission_status == 'pending' %}
+                          bg-warning text-dark
+                        {% else %}
+                          bg-secondary
+                        {% endif %}">
+                        <i class="ti ti-credit-card"></i>
+                      </span>
+                      <span class="fw-semibold">
+                        {% if deg_admission_status == 'paid' %}পেমেন্ট সম্পন্ন & এডমিশন কনফার্ম
+                        {% elif deg_admission_status == 'pending' %}পেমেন্ট যাচাই হচ্ছে
+                        {% else %}পেমেন্ট বাকি{% endif %}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+
+              </div>
+
+              <div class="col-lg-4">
+                <div class="p-3 border rounded-3">
+                  <div class="d-flex align-items-start gap-2 mb-2">
+                    <i class="ti ti-info-circle fs-5 text-primary"></i>
+                    <h6 class="mb-0">Note:</h6>
+                  </div>
+
+                  <ol class="mb-3 ps-3">
+                    <li>পেমেন্টের পর স্ট্যাটাস আপডেট হতে কিছু সময় লাগতে পারে ।</li>
+                    <li>কোনো তথ্য <strong>ভুল থাকলে কলেজ আইটি শাখা থেকে ঠিক করে নিতে হবে।</strong></li>
+                    <li>পেমেন্ট নিশ্চিত হলে <strong>ইনভয়েস ডাউনলোড</strong> করে সংরক্ষণ করুন।</li>
+                  </ol>
+
+                  {% if deg_payment_deadline %}
+                    <div class="alert alert-warning py-2 small mb-3">
+                      <i class="ti ti-alert-triangle me-1"></i>
+                      ডেডলাইন: {{ deg_payment_deadline|date:"d M Y, h:i A" }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="accordion mt-3" id="degPayFaq">
+                  <div class="accordion-item">
+                    <h2 class="accordion-header" id="dq1h">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#dq1">
+                        পেমেন্ট পেন্ডিং থাকলে কী করব?
+                      </button>
+                    </h2>
+                    <div id="dq1" class="accordion-collapse collapse" data-bs-parent="#degPayFaq">
+                      <div class="accordion-body small">
+                        কলেজে ভর্তি ফর্ম জমা দেওয়ার সময় পেমেন্টের তথ্য সঠিক থাকলে কলেজ কর্তৃপক্ষ পেমেন্টটি অনুমোদন করবে।
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header" id="dq2h">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#dq2">
+                        ইনভয়েস কোথায় পাব?
+                      </button>
+                    </h2>
+                    <div id="dq2" class="accordion-collapse collapse" data-bs-parent="#degPayFaq">
+                      <div class="accordion-body small">
+                        পেমেন্ট সফলভাবে সম্পন্ন হলে “ইনভয়েস ডাউনলোড” বাটন সক্রিয় হবে। সেখান থেকে PDF ডাউনলোড করতে পারবেন।
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          {% else %}
+            <div class="alert alert-info mb-0">
+              <i class="ti ti-info-circle me-1"></i>
+              এখনো কোনো ডিগ্রী এডমিশন ফর্ম পাওয়া যায়নি। প্রথমে ডিগ্রী এডমিশন ফর্ম পূরণ করুন।
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
   </div>
 
-</div>
-
-<!-- Small UX helpers -->
-<script>
-  document.addEventListener("DOMContentLoaded", function(){
-    const copyBtn = document.getElementById("copyTrx");
-    if (copyBtn) {
-      copyBtn.addEventListener("click", function(){
-        const text = document.getElementById("trxText")?.innerText?.trim();
-        if (!text) return;
-        navigator.clipboard.writeText(text).then(()=>{
-          copyBtn.innerHTML = '<i class="ti ti-check"></i>';
-          copyBtn.classList.remove('btn-outline-secondary');
-          copyBtn.classList.add('btn-success');
-          setTimeout(()=>{
-            copyBtn.innerHTML = '<i class="ti ti-copy"></i>';
-            copyBtn.classList.remove('btn-success');
-            copyBtn.classList.add('btn-outline-secondary');
-          }, 1500);
+  <script>
+    document.addEventListener("DOMContentLoaded", function(){
+      const copyBtn = document.getElementById("copyTrx");
+      if (copyBtn) {
+        copyBtn.addEventListener("click", function(){
+          const text = document.getElementById("trxText")?.innerText?.trim();
+          if (!text) return;
+          navigator.clipboard.writeText(text).then(()=>{
+            copyBtn.innerHTML = '<i class="ti ti-check"></i>';
+            copyBtn.classList.remove('btn-outline-secondary');
+            copyBtn.classList.add('btn-success');
+            setTimeout(()=>{
+              copyBtn.innerHTML = '<i class="ti ti-copy"></i>';
+              copyBtn.classList.remove('btn-success');
+              copyBtn.classList.add('btn-outline-secondary');
+            }, 1500);
+          });
         });
-      });
-    }
-  });
-</script>
+      }
 
-
+      const copyDegBtn = document.getElementById("copyDegTrx");
+      if (copyDegBtn) {
+        copyDegBtn.addEventListener("click", function(){
+          const text = document.getElementById("degTrxText")?.innerText?.trim();
+          if (!text) return;
+          navigator.clipboard.writeText(text).then(()=>{
+            copyDegBtn.innerHTML = '<i class="ti ti-check"></i>';
+            copyDegBtn.classList.remove('btn-outline-secondary');
+            copyDegBtn.classList.add('btn-success');
+            setTimeout(()=>{
+              copyDegBtn.innerHTML = '<i class="ti ti-copy"></i>';
+              copyDegBtn.classList.remove('btn-success');
+              copyDegBtn.classList.add('btn-outline-secondary');
+            }, 1500);
+          });
+        });
+      }
+    });
+  </script>
 
 {% else %}
+{# ======================= DEFAULT (YOUR CURRENT DASHBOARD) ======================= #}
 
-<!-- Hero -->
-{% comment %} <div class="card page-hero shadow-sm mb-4 rounded-4">
-  <div class="card-body py-3">
-    <h3 class="mb-0 text-primary text-center fw-bold">Welcome to Your Dashboard!</h3>
-  </div>
-</div> {% endcomment %}
-
+<!-- ===== MAIN CONTENT ===== -->
 <div class="row g-4">
-  <!-- Student Info (Redesigned) -->
+  <!-- Student Profile -->
   <div class="col-lg-6">
     <div class="card h-100 border-0 shadow-sm rounded-4">
       <div class="w-100" style="height:6px; background:linear-gradient(90deg,#7367F0,#28C76F,#00CFE8); border-top-left-radius:1rem; border-top-right-radius:1rem;"></div>
@@ -492,30 +806,15 @@
         </div>
 
         <div class="row g-3">
-          {% comment %} <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center p-3 border border-success rounded-3">
-              <div>
-                <div class="text-success small">Student ID: {{ request.user.id }}</div>
-              </div>
-              <span class="badge bg-label-success text-uppercase">Active</span>
-            </div>
-          </div> {% endcomment %}
-
           <div class="col-12">
             <div class="p-3 border border-success rounded-3 position-relative">
-
-
               <div class="row g-3 align-items-center">
-                <!-- Left: Student ID (50%) -->
                 <div class="col-4">
                   <div class="small text-dark">
                     Payment Student ID : <span class="fw-semibold text-success">{{ request.user.id }}</span>
                   </div>
-
                 </div>
-
-                <!-- Right: Class Roll (50%) -->
-                 {% if admission.add_class_roll %}
+                {% if admission.add_class_roll %}
                 <div class="col-3">
                   <div class="small text-dark">Class Roll :
                     <span class="fw-semibold text-success">
@@ -524,7 +823,6 @@
                   </div>
                 </div>
                 {% endif %}
-
                 {% if admission.add_class_id %}
                 <div class="col-5">
                   <div class="small text-dark">
@@ -535,7 +833,6 @@
                   </div>
                 </div>
                 {% endif %}
-
               </div>
             </div>
           </div>
@@ -547,9 +844,6 @@
                   <div class="text-dark small mb-1">Phone</div>
                   <div class="fw-semibold">{{ request.user.phone_number|default:"Not provided" }}</div>
                 </div>
-                {% comment %} <a href="tel:{{ request.user.phone_number }}" class="btn btn-sm btn-primary {% if not request.user.phone_number %}disabled{% endif %}">
-                  <i class="ti ti-phone-call me-1"></i> Call
-                </a> {% endcomment %}
               </div>
             </div>
           </div>
@@ -558,33 +852,11 @@
           <div class="col-12">
             <div class="p-3 border rounded-3 bg-white">
               <div class="text-dark small mb-1">Student Name: </div>
-              <div class="d-flex justify-content-between align-items-center">
-                <div class="fw-semibold truncate-70">{{admission.add_name|default:""}}</div>
-                {% comment %} <a href="mailto:{{ request.user.email }}" class="btn btn-sm btn-outline-secondary {% if not request.user.email %}disabled{% endif %}">
-                  <i class="ti ti-mail me-1"></i> Email
-                </a> {% endcomment %}
-              </div>
+              <div class="fw-semibold truncate-70">{{admission.add_name|default:""}}</div>
             </div>
           </div>
           {% endif %}
         </div>
-
-        <div class="mt-4 d-flex flex-wrap gap-2">
-          {% comment %} <a href="{% url 'hsc_admission_create' %}" class="btn btn-success">
-            <i class="ti ti-edit me-1"></i> ফর্ম পূরণ করুন
-          </a> {% endcomment %}
-
-          {% comment %} {% if admission_pk %}
-            <a href="{% url 'hsc_admission_view' pk=admission_pk %}" class="btn btn-outline-secondary">
-              <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
-            </a>
-          {% else %}
-            <button class="btn btn-outline-secondary" disabled>
-              <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
-            </button>
-          {% endif %} {% endcomment %}
-        </div>
-
 
         <div class="mt-3 small text-dark">
           🔒 কোন তথ‍্য ভুল থাকলে কলেজ আইটি শাখা থেকে ঠিক করে নিতে হবে।
@@ -593,96 +865,72 @@
     </div>
   </div>
 
-  <!-- Your Admission -->
-<div class="col-lg-6">
-  <div class="card h-100 p-0 border-0 shadow-sm rounded-4">
-    <div class="card-header bg-white pb-2 d-flex justify-content-between align-items-center rounded-top-4">
-      <h5 class="card-title mb-0">আপনার ভর্তি তথ‍্য</h5>
+  <!-- Admission Info (HSC + Degree in one card) -->
+  <div class="col-lg-6">
+    <div class="card h-100 p-0 border-0 shadow-sm rounded-4">
+      <div class="card-header bg-white pb-2 d-flex justify-content-between align-items-center rounded-top-4">
+        <h5 class="card-title mb-0">আপনার ভর্তি তথ‍্য</h5>
+      </div>
 
-      {% if admission_status %}
-        <span class="badge text-uppercase
-          {% if admission_status == 'paid' %} bg-success
-          {% elif admission_status == 'pending' %} bg-warning text-dark
-          {% elif admission_status == 'unpaid' %} bg-danger
-          {% else %} bg-secondary
-          {% endif %}">
-          {% if admission_status == 'paid' %}PAID
-          {% elif admission_status == 'pending' %}PENDING
-          {% elif admission_status == 'unpaid' %}UNPAID
-          {% else %}N/A{% endif %}
-        </span>
-      {% endif %}
-    </div>
+      <div class="card-body p-4">
 
-    <div class="card-body p-4">
-      {% if admission_group and admission_pk %}
-        <h6 class="mb-2">
-          আপনি ফর্ম পূরণ করেছেন: HSC <strong>{{ admission.get_add_admission_group_display }}</strong> গ্রুপ
-        </h6>
-
-        <div class="d-flex flex-wrap gap-2 mt-2">
-          {% if admission_pk %}
+        <!-- HSC Admission Info -->
+        <h6 class="mb-2 text-primary">HSC Admission</h6>
+        {% if admission_group and admission_pk %}
+          <div class="d-flex flex-wrap gap-2 mb-3">
             <a href="{% url 'hsc_admission_view' pk=admission_pk %}" class="btn btn-success">
               <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
             </a>
-          {% else %}
-            <button class="btn btn-secondary" disabled>
-              <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
-            </button>
-          {% endif %}
-
-          {% if admission_paid and invoice_url %}
-            <a href="{{ invoice_url }}" class="btn btn-success">
-              <i class="ti ti-file-invoice me-1"></i> Invoice
-            </a>
-          {% else %}
-            <button class="btn btn-secondary" disabled>
-              <i class="ti ti-file-invoice me-1"></i> Invoice (Pending)
-            </button>
-          {% endif %}
-        </div>
-
-        {% if not admission_paid %}
-          <div class="small text-dark mt-2">
-            পেমেন্ট নিশ্চিতকরণের পরে ইনভয়েস পাওয়া যাবে।
+            {% if admission_paid and invoice_url %}
+              <a href="{{ invoice_url }}" class="btn btn-success">
+                <i class="ti ti-file-invoice me-1"></i> Invoice
+              </a>
+            {% else %}
+              <button class="btn btn-secondary" disabled>
+                <i class="ti ti-file-invoice me-1"></i> Invoice (Pending)
+              </button>
+            {% endif %}
           </div>
+          {% if not admission_paid %}
+            <div class="small text-dark mb-4">পেমেন্ট নিশ্চিতকরণের পরে ইনভয়েস পাওয়া যাবে।</div>
+          {% endif %}
+        {% else %}
+          <div class="alert alert-info mb-4">আপনি এখনো কোনো HSC ফর্ম পূরণ করেননি</div>
         {% endif %}
 
-        <!-- সুন্দরভাবে সাজানো নির্দেশনা ব্লক -->
-        <div class="mt-4">
-          <div class="p-3 p-sm-4 border rounded-3 bg-light position-relative" style="border-left-width:.6rem; border-left-color: var(--bs-primary, #0d6efd);">
-            {% comment %} <div class="d-flex align-items-start gap-2 mb-2">
-              <i class="ti ti-clipboard-text fs-5 text-primary"></i>
-              <h6 class="mb-0">ভর্তি সংক্রান্ত নির্দেশনা</h6>
-            </div> {% endcomment %}
-
-            <p class="mb-3 lh-lg">
-              উপরের ফর্ম প্রিন্ট করে ভর্তি নির্দেশনা অনুযায়ী কলেজে জমা দিন। সকল তথ্য সঠিক থাকলে কলেজ
-              অ্যাডমিন কর্তৃক অনুমোদন করা হবে। ফর্ম কলেজে জমা দেওয়ার সময় ক্লাস রোল প্রদান করা হবে।
-              পরবর্তীতে আপনি চাইলে ড্যাশবোর্ডে লগইন করে ইনভয়েস ও অন্যান্য তথ্য দেখতে পারবেন।
-            </p>
-
-            {% comment %} <ul class="mb-0 ps-3">
-              <li class="mb-1">ফর্ম প্রিন্ট করে স্বাক্ষরসহ নির্ধারিত সময়ে কলেজে জমা দিন।</li>
-              <li class="mb-1">তথ্য যাচাই সঠিক হলে কলেজ অ্যাডমিন অনুমোদন করবেন।</li>
-              <li class="mb-1">জমা দেওয়ার সময় আপনার <strong>ক্লাস রোল</strong> প্রদান করা হবে।</li>
-              <li class="mb-1">পরবর্তীতে <strong>ড্যাশবোর্ডে</strong> লগইন করে ইনভয়েস, পেমেন্ট স্ট্যাটাস ও অন্যান্য তথ্য দেখা যাবে।</li>
-            </ul> {% endcomment %}
+        <!-- Degree Admission Info -->
+        <h6 class="mb-2 text-success">Degree Admission</h6>
+        {% if deg_admission_group and deg_admission_pk %}
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <a href="{% url 'degree_admission_view' pk=deg_admission_pk %}" class="btn btn-success">
+              <i class="ti ti-id me-1"></i> ফর্ম প্রিন্ট এবং ডাউনলোড
+            </a>
+            {% if deg_admission_paid and deg_invoice_url %}
+              <a href="{{ deg_invoice_url }}" class="btn btn-success">
+                <i class="ti ti-file-invoice me-1"></i> Invoice
+              </a>
+            {% else %}
+              <button class="btn btn-secondary" disabled>
+                <i class="ti ti-file-invoice me-1"></i> Invoice (Pending)
+              </button>
+            {% endif %}
           </div>
-        </div>
+          {% if not deg_admission_paid %}
+            <div class="small text-dark">পেমেন্ট নিশ্চিতকরণের পরে ইনভয়েস পাওয়া যাবে।</div>
+          {% endif %}
+        {% else %}
+          <div class="alert alert-info mb-0">আপনি এখনো কোনো ডিগ্রী ফর্ম পূরণ করেননি</div>
+        {% endif %}
 
-      {% else %}
-        <div class="alert alert-info mb-0" role="alert">
-          <strong>আপনি এখনো কোনো ফর্ম পূরণ করেননি</strong>
-        </div>
-      {% endif %}
+      </div>
     </div>
   </div>
 </div>
 
-
-  <!-- HSC Admission Notice -->
-  <div class="col-12">
+<!-- ===== Two-Column Notices (HSC + Degree) ===== -->
+<div class="row g-4 mt-1">
+  <!-- HSC Admission Notice (UNCHANGED TEXT) -->
+  <div class="col-12 col-md-6">
     <div class="card border-0 shadow-sm rounded-4">
       <div class="card-header bg-transparent pt-3 pb-0">
         {% comment %} <h4 class="card-title mb-2">একাদশ শ্রেণির ভর্তি নির্দেশিকা :</h4> {% endcomment %}
@@ -691,8 +939,6 @@
       </div>
 
       <div class="card-body">
-        <!-- Status / Callout -->
-
         {% if not admission_pk %}
         <div class="alert alert-warning d-flex align-items-start gap-3 border-2 border-warning rounded-3"
             role="alert" style="border-left-width:.5rem;">
@@ -719,79 +965,7 @@
             </div>
           </div>
         </div>
-      {% endif %}
-
-
-
-      {% comment %} ১.নবাবগঞ্জ সিটি কলেজের ওয়েব লিংক থেকে অনলাইন পোর্টালে এ প্রবেশ করুন।
-      ২. আবেদন লিংকে ক্লিক করে অ‍্যাকাউন্ট তৈরি  করে ফরম পূরণ করুন। {% endcomment %}
-      {% comment %} ৩. ভর্তি ফি :৩০০০/- রকেট বিলার আইডি 4132 এ পরিশোধ করুন।
-      ৪. ডাউনলোড করে প্রিন্ট কপির সাথে নিম্ন লিখিত কাগজসহ  অফিসে  জমা দিন। {% endcomment %}
-
-      {% comment %} ৫. প্রিন্ট কপি জমার তারিখ:৭ থেকে ১৪ সেপ্টেম্বর ২০২৫ খ্রি.
-      .ক) এস.এস.সি/সমমানের মূল নম্বরপত্র ও মূল প্রশংসাপত্র।
-      খ) এস.এস.সি/সমমানের মূল নম্বরপত্র ও মূল প্রশংসাপত্রের ফটোকপি ১ টি।
-      গ)রেজিস্ট্রেশন কার্ড ও এ্যাডমিট কার্ডের ফটোকপি ১টি।
-      ঘ) ছাত্র/ছাত্রীর জন্ম সনদের ফটোকপি ১টি।
-      ঙ)শিক্ষার্থীর ছবি:  ২ কপি (পাসপোর্ট সাইজ)।
-      চ)পিতা ও মাতার জাতীয় পরিচয় পত্রের ফটোকপি ১টি । {% endcomment %}
-       
-
-
-      {% comment %} <div class="mb-2">
-        <ul class="list-group list-group-flush rounded-3 overflow-hidden">
-          <li class="list-group-item d-flex align-items-start">
-            <span class="badge bg-label-primary me-2">১.</span>
-            নবাবগঞ্জ সিটি কলেজের ওয়েব লিংক থেকে
-            <span class="fw-semibold mx-1">অনলাইন পোর্টালে</span> এ প্রবেশ করুন।
-          </li>
-          <li class="list-group-item d-flex align-items-start">
-            <span class="badge bg-label-primary me-2">২.</span>
-            আবেদন লিংকে ক্লিক করে অ‍্যাকাউন্ট তৈরি করে ফর্ম পূরণ করুন।
-          </li>
-          <li class="list-group-item d-flex align-items-start">
-            <span class="badge bg-label-primary me-2">৩.</span>
-            ভর্তি ফি : ৩০০০/- রকেট বিলার আইডি 4132 এ পরিশোধ করুন।
-          </li>
-          <li class="list-group-item d-flex align-items-start">
-            <span class="badge bg-label-primary me-2">৪.</span>
-            ডাউনলোড করে প্রিন্ট কপির সাথে নিম্ন লিখিত কাগজসহ অফিসে জমা দিন।
-          </li>
-          <li class="list-group-item d-flex align-items-start">
-            <span class="badge bg-label-primary me-2">৫.</span>
-            প্রিন্ট কপি জমার তারিখ:
-            <span class="fw-semibold">৭ থেকে ১৪ সেপ্টেম্বর ২০২৫ খ্রি.</span>
-          </li>
-
-          <h4 class="card-title mt-5">প্রয়োজনীয় কাগজপত্র:</h4>
-          <!-- Extra items -->
-          <li class="list-group-item d-flex align-items-start">
-            <span class="badge bg-label-secondary me-2">ক)</span>
-            এস.এস.সি/সমমানের মূল নম্বরপত্র ও মূল প্রশংসাপত্র।
-          </li>
-          <li class="list-group-item d-flex align-items-start">
-            <span class="badge bg-label-secondary me-2">খ)</span>
-            এস.এস.সি/সমমানের মূল নম্বরপত্র ও মূল প্রশংসাপত্রের ফটোকপি ১টি।
-          </li>
-          <li class="list-group-item d-flex align-items-start">
-            <span class="badge bg-label-secondary me-2">গ)</span>
-            রেজিস্ট্রেশন কার্ড ও এ্যাডমিট কার্ডের ফটোকপি ১টি।
-          </li>
-          <li class="list-group-item d-flex align-items-start">
-            <span class="badge bg-label-secondary me-2">ঘ)</span>
-            ছাত্র/ছাত্রীর জন্ম সনদের ফটোকপি ১টি।
-          </li>
-          <li class="list-group-item d-flex align-items-start">
-            <span class="badge bg-label-secondary me-2">ঙ)</span>
-            শিক্ষার্থীর ছবি: ২ কপি (পাসপোর্ট সাইজ)।
-          </li>
-          <li class="list-group-item d-flex align-items-start">
-            <span class="badge bg-label-secondary me-2">চ)</span>
-            পিতা ও মাতার জাতীয় পরিচয়পত্রের ফটোকপি ১টি।
-          </li>
-        </ul>
-      </div> {% endcomment %}
-
+        {% endif %}
 
         <div class="mb-2">
           <div class="kicker text-dark mb-2">এইচ. এস. সি ভর্তির আবেদন ফরমের সাথে যেসব কাগজপত্র জমা দিতে হবে:</div>
@@ -829,14 +1003,90 @@
 
         <div class="small text-dark mt-3">
           ℹ️ সকল কাগজপত্রে তথ্য মিল আছে কি না একবার যাচাই করে নেবেন। প্রিন্ট কপি সিগনেচার করে জমা দিন।
-          {% comment %} <p><span class="text-danger">*</span> সকল কাগজপত্রে তথ্য মিল আছে কি না একবার যাচাই করে নেবেন। প্রিন্ট কপি সিগনেচার করে জমা দিন।
-          <br> &nbsp;&nbsp;&nbsp;নবাবগঞ্জ সিটি কলেজের ওয়েবসাইট লিংক: <a href="https://nawabganjcitycollege.edu.bd/" target="_blank" rel="noopener noreferrer">https://nawabganjcitycollege.edu.bd/</a> </p> {% endcomment %}
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Degree Admission Notice (show alert+links only if NO degree form yet) -->
+  <div class="col-12 col-md-6">
+    <div class="card border-0 shadow-sm rounded-4 h-100">
+      <div class="card-header bg-transparent pt-3 pb-0">
+        <h4 class="card-title mb-2">ডিগ্রী ভর্তি নির্দেশনা</h4>
+      </div>
+
+      <div class="card-body">
+
+        {% if not deg_admission_pk %}
+        <div class="alert alert-info d-flex align-items-start gap-3 border-2 border-info rounded-3"
+            role="alert" style="border-left-width:.5rem;">
+          <div class="fs-3 lh-1">🎓</div>
+          <div>
+            <div class="fw-semibold mb-1">আপনার প্রোগ্রাম অনুযায়ী ফর্ম পূরণ করুন</div>
+            <div class="small text-dark">
+              অনলাইন ফর্ম সাবমিটের পর প্রিন্ট কপি প্রয়োজনীয় কাগজপত্রসহ কলেজে জমা দিন।
+            </div>
+
+            <div class="mt-3 d-flex flex-wrap gap-2">
+              <a href="{% url 'ba_admission_create' %}" class="btn btn-sm btn-primary">
+                <i class="ti ti-edit me-1"></i> BA ফর্ম পূরণ করুন
+              </a>
+              <a href="{% url 'bss_admission_create' %}" class="btn btn-sm btn-primary">
+                <i class="ti ti-edit me-1"></i> BSS ফর্ম পূরণ করুন
+              </a>
+              <a href="{% url 'bsc_admission_create' %}" class="btn btn-sm btn-primary">
+                <i class="ti ti-edit me-1"></i> BSC ফর্ম পূরণ করুন
+              </a>
+              {% comment %} <a href="{% url 'bbs_admission_create' %}" class="btn btn-sm btn-primary">
+                <i class="ti ti-edit me-1"></i> BBS ফর্ম পূরণ করুন
+              </a> {% endcomment %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="mb-2">
+          <div class="kicker text-dark mb-2">ডিগ্রী আবেদনের সাথে যেসব কাগজপত্র জমা দিতে হবে:</div>
+          <ul class="list-group list-group-flush rounded-3 overflow-hidden">
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">১.</span>
+              কলেজের অনলাইন পোর্টালে পূরণকৃত <span class="fw-semibold ms-1">প্রিন্টেড আবেদন কপি আনতে হবে</span>।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">২.</span>
+              এইচ.এস.সি/সমমানের <span class="fw-semibold ms-1">মূল নম্বরপত্র ও মূল প্রশংসাপত্র</span>।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">৩.</span>
+              ⁠এস.এস.সি/সমমানের <span class="fw-semibold ms-1"> মূল নম্বরপত্রের ফটোকপি</span>।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">৪.</span>
+              <span class="fw-semibold">রেজিস্ট্রেশন কার্ড ও এডমিট কার্ডের </span>&nbsp;ফটোকপি ১টি করে।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">৫.</span>
+              ছাত্র/ছাত্রীর <span class="fw-semibold ms-1">জন্ম সনদের ফটোকপি ১টি</span>।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">৬.</span>
+              <span class="fw-semibold">পাসপোর্ট সাইজের ২ কপি ছবি</span>।
+            </li>
+            <li class="list-group-item d-flex align-items-start">
+              <span class="badge bg-label-primary me-2">৭.</span>
+              পিতা ও মাতার <span class="fw-semibold ms-1">জাতীয় পরিচয়পত্রের ফটোকপি ১টি করে।</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="small text-dark mt-3">
+          ℹ️ সকল তথ্য যাচাই করে প্রিন্ট কপি সিগনেচার করে জমা দিন।
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+<!-- ===== /Two-Column Notices ===== -->
 
 <!-- Footer callouts -->
 <div class="col-12 mt-4">
@@ -847,5 +1097,8 @@
     </div>
   </div>
 </div>
+
 {% endif %}
+{# ======================= MODE SWITCH END ======================= #}
+
 {% endblock %}
