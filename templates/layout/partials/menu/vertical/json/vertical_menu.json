@@ -67,14 +67,14 @@
         "slug": "marks",
         "submenu": [
           {
-            "url": "exam2",
+            "url": "admit_front",
             "name": "Admit Card (Front)",
-            "slug": "exam2"
+            "slug": "admit_front"
           },
           {
-            "url": "exam3",
+            "url": "admit_back",
             "name": "Admit Card (Back)",
-            "slug": "exam3"
+            "slug": "admit_back"
           }
           ]
         },

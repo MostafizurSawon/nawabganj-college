@@ -1228,23 +1228,33 @@ class AdmissionBbsCreateView(DegreeSingleApplicationGuardMixin, FormView):
 
 # Fee Section
 
-from django.db.models import Q
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .forms import FeeForm
+
+from decimal import Decimal
+
+from django.db.models import (
+    OuterRef, Subquery, Sum, Value, IntegerField, DecimalField, Q, F, Case, When, CharField
+)
+from django.db.models.functions import Coalesce
+from django.utils.decorators import method_decorator
+from django.views.generic import ListView
+
+from .forms import FeeForm
+from .models import Fee, HscAdmissions, DegreeAdmission, Session, Programs, Group
 
 @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
 class FeeListView(ListView):
     template_name = 'admissions/fee_list.html'
     model = Fee
     context_object_name = 'fees'
-    paginate_by = 25  # 👈 enable pagination
+    paginate_by = 25
 
     def get_queryset(self):
         queryset = super().get_queryset()
 
-
-        # Filters from GET
+        # ===== Filters from GET =====
         session = self.request.GET.get('session')
         program = self.request.GET.get('program')
         group = self.request.GET.get('group')
@@ -1262,7 +1272,128 @@ class FeeListView(ListView):
                 Q(fee_group__group_name__icontains=search)
             )
 
-        return queryset.order_by('-id')
+        # ========= Degree detection (case-insensitive) =========
+        is_degree = Q(fee_program__pro_name__iexact='Degree')
+
+        # ========= Degree mapping: deg_prog_name = group value (Ba/Bss/Bbs/Bsc) =========
+        # __iexact matching ব্যবহার করব, তাই কেসিং মিসম্যাচ ইস্যু থাকবে না
+        queryset = queryset.annotate(
+            deg_prog_name=F('fee_group__group_name')
+        )
+
+        # ===== HSC subqueries (Session + Program + Group) =====
+        hsc_paid_sq = (
+            HscAdmissions.objects
+            .filter(
+                add_session=OuterRef('fee_session'),
+                add_program=OuterRef('fee_program'),
+                add_admission_group=OuterRef('fee_group__group_name'),
+                add_payment_status='paid',
+            )
+            .values('add_session')
+            .annotate(total=Sum('add_amount'))
+            .values('total')[:1]
+        )
+
+        hsc_due_sq = (
+            HscAdmissions.objects
+            .filter(
+                add_session=OuterRef('fee_session'),
+                add_program=OuterRef('fee_program'),
+                add_admission_group=OuterRef('fee_group__group_name'),
+                add_payment_status__in=['pending', 'unpaid'],
+            )
+            .values('add_session')
+            .annotate(total=Sum('add_amount'))
+            .values('total')[:1]
+        )
+
+        hsc_all_sq = (
+            HscAdmissions.objects
+            .filter(
+                add_session=OuterRef('fee_session'),
+                add_program=OuterRef('fee_program'),
+                add_admission_group=OuterRef('fee_group__group_name'),
+            )
+            .values('add_session')
+            .annotate(total=Sum('add_amount'))
+            .values('total')[:1]
+        )
+
+        # ===== Degree subqueries (Session + Program(deg_name) + Group) =====
+        # add_program__deg_name __iexact = deg_prog_name (Ba/Bss/Bbs/Bsc)
+        deg_paid_sq = (
+            DegreeAdmission.objects
+            .filter(
+                add_session=OuterRef('fee_session'),
+                add_admission_group=OuterRef('fee_group__group_name'),
+                add_program__deg_name__iexact=OuterRef('deg_prog_name'),
+                add_payment_status='paid',
+            )
+            .values('add_session', 'add_program')
+            .annotate(total=Sum('add_amount'))
+            .values('total')[:1]
+        )
+
+        deg_due_sq = (
+            DegreeAdmission.objects
+            .filter(
+                add_session=OuterRef('fee_session'),
+                add_admission_group=OuterRef('fee_group__group_name'),
+                add_program__deg_name__iexact=OuterRef('deg_prog_name'),
+                add_payment_status__in=['pending', 'unpaid'],
+            )
+            .values('add_session', 'add_program')
+            .annotate(total=Sum('add_amount'))
+            .values('total')[:1]
+        )
+
+        deg_all_sq = (
+            DegreeAdmission.objects
+            .filter(
+                add_session=OuterRef('fee_session'),
+                add_admission_group=OuterRef('fee_group__group_name'),
+                add_program__deg_name__iexact=OuterRef('deg_prog_name'),
+            )
+            .values('add_session', 'add_program')
+            .annotate(total=Sum('add_amount'))
+            .values('total')[:1]
+        )
+
+        # Money field: Decimal রাখলাম—HSC int হলেও safe conversion হবে
+        money_field = DecimalField(max_digits=14, decimal_places=2)
+
+        queryset = (
+            queryset
+            .annotate(
+                # Paid
+                paid_total_raw=Case(
+                    When(is_degree, then=Subquery(deg_paid_sq, output_field=money_field)),
+                    default=Subquery(hsc_paid_sq, output_field=money_field),
+                    output_field=money_field,
+                ),
+                # Due
+                due_total_raw=Case(
+                    When(is_degree, then=Subquery(deg_due_sq, output_field=money_field)),
+                    default=Subquery(hsc_due_sq, output_field=money_field),
+                    output_field=money_field,
+                ),
+                # Total (Expected)
+                total_expected_raw=Case(
+                    When(is_degree, then=Subquery(deg_all_sq, output_field=money_field)),
+                    default=Subquery(hsc_all_sq, output_field=money_field),
+                    output_field=money_field,
+                ),
+            )
+            .annotate(
+                paid_total=Coalesce(F('paid_total_raw'), Value(Decimal('0.00'))),
+                due_total=Coalesce(F('due_total_raw'), Value(Decimal('0.00'))),
+                total_expected=Coalesce(F('total_expected_raw'), Value(Decimal('0.00'))),
+            )
+            .order_by('-id')
+        )
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1283,6 +1414,57 @@ class FeeListView(ListView):
         context['selected_group'] = self.request.GET.get('group', '')
 
         return context
+
+# @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
+# class FeeListView(ListView):
+#     template_name = 'admissions/fee_list.html'
+#     model = Fee
+#     context_object_name = 'fees'
+#     paginate_by = 25  # 👈 enable pagination
+
+#     def get_queryset(self):
+#         queryset = super().get_queryset()
+
+
+#         # Filters from GET
+#         session = self.request.GET.get('session')
+#         program = self.request.GET.get('program')
+#         group = self.request.GET.get('group')
+#         search = self.request.GET.get('search')
+
+#         if session:
+#             queryset = queryset.filter(fee_session_id=session)
+#         if program:
+#             queryset = queryset.filter(fee_program_id=program)
+#         if group:
+#             queryset = queryset.filter(fee_group_id=group)
+#         if search:
+#             queryset = queryset.filter(
+#                 Q(fee_program__pro_name__icontains=search) |
+#                 Q(fee_group__group_name__icontains=search)
+#             )
+
+#         return queryset.order_by('-id')
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context = TemplateLayout.init(self, context)
+#         context["layout"] = "vertical"
+#         context["layout_path"] = TemplateHelper.set_layout("layout_vertical.html", context)
+#         context["form"] = FeeForm()
+
+#         # For filters
+#         context['sessions'] = Session.objects.all()
+#         context['programs'] = Programs.objects.all()
+#         context['groups'] = Group.objects.all()
+
+#         # For repopulating filter fields
+#         context['search'] = self.request.GET.get('search', '')
+#         context['selected_session'] = self.request.GET.get('session', '')
+#         context['selected_program'] = self.request.GET.get('program', '')
+#         context['selected_group'] = self.request.GET.get('group', '')
+
+#         return context
 
 
 from django.db import IntegrityError

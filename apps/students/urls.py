@@ -68,6 +68,11 @@ urlpatterns = [
     ),
 
 
+    # Admit card
+    path('exam/<int:exam_id>/admit-front/', views.AdmitCardFrontView.as_view(), name='admit_card_front'),
+    path('exam/<int:exam_id>/admit-back/', views.AdmitCardBackView.as_view(), name='admit_card_back'),
+
+
 
 
     # bulk pdf admission form

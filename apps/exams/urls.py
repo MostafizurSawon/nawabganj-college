@@ -49,7 +49,7 @@ urlpatterns = [
     # path('subjects/delete/<int:pk>/', views.DeleteSubjectView.as_view(), name='subject_delete'),
 
     path('exam/create/', views.ExamCreateView.as_view(), name='exam_create'),
-    path('exams/exam/edit/<int:pk>/', views.ExamEditView.as_view(), name='exam_edit'), 
+    path('exams/exam/edit/<int:pk>/', views.ExamEditView.as_view(), name='exam_edit'),
     path('exam/delete/<int:pk>/', views.ExamDeleteView.as_view(), name='exam_delete'),
 
     path('get-subjects-by-class/<int:class_id>/', views.get_subjects_by_class, name='get_subjects_by_class'),
@@ -62,20 +62,20 @@ urlpatterns = [
 
 
 
-    # # sob mark dea 
+    # # sob mark dea
     path('exams/', views.ExamListView.as_view(), name='exam_list'),
     path('exam-list/marks/', views.ExamListView.as_view(extra_context={'mode': 'marks'}), name='exam_list_marks'),
     # path('exam-list/tabulation/', views.ExamListView.as_view(extra_context={'mode': 'tabulation'}), name='tabulation_list'),
-    # path('exam-list/admit-front/', views.ExamListView.as_view(extra_context={'mode': 'sadmit_front'}), name='admit_front'),
-    # path('exam-list/admit-back/', views.ExamListView.as_view(extra_context={'mode': 'sadmit_back'}), name='admit_back'),
+    path('exam-list/admit-front/', views.ExamListView.as_view(extra_context={'mode': 'sadmit_front'}), name='admit_front'),
+    path('exam-list/admit-back/', views.ExamListView.as_view(extra_context={'mode': 'sadmit_back'}), name='admit_back'),
     # # seatplan
     # path('exam-list/seatplan/', views.ExamListView.as_view(extra_context={'mode': 'seatplan'}), name='seatplan'),
 
     # path("exam/<int:exam_id>/seatplan/", views.ExamSeatPlanView.as_view(), name="exam_seat_plan"),
 
     # # Admit card
-    # path('exam/<int:exam_id>/admit-front/', views.AdmitCardFrontView.as_view(), name='admit_card_front'),
-    # path('exam/<int:exam_id>/admit-back/', views.AdmitCardBackView.as_view(), name='admit_card_back'),
+    path('exam/<int:exam_id>/admit-front/', views.AdmitCardFrontView.as_view(), name='admit_card_front'),
+    path('exam/<int:exam_id>/admit-back/', views.AdmitCardBackView.as_view(), name='admit_card_back'),
 
     # # Admit card backside description input
     # path('admit-back/', views.AdmitBackView.as_view(), name='admit_back_page'),

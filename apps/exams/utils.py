@@ -1,33 +1,41 @@
-# apps/exams/utils.py
 from apps.admissions.models import HscAdmissions
+import re
 
+# UI → DB mapping
 GROUP_MAP = {
     'science': 'science',
-    'humanities': 'arts',       
-    'business': 'commerce',      
+    'humanities': 'arts',     # UI 'Humanities' → DB 'arts'
+    'business': 'commerce',   # UI 'Business'   → DB 'commerce'
 }
+
+def _canon(s: str) -> str:
+    return (s or "").strip().lower()
+
 
 def get_hsc_admissions_for_exam(exam):
     """
-    Exam.exam_class (Programs), Exam.exam_session (Session), Exam.group_name → 
-    মিলিয়ে HscAdmissions queryset রিটার্ন করবে।
+    Exam.exam_class (Programs FK), Exam.exam_session (Session FK), Exam.group_name মিলিয়ে
+    HscAdmissions queryset রিটার্ন করবে।
     """
+    if not getattr(exam, "exam_class_id", None) or not getattr(exam, "exam_session_id", None):
+        return HscAdmissions.objects.none()
+
     qs = HscAdmissions.objects.filter(
-        add_program=exam.exam_class,
-        add_session=exam.exam_session,
+        add_program=exam.exam_class,     # exact FK match
+        add_session=exam.exam_session,   # exact FK match
     )
 
-    grp = (exam.group_name or '').strip().lower()
-    if grp in GROUP_MAP:
-        qs = qs.filter(add_admission_group=GROUP_MAP[grp])
+    grp_in = _canon(getattr(exam, "group_name", None))
+    grp = GROUP_MAP.get(grp_in)
+    if grp:
+        qs = qs.filter(add_admission_group=grp)
 
-    return qs
-
-
-
+    return qs.distinct()
 
 
-import re
+# ==============================
+# Subject matching helpers
+# ==============================
 
 def _extract_code_tokens(text: str):
     """
@@ -37,8 +45,10 @@ def _extract_code_tokens(text: str):
         return set()
     return set(re.findall(r"\d+", str(text)))
 
+
 def _norm(s: str):
     return (s or "").strip().lower()
+
 
 def student_allowed_exam_subject_ids(exam, hsc_student, exam_subjects):
     """
@@ -53,25 +63,26 @@ def student_allowed_exam_subject_ids(exam, hsc_student, exam_subjects):
         if obj:
             adm_subs.append(obj)
 
-    # 2) ছাত্র‑side code/name সেট বানাই
-    stu_code_tokens = set()
-    stu_names = set()
+    # 2) ছাত্র-side সেট বানাই
+    stu_code_tokens, stu_names, stu_codes_exact = set(), set(), set()
     for s in adm_subs:
-        stu_code_tokens |= _extract_code_tokens(s.code)
-        stu_names.add(_norm(getattr(s, "sub_name", None)))  # admissions.Subjects.sub_name
+        if getattr(s, "code", None):
+            stu_code_tokens |= _extract_code_tokens(s.code)
+            stu_codes_exact.add(_norm(s.code))
+        stu_names.add(_norm(getattr(s, "sub_name", None)))
 
-    # 3) exam‑side subjects ফিল্টার
+    # 3) exam-side subjects ফিল্টার
     allowed = set()
     for es in exam_subjects:
-        code_match = False
-        if es.code:
-            es_tokens = _extract_code_tokens(es.code)  # exams.Subject.code
-            if es_tokens & stu_code_tokens:
-                code_match = True
+        exact_code_match = bool(getattr(es, "code", None) and _norm(es.code) in stu_codes_exact)
 
-        name_match = _norm(es.name) in stu_names  # fallback by name
+        token_match = False
+        if getattr(es, "code", None):
+            token_match = bool(_extract_code_tokens(es.code) & stu_code_tokens)
 
-        if code_match or name_match:
+        name_match = _norm(getattr(es, "name", None)) in stu_names
+
+        if exact_code_match or token_match or name_match:
             allowed.add(es.id)
 
     return allowed

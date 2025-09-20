@@ -1,0 +1,613 @@
+[
+  {
+    "model": "exams.subject",
+    "pk": 1,
+    "fields": {
+      "name": "Bangla 1st Paper",
+      "code": "101",
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 2,
+    "fields": {
+      "name": "Bangla 2nd Paper",
+      "code": "102",
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 3,
+    "fields": {
+      "name": "English 1st Paper",
+      "code": "107",
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 4,
+    "fields": {
+      "name": "English 2nd Paper",
+      "code": "108",
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 5,
+    "fields": {
+      "name": "Information & Technology",
+      "code": "275",
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 6,
+    "fields": {
+      "name": "Accounting 1st Paper",
+      "code": null,
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 7,
+    "fields": {
+      "name": "Accounting 2nd Paper",
+      "code": null,
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 8,
+    "fields": {
+      "name": "Production Management & Marketing 1st Paper",
+      "code": null,
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 9,
+    "fields": {
+      "name": "Production Management & Marketing 2nd Paper",
+      "code": null,
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 10,
+    "fields": {
+      "name": "Business Organization & Management 1st Paper",
+      "code": null,
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 11,
+    "fields": {
+      "name": "Business Organization & Management 2nd Paper",
+      "code": null,
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 12,
+    "fields": {
+      "name": "Statistics 1st Paper",
+      "code": "129",
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 13,
+    "fields": {
+      "name": "Statistics 2nd Paper",
+      "code": "130",
+      "group_name": "all",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 14,
+    "fields": {
+      "name": "Physics 1st Paper",
+      "code": "174",
+      "group_name": "science",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 15,
+    "fields": {
+      "name": "Physics 2nd Paper",
+      "code": "175",
+      "group_name": "science",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 16,
+    "fields": {
+      "name": "Chemistry 1st Paper",
+      "code": "176",
+      "group_name": "science",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 17,
+    "fields": {
+      "name": "Chemistry 2nd Paper",
+      "code": "177",
+      "group_name": "science",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 18,
+    "fields": {
+      "name": "Higher Math 1st Paper",
+      "code": "265",
+      "group_name": "science",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 19,
+    "fields": {
+      "name": "Higher Math 2nd Paper",
+      "code": "266",
+      "group_name": "science",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 20,
+    "fields": {
+      "name": "Biology 1st Paper",
+      "code": "178",
+      "group_name": "science",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 21,
+    "fields": {
+      "name": "Biology 2nd Paper",
+      "code": "179",
+      "group_name": "science",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 22,
+    "fields": {
+      "name": "Agriculture 1st Paper",
+      "code": null,
+      "group_name": "science",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 23,
+    "fields": {
+      "name": "Agriculture 2nd Paper",
+      "code": null,
+      "group_name": "science",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 24,
+    "fields": {
+      "name": "Economics 1st Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 25,
+    "fields": {
+      "name": "Economics 2nd Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 26,
+    "fields": {
+      "name": "Sociology 1st Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 27,
+    "fields": {
+      "name": "Sociology 2nd Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 28,
+    "fields": {
+      "name": "Social Work 1st Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 29,
+    "fields": {
+      "name": "Social Work 2nd Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 30,
+    "fields": {
+      "name": "Civics and Good Governance 1st Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 31,
+    "fields": {
+      "name": "Civics and Good Governance 2nd Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 32,
+    "fields": {
+      "name": "History 1st Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 33,
+    "fields": {
+      "name": "History 2nd Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 34,
+    "fields": {
+      "name": "Geography 1st Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 35,
+    "fields": {
+      "name": "Geography 2nd Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 36,
+    "fields": {
+      "name": "Islamic History & Culture 1st Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 37,
+    "fields": {
+      "name": "Islamic History & Culture 2nd Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 38,
+    "fields": {
+      "name": "Logic 1st Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 39,
+    "fields": {
+      "name": "Logic 2nd Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 40,
+    "fields": {
+      "name": "Psychology 1st Paper",
+      "code": "123",
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 41,
+    "fields": {
+      "name": "Psychology 2nd Paper",
+      "code": "124",
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 42,
+    "fields": {
+      "name": "Arabic 1st Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 43,
+    "fields": {
+      "name": "Arabic 2nd Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 44,
+    "fields": {
+      "name": "Islamic Studies 1st Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 45,
+    "fields": {
+      "name": "Islamic Studies 2nd Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 46,
+    "fields": {
+      "name": "Home Science 1st Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "exams.subject",
+    "pk": 47,
+    "fields": {
+      "name": "Home Science 2nd Paper",
+      "code": null,
+      "group_name": "humanities",
+      "status": "active",
+      "program": [
+        1
+      ]
+    }
+  }
+]

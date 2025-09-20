@@ -13,7 +13,7 @@ from django.utils.decorators import method_decorator
 from web_project import TemplateLayout, TemplateHelper
 
 # @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
- 
+
 # Create your views here.
 @method_decorator(role_required(['master_admin', 'admin', 'sub_admin', 'teacher']), name='dispatch')
 class TableView(TemplateView):
@@ -62,7 +62,7 @@ class SubjectDashboardView(TemplateView):
         if form.is_valid():
             subject = form.save(commit=False)
             subject.save()
-            form.save_m2m()  
+            form.save_m2m()
 
             request.session["msg"] = "Subject updated successfully!" if edit_id else "Subject added successfully!"
             return redirect("subject_list")
@@ -88,23 +88,137 @@ class SubjectDashboardView(TemplateView):
 
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import View
-from django.utils.decorators import method_decorator
+# from django.shortcuts import render, redirect, get_object_or_404
+# from django.views.generic import View
+# from django.utils.decorators import method_decorator
+# from django.contrib import messages
+# from django.core.paginator import Paginator
+# from django.db.models import Q
+
+# from .models import Exam, Subject
+# from apps.admissions.models import Session
+from .forms import ExamForm
+
+
+# from .models import ExamRecord, SubjectMark
+
+# from .utils import get_hsc_admissions_for_exam
+
+
+# @method_decorator(role_required(['master_admin', 'admin', 'sub_admin']), name='dispatch')
+# class ExamCreateView(View):
+#     template_name = 'exam/exam_form.html'
+
+#     def _get_active_session_id(self, request):
+#         """session থেকে active_session_id পড়বে; না থাকলে None."""
+#         return request.session.get('active_session_id')
+
+#     def get_filtered_paginated_exams(self, request):
+#         search_query = request.GET.get('search', '').strip()
+#         class_filter = request.GET.get('class_filter', '').strip()   # exam_class (Programs.id)
+#         session_filter = request.GET.get('session_filter', '').strip()
+#         group_filter = request.GET.get('group_filter', '').strip()
+
+#         exams = (
+#             Exam.objects
+#             .select_related('exam_session', 'exam_class')
+#             .prefetch_related('subjects')
+#             .order_by('-id')
+#         )
+
+#         # Session filter: explicit > active_session
+#         if session_filter:
+#             exams = exams.filter(exam_session_id=session_filter)
+#         else:
+#             active_sid = self._get_active_session_id(request)
+#             if active_sid:
+#                 exams = exams.filter(exam_session_id=active_sid)
+
+#         if class_filter:
+#             exams = exams.filter(exam_class_id=class_filter)
+
+#         if group_filter:
+#             exams = exams.filter(group_name=group_filter)
+
+#         if search_query:
+#             exams = exams.filter(
+#                 Q(exam_name__icontains=search_query) |
+#                 Q(subjects__name__icontains=search_query) |
+#                 Q(exam_session__ses_name__icontains=search_query) |
+#                 Q(exam_class__pro_name__icontains=search_query)
+#             ).distinct()
+
+#         paginator = Paginator(exams, 10)
+#         page_number = request.GET.get('page')
+#         page_obj = paginator.get_page(page_number)
+#         return page_obj, search_query, class_filter, session_filter, group_filter
+
+#     def get(self, request):
+#         context = TemplateLayout.init(self, {})
+
+#         # Form initial: active session -> exam_session
+#         active_sid = self._get_active_session_id(request)
+#         context['form'] = ExamForm(initial={'exam_session': active_sid}) if active_sid else ExamForm()
+
+#         page_obj, search_query, class_filter, session_filter, group_filter = self.get_filtered_paginated_exams(request)
+
+#         context.update({
+#             'page_obj': page_obj,
+#             'search_query': search_query,
+#             'class_filter': class_filter,
+#             'session_filter': session_filter,
+#             'group_filter': group_filter,
+#             'classes': Programs.objects.filter(pro_status='active').order_by('pro_name'),
+#             'sessions': Session.objects.all().order_by('-id'),
+#         })
+#         return render(request, self.template_name, context)
+
+#     def post(self, request):
+#         form = ExamForm(request.POST)
+#         page_obj, search_query, class_filter, session_filter, group_filter = self.get_filtered_paginated_exams(request)
+
+#         if form.is_valid():
+#             exam = form.save()
+
+#             try:
+#                 # signals চলার ফলে এখন records/marks তৈরি হয়ে গেছে
+#                 student_count = exam.records.count()
+#                 subject_count = exam.subjects.count()
+#                 mark_count = SubjectMark.objects.filter(exam_record__exam=exam).count()
+
+#                 messages.success(
+#                     request,
+#                     f"✅ Exam created: “{exam.exam_name}”. "
+#                     f"Students: {student_count} | Subjects: {subject_count} | Marks rows: {mark_count}"
+#                 )
+#             except Exception as e:
+#                 messages.warning(request, f"Exam saved but summary failed: {e}")
+
+#             return redirect('exam_create')
+
+#         context = TemplateLayout.init(self, {})
+#         context.update({
+#             'form': form,
+#             'page_obj': page_obj,
+#             'search_query': search_query,
+#             'class_filter': class_filter,
+#             'session_filter': session_filter,
+#             'group_filter': group_filter,
+#             'classes': Programs.objects.filter(pro_status='active').order_by('pro_name'),
+#             'sessions': Session.objects.all().order_by('-id'),
+#         })
+#         return render(request, self.template_name, context)
+
+
+from django.views import View
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
 
-from .models import Exam, Subject        
-from apps.admissions.models import Session
-from .forms import ExamForm
-
-
-
+from .models import Exam, Programs, Session, ExamSubject, SubjectMark
 from .utils import get_hsc_admissions_for_exam
 
-
-@method_decorator(role_required(['master_admin', 'admin', 'sub_admin']), name='dispatch')
 class ExamCreateView(View):
     template_name = 'exam/exam_form.html'
 
@@ -114,7 +228,7 @@ class ExamCreateView(View):
 
     def get_filtered_paginated_exams(self, request):
         search_query = request.GET.get('search', '').strip()
-        class_filter = request.GET.get('class_filter', '').strip()   # exam_class (Programs.id)
+        class_filter = request.GET.get('class_filter', '').strip()
         session_filter = request.GET.get('session_filter', '').strip()
         group_filter = request.GET.get('group_filter', '').strip()
 
@@ -152,40 +266,20 @@ class ExamCreateView(View):
         page_obj = paginator.get_page(page_number)
         return page_obj, search_query, class_filter, session_filter, group_filter
 
+    def _base_context(self, request, extra=None):
+        """TemplateLayout সহ কমন context বানায় (layout_path সহ)।"""
+        ctx = TemplateLayout.init(self, {})  # ✅ layout_path সেট হবে
+        if extra:
+            ctx.update(extra)
+        return ctx
+
     def get(self, request):
-        context = TemplateLayout.init(self, {})
-
-        # Form initial: active session -> exam_session
         active_sid = self._get_active_session_id(request)
-        context['form'] = ExamForm(initial={'exam_session': active_sid}) if active_sid else ExamForm()
+        form = ExamForm(initial={'exam_session': active_sid}) if active_sid else ExamForm()
 
         page_obj, search_query, class_filter, session_filter, group_filter = self.get_filtered_paginated_exams(request)
 
-        context.update({
-            'page_obj': page_obj,
-            'search_query': search_query,
-            'class_filter': class_filter,
-            'session_filter': session_filter,
-            'group_filter': group_filter,
-            'classes': Programs.objects.filter(pro_status='active').order_by('pro_name'),  
-            'sessions': Session.objects.all().order_by('-id'),                              
-        })
-        return render(request, self.template_name, context)
-
-    def post(self, request):
-        form = ExamForm(request.POST)
-        page_obj, search_query, class_filter, session_filter, group_filter = self.get_filtered_paginated_exams(request)
-
-        if form.is_valid():
-            exam = form.save()              
-            matched = get_hsc_admissions_for_exam(exam).count()
-            messages.success(request, f"✅ Exam created. Matched HSC students: {matched}")
-            return redirect('exam_create')
-        else:
-            messages.error(request, "❌ Failed to create Exam. Please check the form.")
-
-        context = TemplateLayout.init(self, {})
-        context.update({
+        context = self._base_context(request, {
             'form': form,
             'page_obj': page_obj,
             'search_query': search_query,
@@ -197,8 +291,54 @@ class ExamCreateView(View):
         })
         return render(request, self.template_name, context)
 
+    def post(self, request):
+        form = ExamForm(request.POST)
+        page_obj, search_query, class_filter, session_filter, group_filter = self.get_filtered_paginated_exams(request)
 
+        if form.is_valid():
+            exam = form.save()
 
+            # === sync ExamSubject from posted checkboxes ===
+            selected_ids = set(map(int, request.POST.getlist("subjects")))
+            existing_ids = set(ExamSubject.objects.filter(exam=exam).values_list("subject_id", flat=True))
+
+            to_add = selected_ids - existing_ids
+            to_del = existing_ids - selected_ids
+
+            if to_add:
+                ExamSubject.objects.bulk_create(
+                    [ExamSubject(exam=exam, subject_id=sid) for sid in to_add],
+                    ignore_conflicts=True
+                )
+
+            if to_del:
+                ExamSubject.objects.filter(exam=exam, subject_id__in=to_del).delete()
+
+            # === success message (signals চলার পরে সারাংশ) ===
+            student_count = exam.records.count()
+            subject_count = exam.subjects.count()
+            mark_count = SubjectMark.objects.filter(exam_record__exam=exam).count()
+
+            messages.success(
+                request,
+                f"✅ Exam created: “{exam.exam_name}”. "
+                f"Students: {student_count} | Subjects: {subject_count} | Marks: {mark_count}"
+            )
+            return redirect('exam_create')
+
+        # invalid form → TemplateLayout সহ context
+        messages.error(request, "❌ Failed to create Exam. Please check the form.")
+        context = self._base_context(request, {
+            'form': form,
+            'page_obj': page_obj,
+            'search_query': search_query,
+            'class_filter': class_filter,
+            'session_filter': session_filter,
+            'group_filter': group_filter,
+            'classes': Programs.objects.filter(pro_status='active').order_by('pro_name'),
+            'sessions': Session.objects.all().order_by('-id'),
+        })
+        return render(request, self.template_name, context)
 
 # Exam Edit view
 
@@ -265,7 +405,7 @@ from django.views.decorators.http import require_POST
 #         exam = get_object_or_404(Exam, pk=pk)
 #         exam.delete()
 #         messages.success(request, "🗑️ Exam deleted successfully.")
-#     return redirect('exam_create')  
+#     return redirect('exam_create')
 
 
 
@@ -616,7 +756,7 @@ class MarkEntryView(TemplateView):
     #         .select_related('exam_record__hsc_student')   # HscAdmissions FK ধরে
     #         .order_by('exam_record__hsc_student__add_name')
     #     )
-    
+
     def _marks_queryset(self, exam, subject):
         """
         শুধুই সেই SubjectMark যেগুলো signal দিয়ে তৈরী হয়েছে
@@ -625,7 +765,7 @@ class MarkEntryView(TemplateView):
         return (
             SubjectMark.objects
             .filter(subject=subject, exam_record__exam=exam)
-            .select_related('exam_record__hsc_student')   
+            .select_related('exam_record__hsc_student')
             .order_by('exam_record__hsc_student__add_class_roll', 'exam_record__hsc_student__add_name')
         )
 
@@ -757,7 +897,7 @@ class MarkEntryView(TemplateView):
 
 
 
-# # New method grade and gpa calculate from model 
+# # New method grade and gpa calculate from model
 # from decimal import Decimal, ROUND_HALF_UP
 # from collections import defaultdict
 
@@ -1146,7 +1286,7 @@ class MarkEntryView(TemplateView):
 # from django.contrib.contenttypes.models import ContentType
 
 # from apps.admissions.models import Admissions, NineAdmissions
-# from .models import Exam, ExamRecord, SubjectMark, ExamSubject, GradingScheme  
+# from .models import Exam, ExamRecord, SubjectMark, ExamSubject, GradingScheme
 
 # @method_decorator(role_required(['master_admin', 'admin', 'sub_admin']), name='dispatch')
 # class ExamTabulationView(TemplateView):
@@ -1203,154 +1343,154 @@ class MarkEntryView(TemplateView):
 
 
 # # Admit card
-# from django.views.generic import TemplateView
-# from .models import Exam, ExamRecord
+from django.views.generic import TemplateView
+from .models import Exam, ExamRecord
 
-# @method_decorator(role_required(['master_admin', 'admin', 'sub_admin']), name='dispatch')
-# class AdmitCardFrontView(TemplateView):
-#     template_name = "exam/admit_card_front.html"  # default: class 6–8
+@method_decorator(role_required(['master_admin', 'admin', 'sub_admin']), name='dispatch')
+class AdmitCardFrontView(TemplateView):
+    template_name = "exam/admit_card_front.html"  # default: class 6–8
 
-#     def get_template_names(self):
-#         exam = get_object_or_404(Exam, id=self.kwargs.get("exam_id"))
-#         cls = (exam.exam_class.name or "").strip().lower()
-#         is_68 = any(k in cls for k in ["6","six","7","seven","8","eight"])
-#         return ["exam/admit_card_front.html"] if is_68 else ["exam/admit_card_front_nine.html"]
+    def get_template_names(self):
+        exam = get_object_or_404(Exam, id=self.kwargs.get("exam_id"))
+        cls = (exam.exam_class.name or "").strip().lower()
+        is_68 = any(k in cls for k in ["6","six","7","seven","8","eight"])
+        return ["exam/admit_card_front.html"] if is_68 else ["exam/admit_card_front_nine.html"]
 
-#     def get_context_data(self, **kwargs):
-#         from types import SimpleNamespace
+    def get_context_data(self, **kwargs):
+        from types import SimpleNamespace
 
-#         context = super().get_context_data(**kwargs)
-#         exam_id = self.kwargs.get("exam_id")
-#         exam = get_object_or_404(Exam, id=exam_id)
+        context = super().get_context_data(**kwargs)
+        exam_id = self.kwargs.get("exam_id")
+        exam = get_object_or_404(Exam, id=exam_id)
 
-#         # সব রেকর্ড
-#         students = (
-#             ExamRecord.objects
-#             .filter(exam=exam)
-#             .select_related("exam", "student_content_type")
-#             .order_by("id")
-#         )
+        # সব রেকর্ড
+        students = (
+            ExamRecord.objects
+            .filter(exam=exam)
+            .select_related("exam", "student_content_type")
+            .order_by("id")
+        )
 
-#         # সব সাবজেক্ট (অর্ডার গুরুত্বপূর্ণ)
-#         exam_subjects = (
-#             ExamSubject.objects
-#             .filter(exam=exam)
-#             .select_related("subject")
-#             .order_by("id")
-#         )
-#         subjects = [es.subject for es in exam_subjects]
+        # সব সাবজেক্ট (অর্ডার গুরুত্বপূর্ণ)
+        exam_subjects = (
+            ExamSubject.objects
+            .filter(exam=exam)
+            .select_related("subject")
+            .order_by("id")
+        )
+        subjects = [es.subject for es in exam_subjects]
 
-#         # এই পেজটা 6–8 নাকি 9/10?
-#         cls = (exam.exam_class.name or "").strip().lower()
-#         is_68 = any(k in cls for k in ["6","six","7","seven","8","eight"])
+        # এই পেজটা 6–8 নাকি 9/10?
+        cls = (exam.exam_class.name or "").strip().lower()
+        is_68 = any(k in cls for k in ["6","six","7","seven","8","eight"])
 
-#         # ————— Helpers —————
-#         def norm(s):
-#             return (s or "").strip().lower()
+        # ————— Helpers —————
+        def norm(s):
+            return (s or "").strip().lower()
 
-#         # ৯/১০ সায়েন্স/কমন ফিক্সড নামগুলো (লোয়ারকেস ভ্যারিয়েন্টসহ)
-#         FIXED_NAMES = {
-#             # Bangla & English (1st/2nd as separate rows in admit card)
-#             "bangla 1st paper", "bangla 2nd paper",
-#             "english 1st paper", "english 2nd paper",
-#             # Core/common
-#             "mathematics",
-#             "bangladesh and global studies", "bangladesh & global studies", "bgs",
-#             "ict", "information and communication technology",
-#             "religion", "islam", "islamic studies", "hinduism", "buddhism", "christian studies",
-#             # Science cores
-#             "physics", "chemistry",
-#         }
+        # ৯/১০ সায়েন্স/কমন ফিক্সড নামগুলো (লোয়ারকেস ভ্যারিয়েন্টসহ)
+        FIXED_NAMES = {
+            # Bangla & English (1st/2nd as separate rows in admit card)
+            "bangla 1st paper", "bangla 2nd paper",
+            "english 1st paper", "english 2nd paper",
+            # Core/common
+            "mathematics",
+            "bangladesh and global studies", "bangladesh & global studies", "bgs",
+            "ict", "information and communication technology",
+            "religion", "islam", "islamic studies", "hinduism", "buddhism", "christian studies",
+            # Science cores
+            "physics", "chemistry",
+        }
 
-#         # padding এর জন্য হালকা dict
-#         def blank_row():
-#             return {"code": "", "name": ""}
+        # padding এর জন্য হালকা dict
+        def blank_row():
+            return {"code": "", "name": ""}
 
-#         # ————— Build per-student subject table —————
-#         for rec in students:
-#             if is_68:
-#                 # আগের মতো dynamic split (per-record attach)
-#                 half = (len(subjects) + 1) // 2
-#                 left_subjects = subjects[:half]
-#                 right_subjects = subjects[half:]
-#             else:
-#                 # 9/10: Fixed + Main + Fourth (unique, in exam order)
-#                 sel = []
+        # ————— Build per-student subject table —————
+        for rec in students:
+            if is_68:
+                # আগের মতো dynamic split (per-record attach)
+                half = (len(subjects) + 1) // 2
+                left_subjects = subjects[:half]
+                right_subjects = subjects[half:]
+            else:
+                # 9/10: Fixed + Main + Fourth (unique, in exam order)
+                sel = []
 
-#                 # map: normalized name -> subject object(s) keeping order
-#                 # (একই নামে ডুপ্লিকেট সাবজেক্ট সাধারণত নেই; থাকলে প্রথমটাই নেবে)
-#                 for s in subjects:
-#                     nm = norm(getattr(s, "name", ""))
-#                     if nm in FIXED_NAMES:
-#                         sel.append(s)
+                # map: normalized name -> subject object(s) keeping order
+                # (একই নামে ডুপ্লিকেট সাবজেক্ট সাধারণত নেই; থাকলে প্রথমটাই নেবে)
+                for s in subjects:
+                    nm = norm(getattr(s, "name", ""))
+                    if nm in FIXED_NAMES:
+                        sel.append(s)
 
-#                 # main / fourth detect from admission
-#                 try:
-#                     main_name = norm(getattr(getattr(rec.student, "main_subject", None), "sub_name", ""))
-#                 except Exception:
-#                     main_name = ""
-#                 try:
-#                     fourth_name = norm(getattr(getattr(rec.student, "fourth_subject", None), "sub_name", ""))
-#                 except Exception:
-#                     fourth_name = ""
+                # main / fourth detect from admission
+                try:
+                    main_name = norm(getattr(getattr(rec.student, "main_subject", None), "sub_name", ""))
+                except Exception:
+                    main_name = ""
+                try:
+                    fourth_name = norm(getattr(getattr(rec.student, "fourth_subject", None), "sub_name", ""))
+                except Exception:
+                    fourth_name = ""
 
-#                 def find_by_name(name_norm):
-#                     if not name_norm:
-#                         return None
-#                     for s in subjects:
-#                         if norm(getattr(s, "name", "")) == name_norm:
-#                             return s
-#                     return None
+                def find_by_name(name_norm):
+                    if not name_norm:
+                        return None
+                    for s in subjects:
+                        if norm(getattr(s, "name", "")) == name_norm:
+                            return s
+                    return None
 
-#                 main_subj = find_by_name(main_name)
-#                 fourth_subj = find_by_name(fourth_name)
+                main_subj = find_by_name(main_name)
+                fourth_subj = find_by_name(fourth_name)
 
-#                 # de-duplicate while preserving order
-#                 def add_unique(item_list, s):
-#                     if not s:
-#                         return
-#                     for x in item_list:
-#                         if getattr(x, "id", None) == getattr(s, "id", None):
-#                             return
-#                     item_list.append(s)
+                # de-duplicate while preserving order
+                def add_unique(item_list, s):
+                    if not s:
+                        return
+                    for x in item_list:
+                        if getattr(x, "id", None) == getattr(s, "id", None):
+                            return
+                    item_list.append(s)
 
-#                 add_unique(sel, main_subj)
-#                 add_unique(sel, fourth_subj)
+                add_unique(sel, main_subj)
+                add_unique(sel, fourth_subj)
 
-#                 # normalize to exactly 12 rows
-#                 sel = sel[:12]
-#                 if len(sel) < 12:
-#                     sel = sel + [blank_row() for _ in range(12 - len(sel))]
+                # normalize to exactly 12 rows
+                sel = sel[:12]
+                if len(sel) < 12:
+                    sel = sel + [blank_row() for _ in range(12 - len(sel))]
 
-#                 left_subjects = sel[:6]
-#                 right_subjects = sel[6:12]
+                left_subjects = sel[:6]
+                right_subjects = sel[6:12]
 
-#             # টেমপ্লেটে সরাসরি rec.left_subjects/right_subjects ব্যবহার করবো
-#             rec.left_subjects = left_subjects
-#             rec.right_subjects = right_subjects
+            # টেমপ্লেটে সরাসরি rec.left_subjects/right_subjects ব্যবহার করবো
+            rec.left_subjects = left_subjects
+            rec.right_subjects = right_subjects
 
-#         context.update({
-#             "exam": exam,
-#             "students": students,
-#         })
-#         return TemplateLayout.init(self, context)
-
-
+        context.update({
+            "exam": exam,
+            "students": students,
+        })
+        return TemplateLayout.init(self, context)
 
 
 
-# @method_decorator(role_required(['master_admin', 'admin', 'sub_admin']), name='dispatch')
-# class AdmitCardBackView(TemplateView):
-#     template_name = "exam/admit_card_back.html"
 
-#     def get_context_data(self, **kwargs):
-#         ctx = TemplateLayout.init(self, super().get_context_data(**kwargs))
-#         exam_id = self.kwargs.get("exam_id")
-#         exam = get_object_or_404(Exam, id=exam_id)
-#         ctx.update({
-#             "exam": exam,
-#         })
-#         return ctx
+
+@method_decorator(role_required(['master_admin', 'admin', 'sub_admin']), name='dispatch')
+class AdmitCardBackView(TemplateView):
+    template_name = "exam/admit_card_back.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        exam_id = self.kwargs.get("exam_id")
+        exam = get_object_or_404(Exam, id=exam_id)
+        ctx.update({
+            "exam": exam,
+        })
+        return ctx
 
 
 
@@ -1701,7 +1841,7 @@ class SeatplanStudentsView(TemplateView):
         })
         return ctx
 
-    
+
 
     def post(self, request, *args, **kwargs):
         active_session_id = request.session.get("active_session_id")

@@ -17,6 +17,8 @@ from .models import (
 
 from .models import Exam, ExamSubject, ExamRecord, SubjectMark
 
+admin.site.register(ExamSubject)
+
 class ExamSubjectInline(admin.TabularInline):
     model = ExamSubject
     extra = 1

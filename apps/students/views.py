@@ -1126,6 +1126,254 @@ def admission_pdf_preview(request):
 
 
 
+# Admit card section
+
+from django.views.generic import TemplateView
+from django.template.loader import render_to_string
+
+class AdmitCardFrontView(TemplateView):
+    template_name = "exam/admit_card_front.html"  # default: class 6–8
+
+    # ---------- small helpers ----------
+    @staticmethod
+    def _norm(s):
+        return (s or "").strip().lower()
+
+    @staticmethod
+    def _roll_of(rec):
+        """Return numeric roll; invalid/missing -> very large so goes to bottom."""
+        try:
+            return int(getattr(rec.student, 'add_class_roll', None) or 10**9)
+        except (TypeError, ValueError):
+            return 10**9
+
+    @staticmethod
+    def _sec_of(rec):
+        try:
+            return (getattr(rec.student, 'add_class_section', '') or '').strip().lower()
+        except Exception:
+            return ''
+
+    def get_template_names(self):
+        exam = get_object_or_404(Exam, id=self.kwargs.get("exam_id"))
+        cls = self._norm(getattr(exam.exam_class, "name", ""))
+        is_68 = any(k in cls for k in ["6","six","7","seven","8","eight"])
+        return ["exam/admit_card_front.html"] if is_68 else ["exam/admit_card_front_nine.html"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Inputs
+        exam_id = self.kwargs.get("exam_id")
+        exam = get_object_or_404(Exam, id=exam_id)
+
+        # read section from query (?section=a/b/c)
+        section = self._norm(self.request.GET.get('section') or '')
+
+        # -------- Base students (all records of this exam) --------
+        students_qs = (
+            ExamRecord.objects
+            .filter(exam=exam)
+            .select_related("exam", "student_content_type")
+            .order_by("id")
+        )
+        students = list(students_qs)
+
+        # -------- Section filter (if provided) --------
+        if section:
+            students = [r for r in students if self._sec_of(r) == section]
+
+        # -------- Sort by roll ASC, then name --------
+        students.sort(
+            key=lambda r: (
+                self._roll_of(r),
+                self._norm(getattr(r.student, 'add_name', '')) if r.student else ''
+            )
+        )
+
+        # -------- Subjects collection (order matters) --------
+        exam_subjects = (
+            ExamSubject.objects
+            .filter(exam=exam)
+            .select_related("subject")
+            .order_by("subject__id")   # ✅ subject id অনুযায়ী অর্ডার
+        )
+        subjects = [es.subject for es in exam_subjects]
+
+
+                # -------- Which template flow: 6–8 vs 9/10 --------
+        cls = self._norm(getattr(exam.exam_class, "name", ""))
+        is_68 = any(k in cls for k in ["6","six","7","seven","8","eight"])
+
+        def norm(s):
+            return (s or "").strip().lower()
+
+        # --- Common core for 9/10 (BGS intentionally EXCLUDED here) ---
+        CORE_COMMON_910 = {
+            "bangla 1st paper", "bangla 2nd paper",
+            "english 1st paper", "english 2nd paper",
+            "mathematics",
+            "ict", "information and communication technology",
+            "religion", "islam", "islamic studies", "hinduism", "buddhism", "christian studies",
+        }
+
+        # --- Group-specific for 9/10 ---
+        GROUP_FIXED_910 = {
+            # science: add BGS + core science subjects that are NOT main/fourth for everyone
+            "science": {
+                "physics", "chemistry",
+                "bangladesh and global studies", "bangladesh & global studies", "bgs",
+            },
+            # business studies: add commerce trio + General Science
+            "business studies": {
+                "accounting",
+                "business entrepreneurship", "entrepreneurship",  # alias
+                "finance and banking", "finance & banking",       # alias
+                "science", "general science",
+            },
+            # humanities: civics/citizenship, history, geography, economics + General Science
+            "humanities": {
+                "history", "history of bangladesh and world civilization",
+                "civics", "civics and citizenship", "civics & citizenship",
+                "geography", "geography and environment", "geography & environment",
+                "economics",
+                "science", "general science",
+            },
+        }
+
+        subjects = [es.subject for es in exam_subjects]
+        print("Subjects order:", [(s.id, s.name) for s in subjects])
+
+        def blank_row():
+            return {"code": "", "name": ""}
+
+        def find_by_name(name_norm):
+            if not name_norm:
+                return None
+            for s in subjects:
+                if norm(getattr(s, "name", "")) == name_norm:
+                    return s
+            return None
+
+        def add_unique(lst, s):
+            if not s:
+                return
+            sid = getattr(s, "id", None)
+            if sid is None:
+                return
+            for x in lst:
+                if getattr(x, "id", None) == sid:
+                    return
+            lst.append(s)
+
+        # -------- Build per-student subject table --------
+        grp = norm(getattr(getattr(exam, "group", None), "group_name", ""))  # 'science' / 'business studies' / 'humanities'
+        fixed_set_910 = CORE_COMMON_910 | GROUP_FIXED_910.get(grp, set())
+
+        for rec in students:
+            if is_68:
+                # dynamic split equally across two columns
+                half = (len(subjects) + 1) // 2
+                left_subjects = subjects[:half]
+                right_subjects = subjects[half:]
+            else:
+                # 9/10: core(common, no BGS) + group-fixed + main + fourth
+                sel = []
+
+                # 1) take core+group fixed in the exam's subject order
+                for s in subjects:
+                    if norm(getattr(s, "name", "")) in fixed_set_910:
+                        add_unique(sel, s)
+
+                # 2) then student's main/fourth
+                try:
+                    main_name = norm(getattr(getattr(rec.student, "main_subject", None), "sub_name", ""))
+                except Exception:
+                    main_name = ""
+                try:
+                    fourth_name = norm(getattr(getattr(rec.student, "fourth_subject", None), "sub_name", ""))
+                except Exception:
+                    fourth_name = ""
+
+                add_unique(sel, find_by_name(main_name))
+                add_unique(sel, find_by_name(fourth_name))
+
+                # 3) normalize to exactly 12 rows (keep exam order priority)
+                sel = sel[:12]
+                if len(sel) < 12:
+                    sel += [blank_row() for _ in range(12 - len(sel))]
+
+                left_subjects  = sel[:6]
+                right_subjects = sel[6:12]
+
+            rec.left_subjects = left_subjects
+            rec.right_subjects = right_subjects
+
+
+        # Optionally prepare a pretty label for section
+        SECTION_LABELS = {"a": "A", "b": "B", "c": "C"}
+        section_label = SECTION_LABELS.get(section, section.upper() if section else "")
+
+        context.update({
+            "exam": exam,
+            "students": students,         # ✅ already filtered by section & sorted by roll ASC
+            "section": section,           # raw key (a/b/c)
+            "section_label": section_label,  # pretty label for badge/header
+        })
+        return TemplateLayout.init(self, context)
+
+
+
+
+
+# @method_decorator(admin_role_required, name='dispatch')
+# class AdmitCardBackView(TemplateView):
+#     template_name = "exam/admit_card_back.html"
+
+#     def get_context_data(self, **kwargs):
+#         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
+#         exam_id = self.kwargs.get("exam_id")
+#         exam = get_object_or_404(Exam, id=exam_id)
+
+#         students = (
+#             ExamRecord.objects
+#             .filter(exam=exam)
+#             .select_related("exam", "student_content_type")  # ← এখানেও একই কারণ
+#             .order_by("id")
+#         )
+
+#         context.update({
+#             "exam": exam,
+#             "students": students,
+#         })
+#         return context
+
+class AdmitCardBackView(TemplateView):
+    template_name = "exam/admit_card_back.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = TemplateLayout.init(self, super().get_context_data(**kwargs))
+        exam_id = self.kwargs.get("exam_id")
+        exam = get_object_or_404(Exam, id=exam_id)
+        ctx.update({
+            "exam": exam,
+            # যদি admit.admit_card আলাদা সোর্সে থাকে, এখানে যোগ করুন:
+            # "admit": admit_obj,
+        })
+        return ctx
+
+
+
+
+
+
+
+
+
+
+
+
+
 # invoice view
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponseForbidden

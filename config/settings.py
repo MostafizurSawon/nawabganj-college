@@ -66,7 +66,8 @@ INSTALLED_APPS = [
     "apps.finances",
     "apps.admissions",
     "apps.students",
-    "apps.exams",
+    # "apps.exams",
+    'apps.exams.apps.ExamsConfig',
     "apps.teachers",
     "apps.accounts",
 ]
